@@ -1,0 +1,46 @@
+spring:
+  jpa:
+    # JPA sql 쿼리 로그 출력
+#    show-sql: true
+#    properties.hibernate.format_sql: true
+    hibernate:
+      ddl-auto: create
+      use-new-id-generator-mappings: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+
+  profiles:
+    active: db
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
+
+  data:
+    web:
+      pageable:
+        one-indexed-parameters: true
+
+  output:
+    ansi:
+      enabled: always
+
+server:
+  error:
+    include-stacktrace: on_param
+    include-exception: true
+  servlet:
+    session:
+      tracking-modes: cookie
+
+# JPA sql 로그에 바인딩 된 파라미터 출력
+#logging.level.org.hibernate:
+#  SQL: debug
+#  type:
+#    descriptor:
+#      sql: trace
