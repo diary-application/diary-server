@@ -14,12 +14,14 @@ data class CommentResponse(
     var writer: UserSimpleResponse,
     var content: String,
     var hasChild: Boolean,
+    var layer: Int
 ) {
     constructor(comment: Comment): this(
         id = comment.id,
         writer = UserSimpleResponse(comment.writer),
         content = comment.content,
-        hasChild = comment.children.size != 0
+        hasChild = comment.children.size != 0,
+        layer = comment.layer
     )
 }
 

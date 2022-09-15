@@ -4,6 +4,11 @@ import diary.capstone.user.User
 import diary.capstone.util.BaseTimeEntity
 import javax.persistence.*
 
+// 공개 범위 const
+const val SHOW_ALL = "all"
+const val SHOW_FOLLOWERS = "follower"
+const val SHOW_ME = "me"
+
 @Entity
 class Feed(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,8 +27,8 @@ class Feed(
     @OneToMany(mappedBy = "feed", cascade = [CascadeType.ALL], orphanRemoval = true)
     var likes: MutableList<FeedLike> = mutableListOf(),
 
-    // TODO 공개 범위에 따른 피드 노출 설정
-    var showScope: String = "all"
+    // 피드 공개 범위
+    var showScope: String
 
 ): BaseTimeEntity() {
     fun update(
@@ -42,9 +47,9 @@ class FeedLike(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_id")
-    var feed: Feed,
+    var feed: Feed, // 좋아요 한 피드
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    var user: User,
+    var user: User, // 좋아요 누른 유저
 )

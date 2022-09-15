@@ -2,10 +2,7 @@ package diary.capstone.feed
 
 import diary.capstone.user.User
 import diary.capstone.user.UserService
-import diary.capstone.util.filterChildComments
-import diary.capstone.util.filterMyComments
-import diary.capstone.util.filterNotMyComments
-import diary.capstone.util.filterRootComments
+import diary.capstone.util.*
 import org.springframework.data.domain.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -22,24 +19,49 @@ class FeedService(
         feedRepository.save(
             Feed(
                 writer = loginUser,
-                content = form.content
+                content = form.content,
+                showScope = form.showScope
             )
         )
 
     // 피드 목록 검색 (페이징)
     @Transactional(readOnly = true)
-    fun getFeeds(pageable: Pageable, userId: Long?): Page<Feed> {
-        // 해당 유저의 피드 목록 조회
+    fun getFeeds(pageable: Pageable, userId: Long?, loginUser: User): Page<Feed> {
+        // 특정 유저의 피드만 조회 (프로필 통해 조회)
         userId?.let {
-            val feeds = userService.getUser(userId).feeds.sortedByDescending { it.id }
-            val total = feeds.size
-            val start = pageable.offset.toInt()
-            val end = min((start + pageable.pageSize), total)
-            return PageImpl(feeds.subList(start, end), pageable, total.toLong())
+            val user = userService.getUser(userId)
+
+            // 로그인 유저가 해당 유저일 경우 모든 피드 조회
+            if (userId == loginUser.id)
+                return getPagedFeed(pageable,
+                    user.feeds
+                        .sortedByDescending { it.id }
+                )
+
+            return getPagedFeed(pageable,
+                user.feeds
+                    .filterNotShowFollowersFeed(
+                        // 피드 작성자를 팔로우 했다면 팔로워 공개 피드를 보여줌
+                        !user.follower.map { it.user.id }.contains(loginUser.id)
+                    )
+                    .filterNotShowMeFeed()
+                    .sortedByDescending { it.id }
+            )
         } ?:
         // 모든 피드 조회
-        run { return feedRepository.findAll(pageable) }
-        // TODO 조건 별로 조회 추가
+        // TODO 피드라인의 설정 대로 조회
+        run {
+            return feedRepository.findByShowScope(pageable, SHOW_ALL)
+        }
+    }
+
+    // Pageable, Feed 리스트로 페이징된 Feed 객체 반환
+    @Transactional(readOnly = true)
+    fun getPagedFeed(pageable: Pageable, feeds: List<Feed>): Page<Feed> {
+        val total = feeds.size
+        val start = pageable.offset.toInt()
+        val end = min((start + pageable.pageSize), total)
+        return PageImpl(feeds.subList(start, end), pageable, total.toLong())
     }
 
     @Transactional(readOnly = true)
@@ -116,7 +138,8 @@ class FeedService(
             feed = feed,
             writer = loginUser,
             content = form.content,
-            parent = parentComment
+            parent = parentComment,
+            layer = parentComment.layer + 1
         )
         parentComment.children.add(comment)
     }
@@ -131,7 +154,7 @@ class FeedService(
         getPagedComments(pageable,
             getFeed(feedId).comments
                 .filterRootComments()
-                .filterNotMyComments(loginUser.id!!)
+                .filterNotSpecificUserComments(loginUser.id!!)
                 .sortedBy { it.id }
         )
 
@@ -141,7 +164,7 @@ class FeedService(
         getPagedComments(pageable,
             getFeed(feedId).comments
                 .filterRootComments()
-                .filterMyComments(loginUser.id!!)
+                .filterSpecificUserComments(loginUser.id!!)
                 .sortedBy { it.id }
         )
 

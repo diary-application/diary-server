@@ -45,30 +45,34 @@ class AuthController(private val authService: AuthService) {
 @RequestMapping("/user")
 class UserController(private val userService: UserService) {
 
+    // 내 정보 조회
     @GetMapping
-    fun getUser(user: User) = UserDetailResponse(user)
+    fun getUser(user: User) = MyDetailResponse(user)
 
+    // 특정 유저의 유저 정보 조회
     @GetMapping("/{userId}")
     fun getUser(@PathVariable("userId") userId: Long) =
         UserDetailResponse(userService.getUser(userId))
 
-    // 내가 팔로우한 사람 목록 조회
-    @GetMapping("/following")
-    fun getFollowing(@PageableDefault pageable: Pageable, user: User) =
-        UserPagedResponse(userService.getFollowing(pageable, user))
+    // 특정 유저가 팔로우 한 사람 목록 조회
+    @GetMapping("/{userId}/following")
+    fun getFollowing(@PageableDefault pageable: Pageable,
+                     @PathVariable("userId") userId: Long) =
+        UserPagedResponse(userService.getFollowing(pageable, userId))
 
-    // 나를 팔로우한 사람 목록 조회
-    @GetMapping("/follower")
-    fun getFollowers(@PageableDefault pageable: Pageable, user: User) =
-        UserPagedResponse(userService.getFollowers(pageable, user))
+    // 특정 유저를 팔로우 한 사람 목록 조회
+    @GetMapping("/{userId}/follower")
+    fun getFollowers(@PageableDefault pageable: Pageable,
+                     @PathVariable("userId") userId: Long) =
+        UserPagedResponse(userService.getFollowers(pageable, userId))
 
     // 해당 유저 팔로우
-    @PatchMapping("/follow/{userId}")
+    @PatchMapping("/{userId}/follow")
     fun followUser(@PathVariable("userId") userId: Long, user: User) =
         BoolResponse(userService.followUser(userId, user))
 
     // 해당 유저 팔로우 취소
-    @DeleteMapping("/follow/{userId}")
+    @DeleteMapping("/{userId}/follow")
     fun unfollowUser(@PathVariable("userId") userId: Long, user: User) =
         BoolResponse(userService.unfollowUser(userId, user))
 
@@ -76,6 +80,7 @@ class UserController(private val userService: UserService) {
     fun updatePassword(form: PasswordUpdateForm, user: User) =
         BoolResponse(userService.updatePassword(form, user))
 
+    // 내 정보 수정
     @PatchMapping("/info")
     fun updateUserInfo(form: UserInfoUpdateForm, user: User) =
         UserDetailResponse(userService.updateUserInfo(form, user))

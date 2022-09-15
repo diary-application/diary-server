@@ -20,7 +20,6 @@ class AppConfig(private val userRepository: UserRepository): WebMvcConfigurer {
     // ArgumentResolver 등록
     override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {
         resolvers.add(LoginUserArgumentResolver(userRepository))
-        resolvers.add(BindingResultArgumentResolver())
     }
 
     // 정적 리소스 조회 경로 설정

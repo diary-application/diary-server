@@ -21,12 +21,14 @@ class Comment(
     var content: String,
 
     // 계층형 댓글 구조
+    var layer: Int = 1,
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     var parent: Comment? = null,
 
     @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL])
-    var children: MutableList<Comment> = mutableListOf()
+    var children: MutableList<Comment> = mutableListOf(),
 
 ): BaseTimeEntity() {
     fun update(content: String?) { content?.let { this.content = content } }

@@ -70,7 +70,7 @@ data class UserSimpleResponse(
     )
 }
 
-data class UserDetailResponse(
+data class MyDetailResponse(
     var id: Long,
     var uid: String,
     var name: String,
@@ -85,6 +85,24 @@ data class UserDetailResponse(
         uid = user.uid,
         name = user.name,
         email = user.email,
+        job = user.job,
+        category = user.category,
+        followingCount = user.following.count(),
+        followerCount = user.follower.count()
+    )
+}
+
+data class UserDetailResponse(
+    var id: Long,
+    var name: String,
+    var job: String,
+    var category: String,
+    var followingCount: Int,
+    var followerCount: Int
+) {
+    constructor(user: User): this(
+        id = user.id!!,
+        name = user.name,
         job = user.job,
         category = user.category,
         followingCount = user.following.count(),

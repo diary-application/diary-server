@@ -1,6 +1,5 @@
 package diary.capstone.user
 
-import diary.capstone.feed.Comment
 import diary.capstone.feed.Feed
 import diary.capstone.util.BaseTimeEntity
 import javax.persistence.*
@@ -21,14 +20,11 @@ class User(
     @OneToMany(mappedBy = "writer", cascade = [CascadeType.ALL])
     var feeds: MutableList<Feed> = mutableListOf(),
 
-    @OneToMany(mappedBy = "writer", cascade = [CascadeType.ALL])
-    var comments: MutableList<Comment> = mutableListOf(),
-
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
     var following: MutableList<Follow> = mutableListOf(),
 
-    @OneToMany(mappedBy = "followUser", cascade = [CascadeType.ALL], orphanRemoval = true)
-    var follower: MutableList<Follow> = mutableListOf()
+    @OneToMany(mappedBy = "target", cascade = [CascadeType.ALL], orphanRemoval = true)
+    var follower: MutableList<Follow> = mutableListOf(),
 
 ): BaseTimeEntity() {
     fun update(
@@ -52,11 +48,13 @@ class Follow(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
+    // 팔로우 한 유저
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     var user: User,
 
+    // 팔로우 대상 유저
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "follow_user")
-    var followUser: User,
+    @JoinColumn(name = "target_user_id")
+    var target: User,
 )

@@ -4,10 +4,14 @@ import diary.capstone.user.User
 import diary.capstone.user.UserSimpleResponse
 import org.springframework.data.domain.Page
 import javax.validation.constraints.NotBlank
+import javax.validation.constraints.Pattern
 
 data class FeedRequestForm(
     @field:NotBlank
     var content: String,
+
+    @field:Pattern(regexp = "^(all|followers|me)$", message = "all, followers, me 로만 입력 가능합니다.")
+    var showScope: String
 )
 
 data class FeedSimpleResponse(
@@ -27,14 +31,15 @@ data class FeedSimpleResponse(
         commentCount = feed.comments.size,
         likeCount = feed.likes
             .count { it.feed.id == feed.id },
-        isLiked = feed.likes
+        isLiked = feed.likes // 조회하는 유저의 해당 피드 좋아요 유무
             .any { it.feed.id == feed.id && it.user.id == user.id },
-        isFollowed = user.following
-            .any { it.user.id == user.id && it.followUser.id == feed.writer.id },
+        isFollowed = user.following // 조회하는 유저의 피드 작성자 팔로우 유무
+            .any { it.target.id == feed.writer.id },
         createTime = feed.createTime
     )
 }
 
+// 피드 상세 보기, 댓글 데이터는 해당 API를 통해 따로 요청
 data class FeedDetailResponse(
     var id: Long,
     var writer: UserSimpleResponse,
@@ -54,12 +59,11 @@ data class FeedDetailResponse(
 //        comments = feed.comments
 //            .filter { it.parent == null }
 //            .map { CommentResponse(it) },
-        likeCount = feed.likes
-            .count { it.feed.id == feed.id },
+        likeCount = feed.likes.size,
         isLiked = feed.likes
-            .any { it.feed.id == feed.id && it.user.id == user.id },
+            .any { it.user.id == user.id },
         isFollowed = user.following
-            .any { it.user.id == user.id && it.followUser.id == feed.writer.id },
+            .any { it.target.id == feed.writer.id },
         createTime = feed.createTime,
     )
 }

@@ -13,6 +13,7 @@ const val NOT_LOGIN_USER = "로그인 후 이용 가능합니다."
 // 유저
 const val USER_NOT_FOUND = "해당 유저를 찾을 수 없습니다."
 const val ALREADY_FOLLOWED = "해당 유저를 이미 팔로잉 중입니다."
+const val FOLLOW_TARGET_INVALID = "팔로우 할 수 없는 유저입니다."
 
 class UserException(message: String): RuntimeException(message)
 class AuthException(message: String): RuntimeException(message)

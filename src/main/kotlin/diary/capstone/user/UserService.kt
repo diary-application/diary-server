@@ -21,6 +21,7 @@ class AuthService(private val userRepository: UserRepository) {
         } ?: run { throw UserException(LOGIN_FAILED) }
     }
 
+    // 유저 생성 후 로그인
     fun join(joinForm: JoinForm, request: HttpServletRequest): User {
         if (!joinForm.checkPassword()) throw UserException(PASSWORD_MISMATCH)
         if (userRepository.existsByUid(joinForm.uid)) throw UserException(DUPLICATE_ID)
@@ -46,21 +47,21 @@ class UserService(private val userRepository: UserRepository) {
     fun getUser(userId: Long): User =
         userRepository.findById(userId).orElseThrow { throw UserException(USER_NOT_FOUND) }
 
+    // 내가 팔로우 중인 유저 목록
     @Transactional(readOnly = true)
-    fun getFollowing(pageable: Pageable, loginUser: User): Page<User> =
+    fun getFollowing(pageable: Pageable, userId: Long): Page<User> =
         getPagedUsers(pageable,
-            loginUser.following
-                .filter { it.user.id == loginUser.id }
-                .map { getUser(it.user.id!!) }
+            getUser(userId).following
+                .map { it.target }
                 .sortedBy { it.name }
         )
 
+    // 나를 팔로우 중인 유저 목록
     @Transactional(readOnly = true)
-    fun getFollowers(pageable: Pageable, loginUser: User): Page<User> =
+    fun getFollowers(pageable: Pageable, userId: Long): Page<User> =
         getPagedUsers(pageable,
-            loginUser.follower
-                .filter { it.followUser.id == loginUser.id }
-                .map { getUser(it.user.id!!) }
+            getUser(userId).follower
+                .map { it.user }
                 .sortedBy { it.name }
         )
 
@@ -72,9 +73,14 @@ class UserService(private val userRepository: UserRepository) {
     }
 
     fun followUser(userId: Long, loginUser: User): Boolean {
+        // 자기 자신은 팔로우 불가능
+        if (loginUser.id == userId) throw UserException(FOLLOW_TARGET_INVALID)
+        
         val targetUser = getUser(userId)
-        if (loginUser.following.none { it.user.id == loginUser.id && it.followUser.id == targetUser.id })
-            loginUser.following.add(Follow(user = loginUser, followUser = targetUser))
+
+        // 이미 팔로우 한 대상은 팔로우 불가능
+        if (loginUser.following.none { it.target.id == targetUser.id })
+            loginUser.following.add(Follow(user = loginUser, target = targetUser))
         else throw UserException(ALREADY_FOLLOWED)
         return true
     }
@@ -82,7 +88,7 @@ class UserService(private val userRepository: UserRepository) {
     fun unfollowUser(userId: Long, loginUser: User): Boolean {
         loginUser.following.remove(
             loginUser.following
-                .find { it.user.id == loginUser.id && it.followUser.id == getUser(userId).id }
+                .find { it.user.id == loginUser.id && it.target.id == getUser(userId).id }
         )
         return true
     }

@@ -5,6 +5,7 @@ import diary.capstone.util.BoolResponse
 import diary.capstone.util.aop.Auth
 import diary.capstone.util.exception.ValidationException
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
@@ -23,16 +24,16 @@ class FeedController(private val feedService: FeedService) {
                    bindingResult: BindingResult,
                    user: User
     ): FeedSimpleResponse {
-//        if (bindingResult.hasErrors()) throw ValidationException(bindingResult)
+        if (bindingResult.hasErrors()) throw ValidationException(bindingResult)
         return FeedSimpleResponse(feedService.createFeed(form, user), user)
     }
 
     // 피드 목록 조회 (모든 피드, 해당 유저의 피드)
     @GetMapping
-    fun getFeeds(@PageableDefault pageable: Pageable,
+    fun getFeeds(@PageableDefault(sort = ["id"], direction = Sort.Direction.DESC) pageable: Pageable,
                  @RequestParam(name = "userId", required = false) userId: Long?,
                  user: User
-    ) = FeedPagedResponse(feedService.getFeeds(pageable, userId), user)
+    ) = FeedPagedResponse(feedService.getFeeds(pageable, userId, user), user)
 
     @GetMapping("/{feedId}")
     fun getFeed(@PathVariable("feedId") feedId: Long,
@@ -58,6 +59,7 @@ class FeedController(private val feedService: FeedService) {
 @RestController
 @RequestMapping("/feed/{feedId}/comment")
 class CommentController(private val feedService: FeedService) {
+
     @PostMapping
     fun createRootComment(@PathVariable("feedId") feedId: Long,
                           @Valid @RequestBody form: CommentRequestForm,

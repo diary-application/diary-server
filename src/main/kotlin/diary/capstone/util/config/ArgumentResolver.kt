@@ -5,9 +5,7 @@ import diary.capstone.user.NOT_LOGIN_USER
 import diary.capstone.user.User
 import diary.capstone.user.UserRepository
 import diary.capstone.util.AUTH_KEY
-import diary.capstone.util.exception.ValidationException
 import org.springframework.core.MethodParameter
-import org.springframework.validation.BindingResult
 import org.springframework.web.bind.support.WebDataBinderFactory
 import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
@@ -30,20 +28,5 @@ class LoginUserArgumentResolver(private val userRepository: UserRepository): Han
         val request: HttpServletRequest = webRequest.nativeRequest as HttpServletRequest
         val uid = request.session.getAttribute(AUTH_KEY)?.let { it.toString() } ?: ""
         return userRepository.findByUid(uid) ?: throw AuthException(NOT_LOGIN_USER)
-    }
-}
-
-class BindingResultArgumentResolver: HandlerMethodArgumentResolver {
-    override fun supportsParameter(parameter: MethodParameter): Boolean =
-        parameter.parameterType == BindingResult::class.java
-
-    override fun resolveArgument(
-        parameter: MethodParameter,
-        mavContainer: ModelAndViewContainer?,
-        webRequest: NativeWebRequest,
-        binderFactory: WebDataBinderFactory?
-    ) {
-        var bindingResult: BindingResult
-
     }
 }
