@@ -1,4 +1,4 @@
-package diary.capstone.user
+package diary.capstone.domain.user
 
 // 로그인
 const val LOGIN_FAILED = "아이디/비밀번호를 다시 확인해주세요."

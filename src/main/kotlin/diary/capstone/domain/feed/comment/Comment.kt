@@ -1,6 +1,7 @@
-package diary.capstone.feed
+package diary.capstone.domain.feed.comment
 
-import diary.capstone.user.User
+import diary.capstone.domain.feed.Feed
+import diary.capstone.domain.user.User
 import diary.capstone.util.BaseTimeEntity
 import javax.persistence.*
 
@@ -21,7 +22,7 @@ class Comment(
     var content: String,
 
     // 계층형 댓글 구조
-    var layer: Int = 1,
+    var layer: Int = 1, // 계층
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
@@ -30,6 +31,6 @@ class Comment(
     @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL])
     var children: MutableList<Comment> = mutableListOf(),
 
-): BaseTimeEntity() {
+    ): BaseTimeEntity() {
     fun update(content: String?) { content?.let { this.content = content } }
 }

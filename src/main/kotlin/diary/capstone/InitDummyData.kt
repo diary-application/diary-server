@@ -1,10 +1,8 @@
 package diary.capstone
 
-import diary.capstone.feed.CommentRequestForm
-import diary.capstone.feed.*
-import diary.capstone.user.User
-import diary.capstone.user.UserRepository
-import diary.capstone.user.UserService
+import diary.capstone.domain.feed.*
+import diary.capstone.domain.user.User
+import diary.capstone.domain.user.UserRepository
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import javax.annotation.PostConstruct
@@ -13,7 +11,6 @@ import javax.annotation.PostConstruct
 @Transactional
 class InitDummyData(
     private val userRepository: UserRepository,
-    private val userService: UserService,
     private val feedService: FeedService
 ) {
 

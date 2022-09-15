@@ -1,6 +1,8 @@
-package diary.capstone.util.config
+package diary.capstone.config
 
-import diary.capstone.user.*
+import diary.capstone.auth.AuthService
+import diary.capstone.auth.SessionMethod
+import diary.capstone.domain.user.UserRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
@@ -15,11 +17,11 @@ import springfox.documentation.spring.web.plugins.Docket
 import springfox.documentation.swagger2.annotations.EnableSwagger2
 
 @Configuration
-class AppConfig(private val userRepository: UserRepository): WebMvcConfigurer {
+class AppConfig(private val authService: AuthService): WebMvcConfigurer {
     
     // ArgumentResolver 등록
     override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {
-        resolvers.add(LoginUserArgumentResolver(userRepository))
+        resolvers.add(LoginUserArgumentResolver(authService))
     }
 
     // 정적 리소스 조회 경로 설정
@@ -27,6 +29,13 @@ class AppConfig(private val userRepository: UserRepository): WebMvcConfigurer {
         super.addResourceHandlers(registry)
     }
 }
+
+// JPAQueryFactory 빈 등록
+//@Configuration
+//class QuerydslConfig(@PersistenceContext private val em: EntityManager) {
+//    @Bean
+//    fun jpaQueryFactory(): JPAQueryFactory = JPAQueryFactory(this.em)
+//}
 
 // Swagger 2.0 등록
 @Configuration

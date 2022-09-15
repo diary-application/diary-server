@@ -1,6 +1,6 @@
-package diary.capstone.feed
+package diary.capstone.domain.feed.comment
 
-import diary.capstone.user.UserSimpleResponse
+import diary.capstone.domain.user.UserSimpleResponse
 import org.springframework.data.domain.Page
 import javax.validation.constraints.NotBlank
 

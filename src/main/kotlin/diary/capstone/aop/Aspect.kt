@@ -1,7 +1,8 @@
-package diary.capstone.util.aop
+package diary.capstone.aop
 
-import diary.capstone.user.AuthException
-import diary.capstone.user.NOT_LOGIN_USER
+import diary.capstone.auth.AuthService
+import diary.capstone.domain.user.AuthException
+import diary.capstone.domain.user.NOT_LOGIN_USER
 import diary.capstone.util.AUTH_KEY
 import org.aspectj.lang.annotation.Aspect
 import org.aspectj.lang.annotation.Before
@@ -11,12 +12,12 @@ import org.springframework.web.context.request.ServletRequestAttributes
 
 @Aspect
 @Component
-class Aspect {
+class Aspect(private val authService: AuthService) {
 
     // Auth 어노테이션이 달린 클래스, 메소드의 실행 전
-    @Before("@within(Auth) || @annotation(Auth)")
+    @Before("@within(diary.capstone.auth.Auth) || @annotation(diary.capstone.auth.Auth)")
     fun authCheck() {
         val request = RequestContextHolder.currentRequestAttributes() as ServletRequestAttributes
-        request.request.session.getAttribute(AUTH_KEY) ?: throw AuthException(NOT_LOGIN_USER)
+        authService.authCheck(request.request)
     }
 }

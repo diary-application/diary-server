@@ -1,6 +1,6 @@
-package diary.capstone.user
+package diary.capstone.domain.user
 
-import diary.capstone.util.AUTH_KEY
+import diary.capstone.auth.AuthService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -11,15 +11,13 @@ import kotlin.math.min
 
 @Service
 @Transactional
-class AuthService(private val userRepository: UserRepository) {
+class LoginService(
+    private val authService: AuthService,
+    private val userRepository: UserRepository
+) {
 
-    fun login(loginForm: LoginForm, request: HttpServletRequest): User {
-        userRepository.findByUidAndPassword(loginForm.uid, loginForm.password)?.let {
-            val session = request.getSession(true)
-            session.setAttribute(AUTH_KEY, it.uid)
-            return it
-        } ?: run { throw UserException(LOGIN_FAILED) }
-    }
+    fun login(form: LoginForm, request: HttpServletRequest): User =
+        authService.login(request, form.uid, form.password)
 
     // 유저 생성 후 로그인
     fun join(joinForm: JoinForm, request: HttpServletRequest): User {
@@ -37,6 +35,9 @@ class AuthService(private val userRepository: UserRepository) {
 
         return login(LoginForm(user.uid, user.password), request)
     }
+
+    fun logout(request: HttpServletRequest): Boolean =
+        authService.logout(request)
 }
 
 @Service

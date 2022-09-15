@@ -1,6 +1,9 @@
 package diary.capstone.util
 
-import diary.capstone.feed.*
+import diary.capstone.domain.feed.comment.Comment
+import diary.capstone.domain.feed.Feed
+import diary.capstone.domain.feed.SHOW_FOLLOWERS
+import diary.capstone.domain.feed.SHOW_ME
 
 /**
  * 루트 댓글 필터 (부모 댓글이 없는 경우)

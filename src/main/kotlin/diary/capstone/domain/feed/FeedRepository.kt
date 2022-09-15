@@ -1,6 +1,6 @@
-package diary.capstone.feed
+package diary.capstone.domain.feed
 
-import diary.capstone.user.User
+import diary.capstone.domain.user.User
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository

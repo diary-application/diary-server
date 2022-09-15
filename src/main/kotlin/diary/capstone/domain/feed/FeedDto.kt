@@ -1,7 +1,7 @@
-package diary.capstone.feed
+package diary.capstone.domain.feed
 
-import diary.capstone.user.User
-import diary.capstone.user.UserSimpleResponse
+import diary.capstone.domain.user.User
+import diary.capstone.domain.user.UserSimpleResponse
 import org.springframework.data.domain.Page
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Pattern

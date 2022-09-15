@@ -1,9 +1,10 @@
-package diary.capstone.util.config
+package diary.capstone.config
 
-import diary.capstone.user.AuthException
-import diary.capstone.user.NOT_LOGIN_USER
-import diary.capstone.user.User
-import diary.capstone.user.UserRepository
+import diary.capstone.auth.AuthService
+import diary.capstone.domain.user.AuthException
+import diary.capstone.domain.user.NOT_LOGIN_USER
+import diary.capstone.domain.user.User
+import diary.capstone.domain.user.UserRepository
 import diary.capstone.util.AUTH_KEY
 import org.springframework.core.MethodParameter
 import org.springframework.web.bind.support.WebDataBinderFactory
@@ -13,7 +14,7 @@ import org.springframework.web.method.support.ModelAndViewContainer
 import javax.servlet.http.HttpServletRequest
 
 // 요청하는 클라이언트가 로그인 한 유저 정보를 얻기 위한 ArgumentResolver
-class LoginUserArgumentResolver(private val userRepository: UserRepository): HandlerMethodArgumentResolver {
+class LoginUserArgumentResolver(private val authService: AuthService): HandlerMethodArgumentResolver {
 
     // 핸들러 메소드 파라미터에 User 엔티티 클래스가 존재할 경우
     override fun supportsParameter(parameter: MethodParameter): Boolean =
@@ -25,8 +26,8 @@ class LoginUserArgumentResolver(private val userRepository: UserRepository): Han
                                  webRequest: NativeWebRequest,
                                  binderFactory: WebDataBinderFactory?
     ): User {
+        // 핸들러 메소드 user(요청자) 파라미터를 바인딩하기 위한 인증 로직
         val request: HttpServletRequest = webRequest.nativeRequest as HttpServletRequest
-        val uid = request.session.getAttribute(AUTH_KEY)?.let { it.toString() } ?: ""
-        return userRepository.findByUid(uid) ?: throw AuthException(NOT_LOGIN_USER)
+        return authService.getUser(request) ?: throw AuthException(NOT_LOGIN_USER)
     }
 }

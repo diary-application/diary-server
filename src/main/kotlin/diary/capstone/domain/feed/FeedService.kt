@@ -1,7 +1,9 @@
-package diary.capstone.feed
+package diary.capstone.domain.feed
 
-import diary.capstone.user.User
-import diary.capstone.user.UserService
+import diary.capstone.domain.feed.comment.Comment
+import diary.capstone.domain.feed.comment.CommentRequestForm
+import diary.capstone.domain.user.User
+import diary.capstone.domain.user.UserService
 import diary.capstone.util.*
 import org.springframework.data.domain.*
 import org.springframework.stereotype.Service

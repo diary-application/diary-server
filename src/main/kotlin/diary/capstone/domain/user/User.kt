@@ -1,6 +1,6 @@
-package diary.capstone.user
+package diary.capstone.domain.user
 
-import diary.capstone.feed.Feed
+import diary.capstone.domain.feed.Feed
 import diary.capstone.util.BaseTimeEntity
 import javax.persistence.*
 
@@ -26,7 +26,7 @@ class User(
     @OneToMany(mappedBy = "target", cascade = [CascadeType.ALL], orphanRemoval = true)
     var follower: MutableList<Follow> = mutableListOf(),
 
-): BaseTimeEntity() {
+    ): BaseTimeEntity() {
     fun update(
         password: String? = null,
         name: String? = null,

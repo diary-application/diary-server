@@ -1,4 +1,4 @@
-package diary.capstone.util.config
+package diary.capstone.config
 
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
@@ -6,7 +6,7 @@ import springfox.documentation.annotations.ApiIgnore
 
 @Controller
 @ApiIgnore
-class SwaggerRedirector {
+class SwaggerController {
     @GetMapping("/api")
-    fun redirectSwagger(): String = "redirect:/swagger-ui/#"
+    fun redirectSwagger() = "redirect:/swagger-ui/#"
 }

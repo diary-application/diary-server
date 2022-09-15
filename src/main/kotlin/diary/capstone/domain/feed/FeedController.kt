@@ -1,13 +1,14 @@
-package diary.capstone.feed
+package diary.capstone.domain.feed
 
-import diary.capstone.user.User
+import diary.capstone.domain.user.User
 import diary.capstone.util.BoolResponse
-import diary.capstone.util.aop.Auth
-import diary.capstone.util.exception.ValidationException
+import diary.capstone.auth.Auth
+import diary.capstone.domain.feed.comment.CommentPagedResponse
+import diary.capstone.domain.feed.comment.CommentRequestForm
+import diary.capstone.domain.feed.comment.CommentResponse
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
-import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
@@ -20,13 +21,8 @@ import javax.validation.Valid
 class FeedController(private val feedService: FeedService) {
 
     @PostMapping
-    fun createFeed(@Valid @RequestBody form: FeedRequestForm,
-                   bindingResult: BindingResult,
-                   user: User
-    ): FeedSimpleResponse {
-        if (bindingResult.hasErrors()) throw ValidationException(bindingResult)
-        return FeedSimpleResponse(feedService.createFeed(form, user), user)
-    }
+    fun createFeed(@Valid @RequestBody form: FeedRequestForm, user: User) =
+        FeedSimpleResponse(feedService.createFeed(form, user), user)
 
     // 피드 목록 조회 (모든 피드, 해당 유저의 피드)
     @GetMapping
@@ -36,9 +32,8 @@ class FeedController(private val feedService: FeedService) {
     ) = FeedPagedResponse(feedService.getFeeds(pageable, userId, user), user)
 
     @GetMapping("/{feedId}")
-    fun getFeed(@PathVariable("feedId") feedId: Long,
-                user: User
-    ) = FeedDetailResponse(feedService.getFeed(feedId), user)
+    fun getFeed(@PathVariable("feedId") feedId: Long, user: User) =
+        FeedDetailResponse(feedService.getFeed(feedId), user)
 
     @PutMapping("/{feedId}")
     fun updateFeed(@PathVariable("feedId") feedId: Long,
@@ -47,9 +42,8 @@ class FeedController(private val feedService: FeedService) {
     ) = FeedDetailResponse(feedService.updateFeed(feedId, form, user), user)
 
     @DeleteMapping("/{feedId}")
-    fun deleteFeed(@PathVariable("feedId") feedId: Long,
-                   user: User
-    ) = BoolResponse(feedService.deleteFeed(feedId, user))
+    fun deleteFeed(@PathVariable("feedId") feedId: Long, user: User) =
+        BoolResponse(feedService.deleteFeed(feedId, user))
 }
 
 /**
@@ -63,23 +57,15 @@ class CommentController(private val feedService: FeedService) {
     @PostMapping
     fun createRootComment(@PathVariable("feedId") feedId: Long,
                           @Valid @RequestBody form: CommentRequestForm,
-                          bindingResult: BindingResult,
                           user: User
-    ) {
-        if (bindingResult.hasErrors()) throw ValidationException(bindingResult)
-        feedService.createRootComment(feedId, form, user)
-    }
+    ) = feedService.createRootComment(feedId, form, user)
 
     @PostMapping("/{commentId}")
     fun createChildComment(@PathVariable("feedId") feedId: Long,
                            @PathVariable("commentId") commentId: Long,
                            @Valid @RequestBody form: CommentRequestForm,
-                           bindingResult: BindingResult,
                            user: User
-    ) {
-        if (bindingResult.hasErrors()) throw ValidationException(bindingResult)
-        feedService.createChildComment(feedId, commentId, form, user)
-    }
+    ) = feedService.createChildComment(feedId, commentId, form, user)
 
     @GetMapping
     fun getRootComments(@PathVariable("feedId") feedId: Long,
@@ -120,6 +106,7 @@ class CommentController(private val feedService: FeedService) {
 @RestController
 @RequestMapping("/feed/{feedId}/like")
 class FeedLikeController(private val feedService: FeedService) {
+
     @PostMapping
     fun likeFeed(@PathVariable("feedId") feedId: Long, user: User) =
         BoolResponse(feedService.likeFeed(feedId, user))

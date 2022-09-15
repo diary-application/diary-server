@@ -1,4 +1,4 @@
-package diary.capstone.feed
+package diary.capstone.domain.feed
 
 // 피드
 const val FEED_NOT_FOUND = "해당 글을 찾을 수 없습니다."

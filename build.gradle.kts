@@ -8,6 +8,9 @@ plugins {
 	kotlin("plugin.jpa") version "1.6.21"
 	kotlin("plugin.allopen") version "1.6.21"
 	kotlin("plugin.noarg") version "1.6.21"
+
+	// QueryDSL 사용을 위한 kapt 플러그인 추가
+//	kotlin("kapt") version "1.7.10"
 }
 
 group = "diary"
@@ -34,7 +37,19 @@ dependencies {
 
 	// AOP
 	implementation("org.springframework.boot:spring-boot-starter-aop")
+
+	// Querydsl-jpa
+//	val querydslVersion = "5.0.0"
+//	implementation("com.querydsl:querydsl-jpa:$querydslVersion")
+//	apply(plugin = "kotlin-kapt")
+//	kapt("com.querydsl:querydsl-apt:$querydslVersion:jpa")
+//	kapt("org.springframework.boot:spring-boot-configuration-processor")
 }
+
+// Querydsl 추가 설정
+//sourceSets["main"].withConvention(org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet::class) {
+//	kotlin.srcDir("$buildDir/generated/source/kapt/main")
+//}
 
 allOpen {
 	annotation("javax.persistence.Entity")

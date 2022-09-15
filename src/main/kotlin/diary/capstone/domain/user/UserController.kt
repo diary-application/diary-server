@@ -1,43 +1,31 @@
-package diary.capstone.user
+package diary.capstone.domain.user
 
 import diary.capstone.util.BoolResponse
-import diary.capstone.util.aop.Auth
-import diary.capstone.util.exception.ValidationException
+import diary.capstone.auth.Auth
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
-import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
 
 @RestController
 @RequestMapping("/auth")
-class AuthController(private val authService: AuthService) {
+class AuthController(private val loginService: LoginService) {
 
     @PostMapping("/login")
-    fun login(@Valid @RequestBody loginForm: LoginForm,
-              bindingResult: BindingResult,
+    fun login(@Valid @RequestBody form: LoginForm,
               request: HttpServletRequest
-    ): UserDetailResponse {
-        if (bindingResult.hasErrors()) throw ValidationException(bindingResult)
-        return UserDetailResponse(authService.login(loginForm, request))
-    }
+    ) = UserDetailResponse(loginService.login(form, request))
 
     @PostMapping("/join")
     fun join(@Valid @RequestBody joinForm: JoinForm,
-             bindingResult: BindingResult,
              request: HttpServletRequest
-    ): UserDetailResponse {
-        if (bindingResult.hasErrors()) throw ValidationException(bindingResult)
-        return UserDetailResponse(authService.join(joinForm, request))
-    }
+    ) = UserDetailResponse(loginService.join(joinForm, request))
 
     @Auth
     @GetMapping("/logout")
-    fun logout(request: HttpServletRequest): BoolResponse {
-        request.session.invalidate()
-        return BoolResponse(true)
-    }
+    fun logout(request: HttpServletRequest): BoolResponse =
+        BoolResponse(loginService.logout(request))
 }
 
 @Auth

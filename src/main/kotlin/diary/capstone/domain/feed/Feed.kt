@@ -1,6 +1,7 @@
-package diary.capstone.feed
+package diary.capstone.domain.feed
 
-import diary.capstone.user.User
+import diary.capstone.domain.feed.comment.Comment
+import diary.capstone.domain.user.User
 import diary.capstone.util.BaseTimeEntity
 import javax.persistence.*
 
