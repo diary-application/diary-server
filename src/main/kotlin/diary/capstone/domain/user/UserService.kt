@@ -1,16 +1,17 @@
 package diary.capstone.domain.user
 
 import diary.capstone.auth.AuthService
+import diary.capstone.domain.file.FileService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
 import javax.servlet.http.HttpServletRequest
 import kotlin.math.min
 
 @Service
-@Transactional
 class LoginService(
     private val authService: AuthService,
     private val userRepository: UserRepository
@@ -19,17 +20,18 @@ class LoginService(
     fun login(form: LoginForm, request: HttpServletRequest): User =
         authService.login(request, form.uid, form.password)
 
-    // 유저 생성 후 로그인
-    fun join(joinForm: JoinForm, request: HttpServletRequest): User {
-        if (!joinForm.checkPassword()) throw UserException(PASSWORD_MISMATCH)
-        if (userRepository.existsByUid(joinForm.uid)) throw UserException(DUPLICATE_ID)
+    // 유저 생성 후 로그인까지
+    @Transactional
+    fun join(form: JoinForm, request: HttpServletRequest): User {
+        if (!form.checkPassword()) throw UserException(PASSWORD_MISMATCH)
+        if (userRepository.existsByUid(form.uid)) throw UserException(DUPLICATE_ID)
 
         val user = userRepository.save(
             User(
-                uid = joinForm.uid,
-                password = joinForm.password,
-                name = joinForm.name,
-                email = joinForm.email
+                uid = form.uid,
+                password = form.password,
+                name = form.name,
+                email = form.email
             )
         )
 
@@ -42,7 +44,10 @@ class LoginService(
 
 @Service
 @Transactional
-class UserService(private val userRepository: UserRepository) {
+class UserService(
+    private val userRepository: UserRepository,
+    private val fileService: FileService
+) {
 
     @Transactional(readOnly = true)
     fun getUser(userId: Long): User =
@@ -62,7 +67,7 @@ class UserService(private val userRepository: UserRepository) {
     fun getFollowers(pageable: Pageable, userId: Long): Page<User> =
         getPagedUsers(pageable,
             getUser(userId).follower
-                .map { it.user }
+                .map { it.causer }
                 .sortedBy { it.name }
         )
 
@@ -81,7 +86,7 @@ class UserService(private val userRepository: UserRepository) {
 
         // 이미 팔로우 한 대상은 팔로우 불가능
         if (loginUser.following.none { it.target.id == targetUser.id })
-            loginUser.following.add(Follow(user = loginUser, target = targetUser))
+            loginUser.following.add(Follow(causer = loginUser, target = targetUser))
         else throw UserException(ALREADY_FOLLOWED)
         return true
     }
@@ -89,15 +94,8 @@ class UserService(private val userRepository: UserRepository) {
     fun unfollowUser(userId: Long, loginUser: User): Boolean {
         loginUser.following.remove(
             loginUser.following
-                .find { it.user.id == loginUser.id && it.target.id == getUser(userId).id }
+                .find { it.causer.id == loginUser.id && it.target.id == getUser(userId).id }
         )
-        return true
-    }
-
-    fun updatePassword(form: PasswordUpdateForm, loginUser: User): Boolean {
-        if (!form.checkPassword()) throw UserException(PASSWORD_MISMATCH)
-        if (form.currentPassword != loginUser.password) throw UserException(PASSWORD_MISMATCH)
-        loginUser.update(form.currentPassword)
         return true
     }
 
@@ -110,8 +108,20 @@ class UserService(private val userRepository: UserRepository) {
         )
     }
 
+    fun updateProfileImage(image: MultipartFile, loginUser: User): User {
+        loginUser.profileImage?.let { fileService.deleteFile(it) }
+        return loginUser.update(profileImage = fileService.saveFile(image))
+    }
+
+    fun updatePassword(form: PasswordUpdateForm, loginUser: User): Boolean {
+        if (!form.checkPassword()) throw UserException(PASSWORD_MISMATCH)
+        if (form.currentPassword != loginUser.password) throw UserException(PASSWORD_MISMATCH)
+        loginUser.update(form.currentPassword)
+        return true
+    }
+
     fun deleteUser(form: UserDeleteForm, loginUser: User): Boolean {
-        if (form.password == loginUser.password) userRepository.delete(loginUser)
+        userRepository.delete(loginUser)
         return true
     }
 }

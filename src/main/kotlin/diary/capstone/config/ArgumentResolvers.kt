@@ -4,8 +4,6 @@ import diary.capstone.auth.AuthService
 import diary.capstone.domain.user.AuthException
 import diary.capstone.domain.user.NOT_LOGIN_USER
 import diary.capstone.domain.user.User
-import diary.capstone.domain.user.UserRepository
-import diary.capstone.util.AUTH_KEY
 import org.springframework.core.MethodParameter
 import org.springframework.web.bind.support.WebDataBinderFactory
 import org.springframework.web.context.request.NativeWebRequest
@@ -20,14 +18,13 @@ class LoginUserArgumentResolver(private val authService: AuthService): HandlerMe
     override fun supportsParameter(parameter: MethodParameter): Boolean =
         parameter.parameterType == User::class.java
 
-    // request 객체로부터 세션에 등록된 uid를 데이터베이스에서 조회하여 User 엔티티에 바인딩
+    // 인증 서비스의 getUser 메소드를 통해 로그인 한 유저 엔티티를 얻어 파라미터 값에 바인딩
     override fun resolveArgument(parameter: MethodParameter,
                                  mavContainer: ModelAndViewContainer?,
                                  webRequest: NativeWebRequest,
                                  binderFactory: WebDataBinderFactory?
     ): User {
-        // 핸들러 메소드 user(요청자) 파라미터를 바인딩하기 위한 인증 로직
-        val request: HttpServletRequest = webRequest.nativeRequest as HttpServletRequest
-        return authService.getUser(request) ?: throw AuthException(NOT_LOGIN_USER)
+        return authService.getUser(webRequest.nativeRequest as HttpServletRequest)
+            ?: throw AuthException(NOT_LOGIN_USER)
     }
 }

@@ -27,19 +27,6 @@ class InitDummyData(
                 )
             )
         }
-        val user1 = userRepository.findById(1).get()
-        val user2 = userRepository.findById(2).get()
-        
-        // 피드 생성
-        val feed = feedService.createFeed(
-            FeedRequestForm("모두 공개", SHOW_ALL), user1
-        )
-        feedService.createFeed(
-            FeedRequestForm("팔로워 공개", SHOW_FOLLOWERS), user1
-        )
-        feedService.createFeed(
-            FeedRequestForm("나만 공개", SHOW_ME), user1
-        )
 
         // 댓글 생성
 //        repeat(11) {

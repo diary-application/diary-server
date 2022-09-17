@@ -1,6 +1,7 @@
 package diary.capstone.domain.feed
 
 import diary.capstone.domain.feed.comment.Comment
+import diary.capstone.domain.file.File
 import diary.capstone.domain.user.User
 import diary.capstone.util.BaseTimeEntity
 import javax.persistence.*
@@ -22,6 +23,9 @@ class Feed(
 
     var content: String,
 
+    @OneToMany(mappedBy = "feedFile", cascade = [CascadeType.ALL], orphanRemoval = true)
+    var files: MutableList<File> = mutableListOf(),
+
     @OneToMany(mappedBy = "feed", cascade = [CascadeType.ALL], orphanRemoval = true)
     var comments: MutableList<Comment> = mutableListOf(),
 
@@ -38,6 +42,10 @@ class Feed(
     ) {
         content?.let { this.content = content }
         showScope?.let { this.showScope = showScope }
+    }
+    fun updateFiles(files: MutableList<File>) {
+        this.files.clear()
+        this.files.addAll(files)
     }
 }
 

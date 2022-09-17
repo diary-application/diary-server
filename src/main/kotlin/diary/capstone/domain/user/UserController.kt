@@ -2,25 +2,25 @@ package diary.capstone.domain.user
 
 import diary.capstone.util.BoolResponse
 import diary.capstone.auth.Auth
+import diary.capstone.auth.AuthService
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
 
 @RestController
 @RequestMapping("/auth")
-class AuthController(private val loginService: LoginService) {
+class LoginController(private val loginService: LoginService) {
 
     @PostMapping("/login")
-    fun login(@Valid @RequestBody form: LoginForm,
-              request: HttpServletRequest
-    ) = UserDetailResponse(loginService.login(form, request))
+    fun login(@Valid @RequestBody form: LoginForm, request: HttpServletRequest) =
+        UserDetailResponse(loginService.login(form, request))
 
     @PostMapping("/join")
-    fun join(@Valid @RequestBody joinForm: JoinForm,
-             request: HttpServletRequest
-    ) = UserDetailResponse(loginService.join(joinForm, request))
+    fun join(@Valid @RequestBody form: JoinForm, request: HttpServletRequest) =
+        UserDetailResponse(loginService.join(form, request))
 
     @Auth
     @GetMapping("/logout")
@@ -31,8 +31,10 @@ class AuthController(private val loginService: LoginService) {
 @Auth
 @RestController
 @RequestMapping("/user")
-class UserController(private val userService: UserService) {
-
+class UserController(
+    private val userService: UserService,
+    private val authService: AuthService
+) {
     // 내 정보 조회
     @GetMapping
     fun getUser(user: User) = MyDetailResponse(user)
@@ -64,20 +66,32 @@ class UserController(private val userService: UserService) {
     fun unfollowUser(@PathVariable("userId") userId: Long, user: User) =
         BoolResponse(userService.unfollowUser(userId, user))
 
-    @PatchMapping("/password")
-    fun updatePassword(form: PasswordUpdateForm, user: User) =
-        BoolResponse(userService.updatePassword(form, user))
-
     // 내 정보 수정
     @PatchMapping("/info")
     fun updateUserInfo(form: UserInfoUpdateForm, user: User) =
         UserDetailResponse(userService.updateUserInfo(form, user))
 
-    // 회원 탈퇴 (비밀번호와 함께 요청)
+    // 프로필 이미지 변경
+    @PatchMapping("/profile-image")
+    fun updateProfileImage(@RequestPart("image") image: MultipartFile, user: User) =
+        UserDetailResponse(userService.updateProfileImage(image, user))
+
+    // 비밀번호 변경
+    @PatchMapping("/password")
+    fun updatePassword(form: PasswordUpdateForm, user: User) =
+        BoolResponse(userService.updatePassword(form, user))
+
+    // 회원 삭제 (비밀번호와 함께 요청)
     @DeleteMapping
-    fun deleteUser(form: UserDeleteForm, user: User, request: HttpServletRequest): BoolResponse {
-        userService.deleteUser(form, user)
-        request.session.invalidate()
-        return BoolResponse(true)
+    fun deleteUser(@RequestBody form: UserDeleteForm,
+                   user: User,
+                   request: HttpServletRequest
+    ): BoolResponse {
+        if (form.password == user.password) {
+            userService.deleteUser(form, user)
+            authService.logout(request)
+            return BoolResponse(true)
+        }
+        else throw UserException(PASSWORD_MISMATCH)
     }
 }

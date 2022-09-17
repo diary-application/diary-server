@@ -1,18 +1,19 @@
 package diary.capstone.auth
 
 import diary.capstone.domain.user.*
-import diary.capstone.util.AUTH_KEY
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import javax.servlet.http.HttpServletRequest
 
 /**
- * 클라이언트 인증 방식 구현체
+ * 클라이언트 인증 방식 구현체 모음
  */
 
-// 세션 방식으로 인증
+const val AUTH_KEY = "user"
+
+// 세션 방식
 @Service
-@Transactional
+@Transactional(readOnly = true)
 class SessionMethod(private val userRepository: UserRepository): AuthService {
 
     override fun login(request: HttpServletRequest, uid: String, password: String): User {

@@ -1,6 +1,7 @@
 package diary.capstone.domain.user
 
 import diary.capstone.domain.feed.FeedSimpleResponse
+import diary.capstone.domain.file.FileResponse
 import org.springframework.data.domain.Page
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
@@ -62,16 +63,19 @@ data class UserDeleteForm(
 
 data class UserSimpleResponse(
     var id: Long,
-    var name: String
+    var name: String,
+    var image: FileResponse?
 ) {
     constructor(user: User): this(
         id = user.id!!,
-        name = user.name
+        name = user.name,
+        image = user.profileImage?.let { FileResponse(it) }
     )
 }
 
 data class MyDetailResponse(
     var id: Long,
+    var image: FileResponse?,
     var uid: String,
     var name: String,
     var email: String,
@@ -82,6 +86,7 @@ data class MyDetailResponse(
 ) {
     constructor(user: User): this(
         id = user.id!!,
+        image = user.profileImage?.let { FileResponse(it) },
         uid = user.uid,
         name = user.name,
         email = user.email,
@@ -94,6 +99,7 @@ data class MyDetailResponse(
 
 data class UserDetailResponse(
     var id: Long,
+    var image: FileResponse?,
     var name: String,
     var job: String,
     var category: String,
@@ -102,6 +108,7 @@ data class UserDetailResponse(
 ) {
     constructor(user: User): this(
         id = user.id!!,
+        image = user.profileImage?.let { FileResponse(it) },
         name = user.name,
         job = user.job,
         category = user.category,

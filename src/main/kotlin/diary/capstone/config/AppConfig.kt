@@ -2,6 +2,7 @@ package diary.capstone.config
 
 import diary.capstone.auth.AuthService
 import diary.capstone.auth.SessionMethod
+import diary.capstone.domain.file.FILE_SAVE_PATH
 import diary.capstone.domain.user.UserRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -26,7 +27,9 @@ class AppConfig(private val authService: AuthService): WebMvcConfigurer {
 
     // 정적 리소스 조회 경로 설정
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
-        super.addResourceHandlers(registry)
+        registry
+            .addResourceHandler("/file/**")
+            .addResourceLocations("file:$FILE_SAVE_PATH")
     }
 }
 

@@ -10,7 +10,7 @@ plugins {
 	kotlin("plugin.noarg") version "1.6.21"
 
 	// QueryDSL 사용을 위한 kapt 플러그인 추가
-//	kotlin("kapt") version "1.7.10"
+	kotlin("kapt") version "1.7.10"
 }
 
 group = "diary"

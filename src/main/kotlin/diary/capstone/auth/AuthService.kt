@@ -16,7 +16,7 @@ interface AuthService {
 
     /**
      * 인증 체크 메소드
-     * 요청자의 로그인 유무를 판단. 예외 처리로 구현
+     * 요청자의 로그인 상태 체크, 로그인 안되어있다면 예외 발생하게 구현
      */
     fun authCheck(request: HttpServletRequest)
 }

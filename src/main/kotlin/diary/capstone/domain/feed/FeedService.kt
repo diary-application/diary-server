@@ -2,6 +2,8 @@ package diary.capstone.domain.feed
 
 import diary.capstone.domain.feed.comment.Comment
 import diary.capstone.domain.feed.comment.CommentRequestForm
+import diary.capstone.domain.file.File
+import diary.capstone.domain.file.FileService
 import diary.capstone.domain.user.User
 import diary.capstone.domain.user.UserService
 import diary.capstone.util.*
@@ -14,17 +16,32 @@ import kotlin.math.min
 @Transactional
 class FeedService(
     private val feedRepository: FeedRepository,
-    private val userService: UserService
+    private val userService: UserService,
+    private val fileService: FileService
 ) {
+    private fun setAndSaveFiles(feed: Feed, form: FeedRequestForm) {
+        if (form.images.size == form.descriptions.size) {
+            val files = mutableListOf<File>()
+            form.images.zip(form.descriptions) { file, desc ->
+                files.add(fileService.saveFile(file, desc).setFeed(feed))
+            }
+            feed.updateFiles(files)
+        } else throw FeedException(INVALID_FEED_FORM)
+    }
+
     // 피드 작성
-    fun createFeed(form: FeedRequestForm, loginUser: User): Feed =
-        feedRepository.save(
+    fun createFeed(form: FeedRequestForm, loginUser: User): Feed {
+        val feed = feedRepository.save(
             Feed(
                 writer = loginUser,
                 content = form.content,
                 showScope = form.showScope
             )
         )
+        setAndSaveFiles(feed, form)
+
+        return feed
+    }
 
     // 피드 목록 검색 (페이징)
     @Transactional(readOnly = true)
@@ -44,7 +61,7 @@ class FeedService(
                 user.feeds
                     .filterNotShowFollowersFeed(
                         // 피드 작성자를 팔로우 했다면 팔로워 공개 피드를 보여줌
-                        !user.follower.map { it.user.id }.contains(loginUser.id)
+                        !user.follower.map { it.causer.id }.contains(loginUser.id)
                     )
                     .filterNotShowMeFeed()
                     .sortedByDescending { it.id }
@@ -93,7 +110,11 @@ class FeedService(
     fun updateFeed(feedId: Long, form: FeedRequestForm, loginUser: User): Feed {
         val feed = getFeed(feedId)
         feedPermissionCheck(feed, loginUser)
-        feed.update(form.content)
+
+        feed.update(form.content, form.showScope)
+
+        setAndSaveFiles(feed, form)
+
         return feed
     }
 

@@ -21,7 +21,7 @@ import javax.validation.Valid
 class FeedController(private val feedService: FeedService) {
 
     @PostMapping
-    fun createFeed(@Valid @RequestBody form: FeedRequestForm, user: User) =
+    fun createFeed(@Valid @ModelAttribute form: FeedRequestForm, user: User) =
         FeedSimpleResponse(feedService.createFeed(form, user), user)
 
     // 피드 목록 조회 (모든 피드, 해당 유저의 피드)
@@ -37,7 +37,7 @@ class FeedController(private val feedService: FeedService) {
 
     @PutMapping("/{feedId}")
     fun updateFeed(@PathVariable("feedId") feedId: Long,
-                   @Valid @RequestBody form: FeedRequestForm,
+                   @Valid @ModelAttribute form: FeedRequestForm,
                    user: User
     ) = FeedDetailResponse(feedService.updateFeed(feedId, form, user), user)
 

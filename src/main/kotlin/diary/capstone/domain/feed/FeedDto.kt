@@ -1,14 +1,19 @@
 package diary.capstone.domain.feed
 
+import diary.capstone.domain.file.FileResponse
 import diary.capstone.domain.user.User
 import diary.capstone.domain.user.UserSimpleResponse
 import org.springframework.data.domain.Page
+import org.springframework.web.multipart.MultipartFile
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Pattern
 
 data class FeedRequestForm(
-    @field:NotBlank
     var content: String,
+
+    // 이미지와 설명은 일대일 대응, 설명이 없을 경우 빈 문자열로 전송
+    var images: List<MultipartFile> = listOf(),
+    var descriptions: List<String> = listOf(),
 
     @field:Pattern(regexp = "^(all|followers|me)$", message = "all, followers, me 로만 입력 가능합니다.")
     var showScope: String
@@ -18,6 +23,7 @@ data class FeedSimpleResponse(
     var id: Long,
     var writer: UserSimpleResponse,
     var content: String,
+    var files: List<FileResponse>,
     var commentCount: Int,
     var likeCount: Int,
     var isLiked: Boolean,
@@ -28,6 +34,7 @@ data class FeedSimpleResponse(
         id = feed.id!!,
         writer = UserSimpleResponse(feed.writer),
         content = feed.content,
+        files = feed.files.map { FileResponse(it) },
         commentCount = feed.comments.size,
         likeCount = feed.likes
             .count { it.feed.id == feed.id },
@@ -44,6 +51,7 @@ data class FeedDetailResponse(
     var id: Long,
     var writer: UserSimpleResponse,
     var content: String,
+    var files: List<FileResponse>,
     var commentCount: Int,
 //    var comments: List<CommentResponse>,
     var likeCount: Int,
@@ -55,6 +63,7 @@ data class FeedDetailResponse(
         id = feed.id!!,
         writer = UserSimpleResponse(feed.writer),
         content = feed.content,
+        files = feed.files.map { FileResponse(it) },
         commentCount = feed.comments.size,
 //        comments = feed.comments
 //            .filter { it.parent == null }
