@@ -93,10 +93,7 @@ class UserController(
 
     // 회원 삭제 (비밀번호와 함께 요청)
     @DeleteMapping
-    fun deleteUser(@RequestBody form: UserDeleteForm,
-                   user: User,
-                   request: HttpServletRequest
-    ): BoolResponse {
+    fun deleteUser(@RequestBody form: UserDeleteForm, user: User, request: HttpServletRequest): BoolResponse {
         if (form.password == user.password) {
             userService.deleteUser(form, user)
             authService.logout(request)

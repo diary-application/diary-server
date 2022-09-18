@@ -1,7 +1,9 @@
 package diary.capstone.domain.user
 
 import diary.capstone.auth.AuthService
+import diary.capstone.config.INTERESTS_LIMIT
 import diary.capstone.domain.file.FileService
+import diary.capstone.domain.occupation.INTERESTS_EXCEEDED
 import diary.capstone.domain.occupation.OCCUPATION_NOT_FOUND
 import diary.capstone.domain.occupation.OccupationException
 import diary.capstone.domain.occupation.OccupationService
@@ -117,6 +119,7 @@ class UserService(
     }
 
     fun updateUserInterests(form: UserInterestsUpdateForm, loginUser: User): User {
+        if (form.interests.size > INTERESTS_LIMIT) throw OccupationException(INTERESTS_EXCEEDED)
         // 해당 직종이 존재하는지 확인
         form.interests.forEach {
             if (!occupationService.isExists(it)) throw OccupationException("[$it] $OCCUPATION_NOT_FOUND")

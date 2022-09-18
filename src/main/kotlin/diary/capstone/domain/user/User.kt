@@ -57,6 +57,10 @@ class User(
         return this
     }
 
+    /**
+     * interests 프로퍼티는 String 타입으로 여러 직종을 ,로 구분하여 저장.
+     * 해당 프로퍼티를 조회할 땐 아래 메소드를 사용하여 파싱 후 조회해야함
+     */
     fun getInterests(): List<String> {
         return if (this.interests == "") listOf() else this.interests.split(",")
     }
