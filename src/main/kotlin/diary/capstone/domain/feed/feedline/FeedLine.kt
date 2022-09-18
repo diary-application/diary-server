@@ -20,6 +20,6 @@ class FeedLine (
     // 정렬 기준(날짜순, 좋아요순)
     var sortBy: String = "",
 
-    // 선택한 카테고리 목록
-    var categories: String
+    // 선택한 카테고리 목록(,로 구분)
+    var categories: String = ""
 )

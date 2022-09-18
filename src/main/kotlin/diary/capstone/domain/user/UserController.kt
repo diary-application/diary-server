@@ -37,7 +37,7 @@ class UserController(
 ) {
     // 내 정보 조회
     @GetMapping
-    fun getUser(user: User) = MyDetailResponse(user)
+    fun getUser(user: User) = UserDetailResponse(user)
 
     // 특정 유저의 유저 정보 조회
     @GetMapping("/{userId}")
@@ -66,10 +66,20 @@ class UserController(
     fun unfollowUser(@PathVariable("userId") userId: Long, user: User) =
         BoolResponse(userService.unfollowUser(userId, user))
 
-    // 내 정보 수정
+    // 내 정보 수정(이름, 메일)
     @PatchMapping("/info")
     fun updateUserInfo(form: UserInfoUpdateForm, user: User) =
         UserDetailResponse(userService.updateUserInfo(form, user))
+
+    // 직종 수정
+    @PatchMapping("/occupation")
+    fun updateUserOccupation(@Valid @RequestBody form: UserOccupationUpdateForm, user: User) =
+        UserDetailResponse(userService.updateUserOccupation(form, user))
+    
+    // 관심 분야 수정
+    @PatchMapping("/interests")
+    fun updateUserInterests(@RequestBody form: UserInterestsUpdateForm, user: User) =
+        UserDetailResponse(userService.updateUserInterests(form, user))
 
     // 프로필 이미지 변경
     @PatchMapping("/profile-image")

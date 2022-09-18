@@ -1,6 +1,7 @@
 package diary.capstone
 
 import diary.capstone.domain.feed.*
+import diary.capstone.domain.occupation.OccupationService
 import diary.capstone.domain.user.User
 import diary.capstone.domain.user.UserRepository
 import org.springframework.stereotype.Component
@@ -11,6 +12,7 @@ import javax.annotation.PostConstruct
 @Transactional
 class InitDummyData(
     private val userRepository: UserRepository,
+    private val occupationService: OccupationService,
     private val feedService: FeedService
 ) {
 
@@ -27,6 +29,9 @@ class InitDummyData(
                 )
             )
         }
+        
+        occupationService.createOccupation("IT")
+        occupationService.createOccupation("엔터테인먼트")
 
         // 댓글 생성
 //        repeat(11) {

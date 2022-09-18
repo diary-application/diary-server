@@ -1,6 +1,5 @@
 package diary.capstone.domain.user
 
-import diary.capstone.domain.feed.FeedSimpleResponse
 import diary.capstone.domain.file.FileResponse
 import org.springframework.data.domain.Page
 import javax.validation.constraints.Email
@@ -49,12 +48,15 @@ data class UserInfoUpdateForm(
     @field:NotBlank
     @field:Email
     var email: String,
+)
 
+data class UserOccupationUpdateForm(
     @field:NotBlank
-    var job: String,
+    var occupation: String
+)
 
-    @field:NotBlank
-    var category: String
+data class UserInterestsUpdateForm(
+    var interests: List<String>
 )
 
 data class UserDeleteForm(
@@ -73,36 +75,12 @@ data class UserSimpleResponse(
     )
 }
 
-data class MyDetailResponse(
-    var id: Long,
-    var image: FileResponse?,
-    var uid: String,
-    var name: String,
-    var email: String,
-    var job: String,
-    var category: String,
-    var followingCount: Int,
-    var followerCount: Int
-) {
-    constructor(user: User): this(
-        id = user.id!!,
-        image = user.profileImage?.let { FileResponse(it) },
-        uid = user.uid,
-        name = user.name,
-        email = user.email,
-        job = user.job,
-        category = user.category,
-        followingCount = user.following.count(),
-        followerCount = user.follower.count()
-    )
-}
-
 data class UserDetailResponse(
     var id: Long,
     var image: FileResponse?,
     var name: String,
-    var job: String,
-    var category: String,
+    var occupation: String?,
+    var interests: List<String>,
     var followingCount: Int,
     var followerCount: Int
 ) {
@@ -110,8 +88,8 @@ data class UserDetailResponse(
         id = user.id!!,
         image = user.profileImage?.let { FileResponse(it) },
         name = user.name,
-        job = user.job,
-        category = user.category,
+        occupation = user.occupation?.name,
+        interests = user.getInterests(),
         followingCount = user.following.count(),
         followerCount = user.follower.count()
     )

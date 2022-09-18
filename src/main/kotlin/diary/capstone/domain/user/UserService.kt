@@ -2,6 +2,9 @@ package diary.capstone.domain.user
 
 import diary.capstone.auth.AuthService
 import diary.capstone.domain.file.FileService
+import diary.capstone.domain.occupation.OCCUPATION_NOT_FOUND
+import diary.capstone.domain.occupation.OccupationException
+import diary.capstone.domain.occupation.OccupationService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -46,6 +49,7 @@ class LoginService(
 @Transactional
 class UserService(
     private val userRepository: UserRepository,
+    private val occupationService: OccupationService,
     private val fileService: FileService
 ) {
 
@@ -103,8 +107,22 @@ class UserService(
         return loginUser.update(
             name = form.name,
             email = form.email,
-            job = form.job,
-            category = form.category
+        )
+    }
+
+    fun updateUserOccupation(form: UserOccupationUpdateForm, loginUser: User): User {
+        return loginUser.update(
+            occupation = occupationService.getOccupation(form.occupation)
+        )
+    }
+
+    fun updateUserInterests(form: UserInterestsUpdateForm, loginUser: User): User {
+        // 해당 직종이 존재하는지 확인
+        form.interests.forEach {
+            if (!occupationService.isExists(it)) throw OccupationException("[$it] $OCCUPATION_NOT_FOUND")
+        }
+        return loginUser.update(
+            interests = form.interests.joinToString(",")
         )
     }
 
