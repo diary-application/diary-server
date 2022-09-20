@@ -30,6 +30,16 @@ class InitDummyData(
             )
         }
         
+        // 관리자 생성
+        userRepository.saveAndFlush(
+            User(
+                uid = "admin",
+                password = "1234",
+                email = "admin@mail.com",
+                name = "관리자"
+            )
+        )
+        
         occupationService.createOccupation("IT")
         occupationService.createOccupation("엔터테인먼트")
 

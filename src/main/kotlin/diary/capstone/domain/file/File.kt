@@ -26,9 +26,7 @@ class File (
         return this
     }
 
+    // 엔티티 삭제 전 서버에 저장된 해당 파일 삭제
     @PreRemove
-    fun deleteStoredFile() {
-        // 엔티티 삭제될 때 서버에 저장된 파일 삭제 로직
-        java.io.File(FILE_SAVE_PATH + this.savedName).delete()
-    }
+    fun deleteStoredFile() { java.io.File(FILE_SAVE_PATH + this.savedName).delete() }
 }

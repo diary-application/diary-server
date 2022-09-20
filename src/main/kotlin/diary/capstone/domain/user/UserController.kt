@@ -57,7 +57,7 @@ class UserController(
         UserPagedResponse(userService.getFollowers(pageable, userId))
 
     // 해당 유저 팔로우
-    @PatchMapping("/{userId}/follow")
+    @PostMapping("/{userId}/follow")
     fun followUser(@PathVariable("userId") userId: Long, user: User) =
         BoolResponse(userService.followUser(userId, user))
 
@@ -67,27 +67,27 @@ class UserController(
         BoolResponse(userService.unfollowUser(userId, user))
 
     // 내 정보 수정(이름, 메일)
-    @PatchMapping("/info")
+    @PutMapping("/info")
     fun updateUserInfo(form: UserInfoUpdateForm, user: User) =
         UserDetailResponse(userService.updateUserInfo(form, user))
 
     // 직종 수정
-    @PatchMapping("/occupation")
+    @PutMapping("/occupation")
     fun updateUserOccupation(@Valid @RequestBody form: UserOccupationUpdateForm, user: User) =
         UserDetailResponse(userService.updateUserOccupation(form, user))
     
     // 관심 분야 수정
-    @PatchMapping("/interests")
+    @PutMapping("/interests")
     fun updateUserInterests(@RequestBody form: UserInterestsUpdateForm, user: User) =
         UserDetailResponse(userService.updateUserInterests(form, user))
 
     // 프로필 이미지 변경
-    @PatchMapping("/profile-image")
+    @PutMapping("/profile-image")
     fun updateProfileImage(@RequestPart("image") image: MultipartFile, user: User) =
         UserDetailResponse(userService.updateProfileImage(image, user))
 
     // 비밀번호 변경
-    @PatchMapping("/password")
+    @PutMapping("/password")
     fun updatePassword(form: PasswordUpdateForm, user: User) =
         BoolResponse(userService.updatePassword(form, user))
 

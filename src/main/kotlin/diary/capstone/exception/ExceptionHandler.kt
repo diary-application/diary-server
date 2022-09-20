@@ -14,7 +14,7 @@ class ExceptionHandler {
     // 인증 예외 처리
     @ExceptionHandler(AuthException::class)
     fun loginExceptionHandle(ex: AuthException): ResponseEntity<ErrorResponse> {
-        log.warn("[LoginException] : {}", ex.message)
+        log.warn("[AuthException] : {}", ex.message)
         return unauthorized(ex)
     }
 

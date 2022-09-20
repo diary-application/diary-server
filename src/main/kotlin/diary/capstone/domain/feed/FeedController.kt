@@ -38,7 +38,7 @@ class FeedController(private val feedService: FeedService) {
         FeedDetailResponse(feedService.getFeed(feedId), user)
 
     // 피드 수정
-    @PutMapping("/{feedId}")
+    @PatchMapping("/{feedId}")
     fun updateFeed(@PathVariable("feedId") feedId: Long,
                    @Valid @ModelAttribute form: FeedRequestForm,
                    user: User

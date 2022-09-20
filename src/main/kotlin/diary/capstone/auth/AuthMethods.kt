@@ -36,4 +36,9 @@ class SessionMethod(private val userRepository: UserRepository): AuthService {
     override fun authCheck(request: HttpServletRequest) {
         request.session.getAttribute(AUTH_KEY) ?: throw AuthException(NOT_LOGIN_USER)
     }
+
+    override fun adminCheck(request: HttpServletRequest) {
+        val uid = request.session.getAttribute(AUTH_KEY)?.let { it.toString() } ?: ""
+        if (uid != "admin") throw AuthException(ADMIN_ONLY)
+    }
 }

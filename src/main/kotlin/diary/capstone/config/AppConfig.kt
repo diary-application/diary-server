@@ -6,6 +6,7 @@ import diary.capstone.domain.file.FILE_SAVE_PATH
 import diary.capstone.domain.user.UserRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.CacheControl
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
@@ -16,6 +17,7 @@ import springfox.documentation.service.ApiInfo
 import springfox.documentation.spi.DocumentationType
 import springfox.documentation.spring.web.plugins.Docket
 import springfox.documentation.swagger2.annotations.EnableSwagger2
+import java.util.concurrent.TimeUnit
 
 @Configuration
 class AppConfig(private val authService: AuthService): WebMvcConfigurer {
@@ -28,8 +30,9 @@ class AppConfig(private val authService: AuthService): WebMvcConfigurer {
     // 정적 리소스 조회 경로 설정
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
         registry
-            .addResourceHandler("/file/**")
+            .addResourceHandler("/resource/**")
             .addResourceLocations("file:$FILE_SAVE_PATH")
+            .setCacheControl(CacheControl.maxAge(CACHING_MINUTES, TimeUnit.MINUTES))
     }
 }
 

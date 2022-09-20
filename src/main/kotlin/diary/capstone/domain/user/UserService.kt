@@ -73,7 +73,7 @@ class UserService(
     fun getFollowers(pageable: Pageable, userId: Long): Page<User> =
         getPagedUsers(pageable,
             getUser(userId).follower
-                .map { it.causer }
+                .map { it.user }
                 .sortedBy { it.name }
         )
 
@@ -92,7 +92,7 @@ class UserService(
 
         // 이미 팔로우 한 대상은 팔로우 불가능
         if (loginUser.following.none { it.target.id == targetUser.id })
-            loginUser.following.add(Follow(causer = loginUser, target = targetUser))
+            loginUser.following.add(Follow(user = loginUser, target = targetUser))
         else throw UserException(ALREADY_FOLLOWED)
         return true
     }
@@ -100,7 +100,7 @@ class UserService(
     fun unfollowUser(userId: Long, loginUser: User): Boolean {
         loginUser.following.remove(
             loginUser.following
-                .find { it.causer.id == loginUser.id && it.target.id == getUser(userId).id }
+                .find { it.user.id == loginUser.id && it.target.id == getUser(userId).id }
         )
         return true
     }
@@ -130,13 +130,14 @@ class UserService(
     }
 
     fun updateProfileImage(image: MultipartFile, loginUser: User): User {
+        // 등록된 프로필 사진이 있다면 원래 사진 삭제 후 새 사진 저장
         loginUser.profileImage?.let { fileService.deleteFile(it) }
         return loginUser.update(profileImage = fileService.saveFile(image))
     }
 
     fun updatePassword(form: PasswordUpdateForm, loginUser: User): Boolean {
-        if (!form.checkPassword()) throw UserException(PASSWORD_MISMATCH)
-        if (form.currentPassword != loginUser.password) throw UserException(PASSWORD_MISMATCH)
+        if (!form.checkPassword()) throw UserException(NEW_PASSWORD_MISMATCH)
+        if (form.currentPassword != loginUser.password) throw UserException(CURRENT_PASSWORD_MISMATCH)
         loginUser.update(form.currentPassword)
         return true
     }

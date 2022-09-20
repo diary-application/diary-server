@@ -61,7 +61,7 @@ class FeedService(
                 user.feeds
                     .filterNotShowFollowersFeed(
                         // 피드 작성자를 팔로우 했다면 팔로워 공개 피드를 보여줌
-                        !user.follower.map { it.causer.id }.contains(loginUser.id)
+                        !user.follower.map { it.user.id }.contains(loginUser.id)
                     )
                     .filterNotShowMeFeed()
                     .sortedByDescending { it.id }

@@ -6,7 +6,7 @@ import diary.capstone.domain.user.User
 import diary.capstone.util.BaseTimeEntity
 import javax.persistence.*
 
-// 공개 범위 const
+// 공개 범위 Domains
 const val SHOW_ALL = "all"
 const val SHOW_FOLLOWERS = "follower"
 const val SHOW_ME = "me"
@@ -52,6 +52,7 @@ class Feed(
 @Entity
 class FeedLike(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "feed_like_id")
     var id: Long? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)

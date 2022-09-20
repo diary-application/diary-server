@@ -1,7 +1,7 @@
 package diary.capstone.domain.user
 
 import diary.capstone.domain.feed.Feed
-import diary.capstone.domain.feed.feedline.FeedLine
+import diary.capstone.domain.user.feedline.FeedLine
 import diary.capstone.domain.file.File
 import diary.capstone.domain.occupation.Occupation
 import diary.capstone.util.BaseTimeEntity
@@ -33,7 +33,7 @@ class User(
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
     var feedLines: MutableList<FeedLine> = mutableListOf(),
 
-    @OneToMany(mappedBy = "causer", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
     var following: MutableList<Follow> = mutableListOf(),
 
     @OneToMany(mappedBy = "target", cascade = [CascadeType.ALL], orphanRemoval = true)
@@ -69,12 +69,13 @@ class User(
 @Entity
 class Follow(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "follow_id")
     var id: Long? = null,
 
     // 팔로우 한 유저
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    var causer: User,
+    var user: User,
 
     // 팔로우 대상 유저
     @ManyToOne(fetch = FetchType.LAZY)

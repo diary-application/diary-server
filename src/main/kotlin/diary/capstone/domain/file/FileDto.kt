@@ -11,3 +11,13 @@ data class FileResponse(
         description = file.description
     )
 }
+
+data class ProfileImageFileResponse(
+    var originalName: String,
+    var savedName: String,
+) {
+    constructor(file: File): this(
+        originalName = file.originalName,
+        savedName = file.savedName,
+    )
+}

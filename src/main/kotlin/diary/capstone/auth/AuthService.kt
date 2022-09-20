@@ -15,8 +15,14 @@ interface AuthService {
     fun getUser(request: HttpServletRequest): User?
 
     /**
-     * 인증 체크 메소드
-     * 요청자의 로그인 상태 체크, 로그인 안되어있다면 예외 발생하게 구현
+     * 요청자의 로그인 상태 체크
+     * 로그인 안되어있다면 예외 발생
      */
     fun authCheck(request: HttpServletRequest)
+
+    /**
+     * 요청자가 관리자인지 체크
+     * 관리자가 아니라면 예외 발생
+     */
+    fun adminCheck(request: HttpServletRequest)
 }

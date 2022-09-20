@@ -1,7 +1,8 @@
 package diary.capstone.domain.occupation
 
-data class OccupationResponse(var name: String) {
-    constructor(occupation: Occupation): this(
-        name = occupation.name
-    )
-}
+import javax.validation.constraints.NotBlank
+
+data class OccupationRequestForm(
+    @field:NotBlank
+    var name: String
+)
