@@ -13,4 +13,4 @@ const val CACHING_MINUTES: Long = 5
 const val AUTH_CODE_DIGITS = 6
 
 // 인증용 코드 유효 시간(분)
-const val AUTH_CODE_VALID_MINUTE = 5
+const val AUTH_VALID_MINUTE = 5
