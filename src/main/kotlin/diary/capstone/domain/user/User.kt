@@ -18,6 +18,10 @@ class User(
     var name: String,
     var email: String,
 
+    // 최근 접속 ip
+    var ip: String = "",
+    var loginWaiting: Boolean = false,
+
     @OneToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "id")
     var occupation: Occupation? = null, // 직종
@@ -44,6 +48,8 @@ class User(
         password: String? = null,
         name: String? = null,
         email: String? = null,
+        ip: String? = null,
+        loginWaiting: Boolean? = null,
         occupation: Occupation? = null,
         interests: String? = null,
         profileImage: File? = null
@@ -51,6 +57,8 @@ class User(
         password?.let { this.password = password }
         name?.let { this.name = name }
         email?.let { this.email = email }
+        ip?.let { this.ip = ip }
+        loginWaiting?.let { this.loginWaiting = loginWaiting }
         occupation?.let { this.occupation = occupation }
         interests?.let { this.interests = interests }
         profileImage?.let { this.profileImage = profileImage }

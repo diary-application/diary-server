@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletRequest
 
 interface AuthService {
 
-    fun login(request: HttpServletRequest, uid: String, password: String): User
+    fun login(request: HttpServletRequest, user: User): User
 
     fun logout(request: HttpServletRequest): Boolean
 

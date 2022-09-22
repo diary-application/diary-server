@@ -1,6 +1,7 @@
 package diary.capstone.exception
 
 import diary.capstone.domain.user.AuthException
+import diary.capstone.domain.user.MAIL_AUTH_REQUIRED
 import diary.capstone.util.*
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.BindException
@@ -15,7 +16,7 @@ class ExceptionHandler {
     @ExceptionHandler(AuthException::class)
     fun loginExceptionHandle(ex: AuthException): ResponseEntity<ErrorResponse> {
         log.warn("[AuthException] : {}", ex.message)
-        return unauthorized(ex)
+        return if (ex.message == MAIL_AUTH_REQUIRED) proxyAuthenticationRequired(ex) else unauthorized(ex)
     }
 
     // 검증 예외 처리
@@ -24,10 +25,8 @@ class ExceptionHandler {
         log.warn("[{}] : {}, \nerrors = {}", ex.javaClass.simpleName, ex.message, ex.bindingResult.fieldErrors)
 
         return badRequest(
-            ErrorListResponse(
-                ex.bindingResult.fieldErrors
-                    .map { ErrorResponse("검증 오류", "${it.field}: ${it.defaultMessage}") }
-            )
+            ex.bindingResult.fieldErrors
+                .map { ErrorResponse(it.field, it.defaultMessage ?: "검증 오류") }
         )
     }
 

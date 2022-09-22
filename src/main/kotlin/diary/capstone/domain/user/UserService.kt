@@ -1,46 +1,100 @@
 package diary.capstone.domain.user
 
 import diary.capstone.auth.AuthService
+import diary.capstone.auth.AuthCodeManager
 import diary.capstone.config.INTERESTS_LIMIT
 import diary.capstone.domain.file.FileService
 import diary.capstone.domain.occupation.INTERESTS_EXCEEDED
 import diary.capstone.domain.occupation.OCCUPATION_NOT_FOUND
 import diary.capstone.domain.occupation.OccupationException
 import diary.capstone.domain.occupation.OccupationService
+import diary.capstone.util.MailService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
+import java.time.LocalDateTime
 import javax.servlet.http.HttpServletRequest
 import kotlin.math.min
 
 @Service
 class LoginService(
     private val authService: AuthService,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val authCodeManager: AuthCodeManager,
+    private val mailService: MailService
 ) {
 
-    fun login(form: LoginForm, request: HttpServletRequest): User =
-        authService.login(request, form.uid, form.password)
+    @Transactional
+    fun login(form: LoginForm, request: HttpServletRequest): User {
+        val user = userRepository.findByUidAndPassword(form.uid, form.password)
+            ?: throw AuthException(LOGIN_FAILED)
 
-    // 유저 생성 후 로그인까지
+        /**
+         * 다른 ip로 접속 시 or 로그인 하려는 유저가 로그인 대기 상태일 시
+         * 인증 코드 생성 -> 인증 메일 발송 -> 인증 예외 발생
+         */
+        if (user.ip != request.remoteAddr || user.loginWaiting) {
+            user.update(loginWaiting = true)
+            mailService.sendLoginAuthMail(authCodeManager.generateCode(user.id!!.toString()), user.email)
+            throw AuthException(MAIL_AUTH_REQUIRED)
+        }
+        else authService.login(request, user)
+
+        return user
+    }
+
+    // 메일 인증 로그인
+    @Transactional
+    fun mailAuthenticationLogin(form: MailAuthLoginForm, request: HttpServletRequest): User {
+        val user = userRepository.findByUidAndPassword(form.uid, form.password)
+            ?: throw AuthException(LOGIN_FAILED)
+
+        // 인증 코드 일치 확인, 불일치 시 예외 발생
+        if (form.code == authCodeManager.getAuthCode(user.id!!.toString())) {
+            // 최근 접속 IP를 현재 접속 IP로 수정, 로그인 대기 상태 해제 후 로그인
+            authCodeManager.removeUsedAuthCode(user.id!!.toString())
+            user.update(ip = request.remoteAddr, loginWaiting = false)
+            return authService.login(request, user)
+        }
+        else throw AuthException(AUTH_CODE_MISMATCH)
+    }
+    
+    // 이메일 인증 메일 발송
+    fun sendEmailAuthMail(form: AuthMailForm) =
+        mailService.sendEmailAuthMail(authCodeManager.generateCode(form.email), form.email)
+
+    // 이메일 인증 메일 확인
+    fun checkEmailAuthMail(form: AuthCodeForm) {
+        if (form.code == authCodeManager.getAuthCode(form.email)) {
+            authCodeManager.addAuthenticatedEmail(form.email)
+            authCodeManager.removeUsedAuthCode(form.email)
+        }
+        else throw UserException(AUTH_CODE_MISMATCH)
+    }
+
+    // 유저 생성
     @Transactional
     fun join(form: JoinForm, request: HttpServletRequest): User {
         if (!form.checkPassword()) throw UserException(PASSWORD_MISMATCH)
         if (userRepository.existsByUid(form.uid)) throw UserException(DUPLICATE_ID)
+        if (userRepository.existsByEmail(form.email)) throw UserException(DUPLICATE_EMAIL)
+        if (!authCodeManager.emails.contains(form.email)) throw UserException(MAIL_AUTH_REQUIRED)
 
-        val user = userRepository.save(
+        // 로그인 대기 상태로 유저 생성
+        userRepository.save(
             User(
                 uid = form.uid,
                 password = form.password,
                 name = form.name,
-                email = form.email
+                email = form.email,
+                ip = request.remoteAddr
             )
         )
 
-        return login(LoginForm(user.uid, user.password), request)
+        return login(LoginForm(form.uid, form.password), request)
     }
 
     fun logout(request: HttpServletRequest): Boolean =

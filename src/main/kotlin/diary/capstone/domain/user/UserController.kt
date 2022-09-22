@@ -3,8 +3,11 @@ package diary.capstone.domain.user
 import diary.capstone.util.BoolResponse
 import diary.capstone.auth.Auth
 import diary.capstone.auth.AuthService
+import diary.capstone.util.SuccessResponse
+import diary.capstone.util.ok
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import javax.servlet.http.HttpServletRequest
@@ -18,11 +21,30 @@ class LoginController(private val loginService: LoginService) {
     fun login(@Valid @RequestBody form: LoginForm, request: HttpServletRequest) =
         UserDetailResponse(loginService.login(form, request))
 
+    // 메일 인증과 함께 로그인
+    @PostMapping("/mail-auth-login")
+    fun mailAuthenticationLogin(@Valid @RequestBody form: MailAuthLoginForm, request: HttpServletRequest) =
+        UserDetailResponse(loginService.mailAuthenticationLogin(form, request))
+
+    // 회원 가입, 이메일은 인증된 이메일을 입력해야 함
     @PostMapping("/join")
     fun join(@Valid @RequestBody form: JoinForm, request: HttpServletRequest) =
         UserDetailResponse(loginService.join(form, request))
+    
+    // 이메일 인증 메일 발송
+    @PostMapping("/mail-auth")
+    fun authenticationEmail(@Valid @RequestBody form: AuthMailForm): SuccessResponse {
+        loginService.sendEmailAuthMail(form)
+        return SuccessResponse("확인용 메일이 발송되었습니다.")
+    }
 
-    @Auth
+    // 이메일 인증 메일 확인
+    @PostMapping("/mail-auth-check")
+    fun checkEmailAuthMail(@Valid @RequestBody form: AuthCodeForm): SuccessResponse {
+        loginService.checkEmailAuthMail(form)
+        return SuccessResponse("해당 메일이 인증되었습니다.")
+    }
+
     @GetMapping("/logout")
     fun logout(request: HttpServletRequest): BoolResponse =
         BoolResponse(loginService.logout(request))

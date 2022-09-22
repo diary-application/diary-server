@@ -2,10 +2,13 @@ package diary.capstone.domain.user
 
 // 로그인
 const val LOGIN_FAILED = "아이디/비밀번호를 다시 확인해주세요."
+const val MAIL_AUTH_REQUIRED = "메일 인증이 필요합니다."
+const val AUTH_CODE_MISMATCH = "인증 코드가 일치하지 않습니다."
 
 // 회원가입
 const val PASSWORD_MISMATCH = "비밀번호가 일치하지 않습니다."
 const val DUPLICATE_ID = "이미 사용중인 아이디입니다."
+const val DUPLICATE_EMAIL = "이미 사용중인 이메일입니다."
 
 // 인증
 const val NOT_LOGIN_USER = "로그인 후 이용 가능합니다."
@@ -21,4 +24,4 @@ const val CURRENT_PASSWORD_MISMATCH = "현재 비밀번호가 일치하지 않�
 const val NEW_PASSWORD_MISMATCH = "새 비밀번호가 일치하지 않습니다."
 
 class UserException(message: String): RuntimeException(message)
-class AuthException(message: String): RuntimeException(message)
+class AuthException(message: String): Exception(message)

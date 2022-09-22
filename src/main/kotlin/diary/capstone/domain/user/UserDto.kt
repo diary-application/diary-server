@@ -1,6 +1,5 @@
 package diary.capstone.domain.user
 
-import diary.capstone.domain.file.FileResponse
 import diary.capstone.domain.file.ProfileImageFileResponse
 import org.springframework.data.domain.Page
 import javax.validation.constraints.Email
@@ -13,6 +12,20 @@ data class LoginForm(
     @field:NotBlank
     var password: String
 )
+
+data class MailAuthLoginForm(
+    @field:NotBlank
+    var uid: String,
+
+    @field:NotBlank
+    var password: String,
+
+    @field:NotBlank
+    var code: String
+)
+
+data class AuthMailForm(@field:NotBlank @field:Email var email: String)
+data class AuthCodeForm(@field:NotBlank @field:Email var email: String, @field:NotBlank var code: String)
 
 data class JoinForm(
     @field:NotBlank
@@ -27,6 +40,29 @@ data class JoinForm(
     @field:NotBlank
     @field:Email
     var email: String,
+
+    @field:NotBlank
+    var name: String
+) {
+    fun checkPassword(): Boolean = this.password == this.passwordCheck
+}
+
+data class MailAuthJoinForm(
+    @field:NotBlank
+    var uid: String,
+
+    @field:NotBlank
+    var password: String,
+
+    @field:NotBlank
+    var passwordCheck: String,
+
+    @field:NotBlank
+    @field:Email
+    var email: String,
+
+    @field:NotBlank
+    var code: String,
 
     @field:NotBlank
     var name: String
@@ -80,19 +116,23 @@ data class UserDetailResponse(
     var id: Long,
     var image: ProfileImageFileResponse?,
     var name: String,
+    var email: String,
     var occupation: String?,
     var interests: List<String>,
     var followingCount: Int,
-    var followerCount: Int
+    var followerCount: Int,
+    var ip: String
 ) {
     constructor(user: User): this(
         id = user.id!!,
         image = user.profileImage?.let { ProfileImageFileResponse(it) },
         name = user.name,
+        email = user.email,
         occupation = user.occupation?.name,
         interests = user.getInterests(),
         followingCount = user.following.count(),
-        followerCount = user.follower.count()
+        followerCount = user.follower.count(),
+        ip = user.ip
     )
 }
 

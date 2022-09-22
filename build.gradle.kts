@@ -31,12 +31,15 @@ dependencies {
 	runtimeOnly("mysql:mysql-connector-java")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 
-	// swagger
-	implementation("io.springfox:springfox-boot-starter:3.0.0")
-	implementation("io.springfox:springfox-swagger-ui:3.0.0")
+	// mail
+	implementation("org.springframework.boot:spring-boot-starter-mail")
 
 	// AOP
 	implementation("org.springframework.boot:spring-boot-starter-aop")
+
+	// swagger
+	implementation("io.springfox:springfox-boot-starter:3.0.0")
+	implementation("io.springfox:springfox-swagger-ui:3.0.0")
 
 	// Querydsl-jpa
 //	val querydslVersion = "5.0.0"
