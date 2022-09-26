@@ -74,3 +74,8 @@ tasks.withType<KotlinCompile> {
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
+
+// for github actions
+tasks.getByName<Jar>("jar") {
+	enabled = false
+}
