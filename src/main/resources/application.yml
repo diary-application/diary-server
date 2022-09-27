@@ -6,6 +6,8 @@
 #      sql: trace
 
 spring:
+  config:
+    import: application-secret.yml
   jpa:
     # JPA sql 쿼리 로그 출력
 #    show-sql: true
@@ -25,8 +27,8 @@ spring:
       # 한 요청의 최대 크기
       max-request-size: 100MB
 
-  profiles:
-    active: db, mail
+#  profiles:
+#    active: secret
 
   mvc:
     pathmatch:
@@ -52,4 +54,3 @@ server:
   servlet:
     session:
       tracking-modes: cookie
-  port: 8081

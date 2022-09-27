@@ -34,6 +34,14 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
     
+    - name: Copy Yaml Secrets
+      env:
+          YAML_SECRET: ${{ secrets.YML_SECRET }}
+          YAML_DIR: src/main/resources
+          YAML_FILE_NAME: application-secret.yml
+      run: echo $YAML_SECRET | base64 --decode > $YAML_DIR/$YAML_FILE_NAME
+        
+    
     # (2-1) gradlew 권한 수정
     - name: Run chmod to make gradlew executable
       run: chmod +x ./gradlew
