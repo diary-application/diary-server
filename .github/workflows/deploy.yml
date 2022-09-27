@@ -37,10 +37,6 @@ jobs:
     # (2-1) gradlew 권한 수정
     - name: Run chmod to make gradlew executable
       run: chmod +x ./gradlew
-      
-    # (2-3) application-db.yml 복사
-    - name: Copy application-db.yml
-      run: sudo cp /home/ubuntu/application-db.yml /home/ubuntu/diary-server/src/main/resources/application-db.yml
 
     # (3) Gradle build (Test 제외)
     - name: Build with Gradle
