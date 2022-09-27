@@ -19,7 +19,7 @@ spring:
       max-request-size: 100MB
 
   profiles:
-    active: db, mail
+    active: secret
 
   mvc:
     pathmatch:
