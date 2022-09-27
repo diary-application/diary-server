@@ -15,5 +15,5 @@ class SwaggerController {
 @RestController
 class GlobalController {
     @GetMapping
-    fun welcome() = "diary server is running super !!"
+    fun welcome() = "diary server is running super awesome!!!"
 }
