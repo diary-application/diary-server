@@ -5,4 +5,4 @@ if [ -d /home/ubuntu/diary-server/ ]; then
   rm -rf /home/ubuntu/diary-server/
 fi
 mkdir -vp /home/ubuntu/diary-server/
-sudo cp /home/ubuntu/application-db.yml /home/ubuntu/diary-server/src/main/resources/application-db.yml
+#sudo cp /home/ubuntu/application-db.yml /home/ubuntu/diary-server/src/main/resources/application-db.yml
