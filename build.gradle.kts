@@ -74,3 +74,13 @@ tasks.withType<KotlinCompile> {
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
+
+// for Github actions
+tasks.getByName<Jar>("jar") {
+	enabled = false
+}
+
+// jar 파일 이름 변경
+tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+	archiveFileName.set("diary-server.jar")
+}

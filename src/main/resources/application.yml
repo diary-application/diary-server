@@ -52,3 +52,4 @@ server:
   servlet:
     session:
       tracking-modes: cookie
+  port: 8081

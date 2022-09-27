@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page
 import org.springframework.web.multipart.MultipartFile
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Pattern
-
+// ci/cd test
 data class FeedRequestForm(
     var content: String,
 
