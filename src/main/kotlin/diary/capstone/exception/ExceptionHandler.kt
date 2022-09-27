@@ -16,7 +16,7 @@ class ExceptionHandler {
     @ExceptionHandler(AuthException::class)
     fun loginExceptionHandle(ex: AuthException): ResponseEntity<ErrorResponse> {
         log.warn("[AuthException] : {}", ex.message)
-        return if (ex.message == MAIL_AUTH_REQUIRED) proxyAuthenticationRequired(ex) else unauthorized(ex)
+        return if (ex.message == MAIL_AUTH_REQUIRED) found(ex) else unauthorized(ex)
     }
 
     // 검증 예외 처리

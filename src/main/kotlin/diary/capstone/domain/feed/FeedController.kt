@@ -1,8 +1,8 @@
 package diary.capstone.domain.feed
 
 import diary.capstone.domain.user.User
-import diary.capstone.util.BoolResponse
 import diary.capstone.auth.Auth
+import diary.capstone.config.FEED_PAGE_SIZE
 import diary.capstone.domain.feed.comment.CommentPagedResponse
 import diary.capstone.domain.feed.comment.CommentRequestForm
 import diary.capstone.domain.feed.comment.CommentResponse
@@ -21,16 +21,23 @@ import javax.validation.Valid
 class FeedController(private val feedService: FeedService) {
 
     // 피드 생성
-    @PostMapping
+    @PostMapping // @ResponseStatus(HttpStatus.CREATED)
     fun createFeed(@Valid @ModelAttribute form: FeedRequestForm, user: User) =
         FeedSimpleResponse(feedService.createFeed(form, user), user)
 
-    // 피드 목록 조회 (모든 피드, 특정 유저의 피드)
+    // 피드 목록 조회 (모든 피드, 특정 유저의 피드): 기본 피드라인 또는 프로필
     @GetMapping
-    fun getFeeds(@PageableDefault(sort = ["id"], direction = Sort.Direction.DESC) pageable: Pageable,
-                 @RequestParam(name = "userId", required = false) userId: Long?,
+    fun getFeeds(@PageableDefault(sort = ["id"], direction = Sort.Direction.DESC, size = FEED_PAGE_SIZE) pageable: Pageable,
+                 @RequestParam(name = "userid", required = false) userId: Long?,
                  user: User
     ) = FeedPagedResponse(feedService.getFeeds(pageable, userId, user), user)
+
+    // 피드 목록 조회 (피드라인으로)
+    @GetMapping
+    fun getFeedsByFeedLine(@RequestParam(name = "flid", required = true) feedLineId: Long,
+                           @PageableDefault(size = FEED_PAGE_SIZE) pageable: Pageable,
+                           user: User
+    ) = FeedPagedResponse(feedService.getFeedsByFeedLine(pageable, feedLineId, user), user)
 
     // 피드 상세 보기
     @GetMapping("/{feedId}")
@@ -47,7 +54,7 @@ class FeedController(private val feedService: FeedService) {
     // 피드 삭제
     @DeleteMapping("/{feedId}")
     fun deleteFeed(@PathVariable("feedId") feedId: Long, user: User) =
-        BoolResponse(feedService.deleteFeed(feedId, user))
+        feedService.deleteFeed(feedId, user)
 }
 
 /**
@@ -106,7 +113,7 @@ class CommentController(private val feedService: FeedService) {
     fun deleteComment(@PathVariable("feedId") feedId: Long,
                       @PathVariable("commentId") commentId: Long,
                       user: User
-    ) = BoolResponse(feedService.deleteComment(feedId, commentId, user))
+    ) = feedService.deleteComment(feedId, commentId, user)
 }
 
 /**
@@ -119,9 +126,9 @@ class FeedLikeController(private val feedService: FeedService) {
 
     @PostMapping
     fun likeFeed(@PathVariable("feedId") feedId: Long, user: User) =
-        BoolResponse(feedService.likeFeed(feedId, user))
+        feedService.likeFeed(feedId, user)
 
     @DeleteMapping
     fun cancelLikeFeed(@PathVariable("feedId") feedId: Long, user: User) =
-        BoolResponse(feedService.cancelLikeFeed(feedId, user))
+        feedService.cancelLikeFeed(feedId, user)
 }

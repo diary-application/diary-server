@@ -19,43 +19,41 @@ class FeedService(
     private val userService: UserService,
     private val fileService: FileService
 ) {
+
+    // 피드의 사진을 저장
     private fun setAndSaveFiles(feed: Feed, form: FeedRequestForm) {
         if (form.images.size == form.descriptions.size) {
-            val files = mutableListOf<File>()
+            // 이미지 파일들과 설명들을 합쳐서 하나의 리스트로 묶고 순회
             form.images.zip(form.descriptions) { file, desc ->
-                files.add(fileService.saveFile(file, desc).setFeed(feed))
+                fileService.saveFile(file, desc).setFeed(feed)
             }
-            feed.updateFiles(files)
         } else throw FeedException(INVALID_FEED_FORM)
     }
 
     // 피드 작성
-    fun createFeed(form: FeedRequestForm, loginUser: User): Feed {
-        val feed = feedRepository.save(
+    fun createFeed(form: FeedRequestForm, loginUser: User): Feed =
+        feedRepository.save(
             Feed(
                 writer = loginUser,
                 content = form.content,
                 showScope = form.showScope
             )
-        )
-        setAndSaveFiles(feed, form)
-
-        return feed
-    }
+        ).let {
+            setAndSaveFiles(it, form)
+            feedRepository.flush()
+            it
+        }
 
     // 피드 목록 검색 (페이징)
     @Transactional(readOnly = true)
-    fun getFeeds(pageable: Pageable, userId: Long?, loginUser: User): Page<Feed> {
+    fun getFeeds(pageable: Pageable, userId: Long?, loginUser: User): Page<Feed> =
         // 특정 유저의 피드만 조회 (프로필 통해 조회)
-        userId?.let {
+        userId?.let { userId ->
             val user = userService.getUser(userId)
 
             // 로그인 유저가 해당 유저일 경우 모든 피드 조회
-            if (userId == loginUser.id)
-                return getPagedFeed(pageable,
-                    user.feeds
-                        .sortedByDescending { it.id }
-                )
+            if (loginUser.id == userId)
+                return getPagedFeed(pageable, user.feeds.sortedByDescending { it.id })
 
             return getPagedFeed(pageable,
                 user.feeds
@@ -68,10 +66,18 @@ class FeedService(
             )
         } ?:
         // 모든 피드 조회
-        // TODO 피드라인의 설정 대로 조회
         run {
             return feedRepository.findByShowScope(pageable, SHOW_ALL)
         }
+
+    // 피드 목록 검색 (페이징, 피드라인으로)
+    fun getFeedsByFeedLine(pageable: Pageable, feedLineId: Long, loginUser: User): Page<Feed> {
+        loginUser.feedLines
+            .find { it.id == feedLineId }
+            ?.let {
+                // TODO 피드 라인에 따른 피드 목록 조회 로직
+            }
+            .run { throw FeedException(FEED_LINE_NOT_FOUND) }
     }
 
     // Pageable, Feed 리스트로 페이징된 Feed 객체 반환
@@ -83,47 +89,41 @@ class FeedService(
         return PageImpl(feeds.subList(start, end), pageable, total.toLong())
     }
 
+    // 피드 하나의 상세 정보
     @Transactional(readOnly = true)
     fun getFeed(feedId: Long): Feed =
         feedRepository.findById(feedId).orElseThrow { throw FeedException(FEED_NOT_FOUND) }
 
     // 피드 좋아요 등록
-    fun likeFeed(feedId: Long, loginUser: User): Boolean {
-        val feed = getFeed(feedId)
-        if (feed.likes.none { it.user == loginUser })
-            feed.likes.add(FeedLike(feed = feed, user = loginUser))
-        else
-            throw FeedLikeException(ALREADY_LIKED_FEED)
-        return true
-    }
+    fun likeFeed(feedId: Long, loginUser: User) =
+        getFeed(feedId).let { feed ->
+            if (feed.likes.none { it.user == loginUser })
+                feed.likes.add(FeedLike(feed = feed, user = loginUser))
+            else
+                throw FeedLikeException(ALREADY_LIKED_FEED)
+        }
 
     // 피드 좋아요 취소
-    fun cancelLikeFeed(feedId: Long, loginUser: User): Boolean {
-        val feed = getFeed(feedId)
-        feed.likes.remove(
-            feed.likes
-                .find { it.user.id == loginUser.id }
-        )
-        return true
-    }
+    fun cancelLikeFeed(feedId: Long, loginUser: User) =
+        getFeed(feedId).let { feed ->
+            feed.likes.remove(
+                feed.likes.find { it.user.id == loginUser.id }
+            )
+        }
 
-    fun updateFeed(feedId: Long, form: FeedRequestForm, loginUser: User): Feed {
-        val feed = getFeed(feedId)
-        feedPermissionCheck(feed, loginUser)
+    fun updateFeed(feedId: Long, form: FeedRequestForm, loginUser: User): Feed =
+        getFeed(feedId).let { feed ->
+            feedPermissionCheck(feed, loginUser)
+            feed.update(form.content, form.showScope)
+            setAndSaveFiles(feed, form)
+            feed
+        }
 
-        feed.update(form.content, form.showScope)
-
-        setAndSaveFiles(feed, form)
-
-        return feed
-    }
-
-    fun deleteFeed(feedId: Long, loginUser: User): Boolean {
-        val feed = getFeed(feedId)
-        feedPermissionCheck(feed, loginUser)
-        feedRepository.delete(feed)
-        return true
-    }
+    fun deleteFeed(feedId: Long, loginUser: User) =
+        getFeed(feedId).let {
+            feedPermissionCheck(it, loginUser)
+            feedRepository.delete(it)
+        }
 
     // 피드 접근 권한 체크
     private fun feedPermissionCheck(feed: Feed, loginUser: User) {
@@ -143,29 +143,30 @@ class FeedService(
             .find { it.id == commentId } ?: throw CommentException(COMMENT_NOT_FOUND)
 
     // 새 루트 댓글 생성
-    fun createRootComment(feedId: Long, form: CommentRequestForm, loginUser: User) {
-        val feed = getFeed(feedId)
-        val comment = Comment(
-            feed = feed,
-            writer = loginUser,
-            content = form.content
-        )
-        feed.comments.add(comment)
-    }
+    fun createRootComment(feedId: Long, form: CommentRequestForm, loginUser: User) =
+        getFeed(feedId).let {
+            it.comments.add(
+                Comment(
+                    feed = it,
+                    writer = loginUser,
+                    content = form.content
+                )
+            )
+        }
 
     // 대댓글 생성
-    fun createChildComment(feedId: Long, parentId: Long, form: CommentRequestForm, loginUser: User) {
-        val feed = getFeed(feedId)
-        val parentComment = getComment(feedId, parentId)
-        val comment = Comment(
-            feed = feed,
-            writer = loginUser,
-            content = form.content,
-            parent = parentComment,
-            layer = parentComment.layer + 1
-        )
-        parentComment.children.add(comment)
-    }
+    fun createChildComment(feedId: Long, parentId: Long, form: CommentRequestForm, loginUser: User) =
+        getComment(feedId, parentId).let {
+            it.children.add(
+                Comment(
+                    feed = getFeed(feedId),
+                    writer = loginUser,
+                    content = form.content,
+                    parent = it,
+                    layer = it.layer + 1
+                )
+            )
+        }
 
     /**
      * 댓글 페이징 조회
@@ -200,22 +201,21 @@ class FeedService(
                 .sortedBy { it.id }
         )
 
-    fun updateComment(feedId: Long, commentId: Long, form: CommentRequestForm, loginUser: User): Comment {
-        val comment = getComment(feedId, commentId)
-        commentPermissionCheck(comment, loginUser)
-        comment.update(form.content)
-        return comment
-    }
+    fun updateComment(feedId: Long, commentId: Long, form: CommentRequestForm, loginUser: User): Comment =
+        getComment(feedId, commentId).let {
+            commentPermissionCheck(it, loginUser)
+            it.update(form.content)
+        }
 
-    fun deleteComment(feedId: Long, commentId: Long, loginUser: User): Boolean {
-        val feed = getFeed(feedId)
-        val comment = getComment(feedId, commentId)
-        commentPermissionCheck(comment, loginUser)
-        feed.comments.remove(comment)
-        return true
-    }
+    fun deleteComment(feedId: Long, commentId: Long, loginUser: User) =
+        getFeed(feedId).let {
+            getComment(feedId, commentId).let { comment ->
+                commentPermissionCheck(comment, loginUser)
+                it.comments.remove(comment)
+            }
+        }
 
-    // 댓글 수정/삭제 시 권한 체크
+    // 댓글 접근 권한 체크
     private fun commentPermissionCheck(comment: Comment, loginUser: User) {
         if (comment.writer.id != loginUser.id) throw CommentException(COMMENT_ACCESS_DENIED)
     }

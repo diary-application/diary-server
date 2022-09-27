@@ -24,7 +24,10 @@ data class MailAuthLoginForm(
     var code: String
 )
 
+// 해당 메일에 대한 인증 요청
 data class AuthMailForm(@field:NotBlank @field:Email var email: String)
+
+// 해당 메일에 대한 인증 코드와 함께 요청
 data class AuthCodeForm(@field:NotBlank @field:Email var email: String, @field:NotBlank var code: String)
 
 data class JoinForm(

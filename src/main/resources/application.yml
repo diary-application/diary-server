@@ -1,8 +1,15 @@
+# JPA sql 로그에 바인딩 된 파라미터 출력
+#logging.level.org.hibernate:
+#  SQL: debug
+#  type:
+#    descriptor:
+#      sql: trace
+
 spring:
   jpa:
     # JPA sql 쿼리 로그 출력
-    show-sql: true
-    properties.hibernate.format_sql: true
+#    show-sql: true
+#    properties.hibernate.format_sql: true
 
     hibernate:
       ddl-auto: update
@@ -45,10 +52,3 @@ server:
   servlet:
     session:
       tracking-modes: cookie
-
-# JPA sql 로그에 바인딩 된 파라미터 출력
-logging.level.org.hibernate:
-  SQL: debug
-  type:
-    descriptor:
-      sql: trace
