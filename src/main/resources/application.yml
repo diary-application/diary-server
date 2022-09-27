@@ -47,7 +47,6 @@ server:
   servlet:
     session:
       tracking-modes: cookie
-  port: 8081
 
 # JPA sql 로그에 바인딩 된 파라미터 출력
 logging.level.org.hibernate:
