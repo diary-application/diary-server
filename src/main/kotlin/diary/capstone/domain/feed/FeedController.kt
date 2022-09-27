@@ -33,8 +33,8 @@ class FeedController(private val feedService: FeedService) {
     ) = FeedPagedResponse(feedService.getFeeds(pageable, userId, user), user)
 
     // 피드 목록 조회 (피드라인으로)
-    @GetMapping
-    fun getFeedsByFeedLine(@RequestParam(name = "flid", required = true) feedLineId: Long,
+    @GetMapping("/{feedLineId}")
+    fun getFeedsByFeedLine(@PathVariable("feedLineId") feedLineId: Long,
                            @PageableDefault(size = FEED_PAGE_SIZE) pageable: Pageable,
                            user: User
     ) = FeedPagedResponse(feedService.getFeedsByFeedLine(pageable, feedLineId, user), user)
