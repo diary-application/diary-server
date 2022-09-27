@@ -10,7 +10,7 @@ import javax.persistence.*
 const val SHOW_ALL = "all"
 const val SHOW_FOLLOWERS = "follower"
 const val SHOW_ME = "me"
-//
+
 @Entity
 class Feed(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
