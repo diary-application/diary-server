@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PROJECT_ROOT="/home/ubuntu/spring"
+PROJECT_ROOT="/home/ubuntu/diary-server"
 JAR_FILE="$PROJECT_ROOT/diary-server.jar"
 
 DEPLOY_LOG="$PROJECT_ROOT/deploy.log"
