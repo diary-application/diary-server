@@ -13,8 +13,6 @@ permissions:
     group: ubuntu
 
 hooks:
-  BeforeInstall:
-    - location: scripts/before.sh
   AfterInstall:
     - location: scripts/stop.sh
   ApplicationStart:
