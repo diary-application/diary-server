@@ -37,7 +37,7 @@ spring:
   output:
     ansi:
       enabled: always
-
+#
 server:
   error:
     include-stacktrace: on_param
