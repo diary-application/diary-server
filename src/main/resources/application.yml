@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: application-secret.yml
   jpa:
     # JPA sql 쿼리 로그 출력
     show-sql: true
@@ -18,8 +20,8 @@ spring:
       # 한 요청의 최대 크기
       max-request-size: 100MB
 
-  profiles:
-    active: secret
+#  profiles:
+#    active: secret
 
   mvc:
     pathmatch:
