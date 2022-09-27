@@ -36,7 +36,7 @@ jobs:
     
     - name: Copy Yaml Secrets
       env:
-          YAML_SECRET: ${{ secrets.YAML_SECRET }}
+          YAML_SECRET: ${{ secrets.YML_SECRET }}
           YAML_DIR: src/main/resources
           YAML_FILE_NAME: application-secret.yml
       run: echo $YAML_SECRET | base64 --decode > $YAML_DIR/$YAML_FILE_NAME
