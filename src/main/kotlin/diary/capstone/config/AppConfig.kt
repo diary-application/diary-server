@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.CacheControl
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
+import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import springfox.documentation.builders.ApiInfoBuilder
@@ -33,6 +34,13 @@ class AppConfig(private val authService: AuthService): WebMvcConfigurer {
             .addResourceHandler("/resource/**")
             .addResourceLocations("file:$FILE_SAVE_PATH")
             .setCacheControl(CacheControl.maxAge(CACHING_MINUTES, TimeUnit.MINUTES))
+    }
+
+    // CORS 설정
+    override fun addCorsMappings(registry: CorsRegistry) {
+        registry.addMapping("/**")
+            .allowedMethods("*") // http 모든 메소드 요청 허용
+            .allowedHeaders("*") // 헤더 정보 모두 허용
     }
 }
 

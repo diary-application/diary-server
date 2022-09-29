@@ -1,7 +1,7 @@
 package diary.capstone.domain.user
 
 import diary.capstone.domain.feed.Feed
-import diary.capstone.domain.user.feedline.FeedLine
+import diary.capstone.domain.feedline.FeedLine
 import diary.capstone.domain.file.File
 import diary.capstone.domain.occupation.Occupation
 import diary.capstone.util.BaseTimeEntity

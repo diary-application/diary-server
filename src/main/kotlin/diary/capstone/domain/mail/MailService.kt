@@ -1,7 +1,8 @@
-package diary.capstone.util
+package diary.capstone.domain.mail
 
 import diary.capstone.config.AUTH_CODE_DIGITS
 import diary.capstone.config.AUTH_VALID_MINUTE
+import diary.capstone.util.logger
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.stereotype.Service
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service
 @Service
 class MailService(private val javaMailSender: JavaMailSender) {
 
+    // 다른 IP로 로그인 시 인증을 위해 발송
     fun sendLoginAuthMail(code: String, email: String) {
         try {
             val mail = javaMailSender.createMimeMessage()
@@ -17,7 +19,7 @@ class MailService(private val javaMailSender: JavaMailSender) {
 
             mailHelper.setTo(email)
             mailHelper.setFrom("ahdwjdtprtm@naver.com", "모두의 일기장")
-            mailHelper.setSubject("메일 인증 코드")
+            mailHelper.setSubject("[모두의 일기장] 메일 인증 코드")
             text += "<html>" +
                     "<head><meta charset='utf-8'></head>" +
                     "<body>"
@@ -38,6 +40,7 @@ class MailService(private val javaMailSender: JavaMailSender) {
         }
     }
 
+    // 회원 가입 시 이메일 인증을 위해 발송
     fun sendEmailAuthMail(code: String, email: String) {
         try {
             val mail = javaMailSender.createMimeMessage()
@@ -46,7 +49,7 @@ class MailService(private val javaMailSender: JavaMailSender) {
 
             mailHelper.setTo(email)
             mailHelper.setFrom("ahdwjdtprtm@naver.com", "모두의 일기장")
-            mailHelper.setSubject("메일 인증 코드")
+            mailHelper.setSubject("[모두의 일기장] 메일 인증 코드")
             text += "<html>" +
                     "<head><meta charset='utf-8'></head>" +
                     "<body>"

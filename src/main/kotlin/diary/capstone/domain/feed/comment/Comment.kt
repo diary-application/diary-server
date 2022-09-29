@@ -32,5 +32,8 @@ class Comment(
     var children: MutableList<Comment> = mutableListOf(),
 
     ): BaseTimeEntity() {
-    fun update(content: String?) { content?.let { this.content = content } }
+    fun update(content: String): Comment {
+        this.content = content
+        return this
+    }
 }

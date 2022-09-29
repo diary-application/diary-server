@@ -1,5 +1,6 @@
 package diary.capstone.domain.user
 
+import diary.capstone.domain.feedline.FeedLine
 import diary.capstone.domain.file.ProfileImageFileResponse
 import org.springframework.data.domain.Page
 import javax.validation.constraints.Email
@@ -24,7 +25,10 @@ data class MailAuthLoginForm(
     var code: String
 )
 
+// 해당 메일에 대한 인증 요청
 data class AuthMailForm(@field:NotBlank @field:Email var email: String)
+
+// 해당 메일에 대한 인증 코드와 함께 요청
 data class AuthCodeForm(@field:NotBlank @field:Email var email: String, @field:NotBlank var code: String)
 
 data class JoinForm(
@@ -92,13 +96,9 @@ data class UserOccupationUpdateForm(
     var occupation: String
 )
 
-data class UserInterestsUpdateForm(
-    var interests: List<String>
-)
+data class UserInterestsUpdateForm(var interests: List<String>)
 
-data class UserDeleteForm(
-    var password: String
-)
+data class UserDeleteForm(var password: String)
 
 data class UserSimpleResponse(
     var id: Long,
@@ -109,6 +109,16 @@ data class UserSimpleResponse(
         id = user.id!!,
         name = user.name,
         image = user.profileImage?.let { ProfileImageFileResponse(it) }
+    )
+}
+
+data class FeedLineResponse(
+    var id: Long,
+    var title: String
+) {
+    constructor(feedLine: FeedLine): this(
+        id = feedLine.id!!,
+        title = feedLine.title
     )
 }
 

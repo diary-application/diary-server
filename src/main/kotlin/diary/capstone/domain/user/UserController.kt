@@ -1,13 +1,9 @@
 package diary.capstone.domain.user
 
-import diary.capstone.util.BoolResponse
 import diary.capstone.auth.Auth
 import diary.capstone.auth.AuthService
-import diary.capstone.util.SuccessResponse
-import diary.capstone.util.ok
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import javax.servlet.http.HttpServletRequest
@@ -17,6 +13,7 @@ import javax.validation.Valid
 @RequestMapping("/auth")
 class LoginController(private val loginService: LoginService) {
 
+    // 로그인 (인증 메일 재전송 필요할 시 해당 메소드로 다시 요청)
     @PostMapping("/login")
     fun login(@Valid @RequestBody form: LoginForm, request: HttpServletRequest) =
         UserDetailResponse(loginService.login(form, request))
@@ -33,21 +30,17 @@ class LoginController(private val loginService: LoginService) {
     
     // 이메일 인증 메일 발송
     @PostMapping("/mail-auth")
-    fun authenticationEmail(@Valid @RequestBody form: AuthMailForm): SuccessResponse {
+    fun authenticationEmail(@Valid @RequestBody form: AuthMailForm) =
         loginService.sendEmailAuthMail(form)
-        return SuccessResponse("확인용 메일이 발송되었습니다.")
-    }
 
     // 이메일 인증 메일 확인
     @PostMapping("/mail-auth-check")
-    fun checkEmailAuthMail(@Valid @RequestBody form: AuthCodeForm): SuccessResponse {
+    fun checkEmailAuthMail(@Valid @RequestBody form: AuthCodeForm) =
         loginService.checkEmailAuthMail(form)
-        return SuccessResponse("해당 메일이 인증되었습니다.")
-    }
 
+    // 로그아웃
     @GetMapping("/logout")
-    fun logout(request: HttpServletRequest): BoolResponse =
-        BoolResponse(loginService.logout(request))
+    fun logout(request: HttpServletRequest) = loginService.logout(request)
 }
 
 @Auth
@@ -59,7 +52,10 @@ class UserController(
 ) {
     // 내 정보 조회
     @GetMapping
-    fun getUser(user: User) = UserDetailResponse(user)
+    fun getMyInfo(user: User) = UserDetailResponse(user)
+
+    // 내 피드라인 목록 조회
+    fun getMyFeedLines(user: User) = user.feedLines.map { FeedLineResponse(it) }
 
     // 특정 유저의 유저 정보 조회
     @GetMapping("/{userId}")
@@ -81,12 +77,12 @@ class UserController(
     // 해당 유저 팔로우
     @PostMapping("/{userId}/follow")
     fun followUser(@PathVariable("userId") userId: Long, user: User) =
-        BoolResponse(userService.followUser(userId, user))
+        userService.followUser(userId, user)
 
     // 해당 유저 팔로우 취소
     @DeleteMapping("/{userId}/follow")
     fun unfollowUser(@PathVariable("userId") userId: Long, user: User) =
-        BoolResponse(userService.unfollowUser(userId, user))
+        userService.unfollowUser(userId, user)
 
     // 내 정보 수정(이름, 메일)
     @PutMapping("/info")
@@ -111,15 +107,14 @@ class UserController(
     // 비밀번호 변경
     @PutMapping("/password")
     fun updatePassword(form: PasswordUpdateForm, user: User) =
-        BoolResponse(userService.updatePassword(form, user))
+        userService.updatePassword(form, user)
 
     // 회원 삭제 (비밀번호와 함께 요청)
     @DeleteMapping
-    fun deleteUser(@RequestBody form: UserDeleteForm, user: User, request: HttpServletRequest): BoolResponse {
+    fun deleteUser(@RequestBody form: UserDeleteForm, user: User, request: HttpServletRequest) {
         if (form.password == user.password) {
             userService.deleteUser(form, user)
             authService.logout(request)
-            return BoolResponse(true)
         }
         else throw UserException(PASSWORD_MISMATCH)
     }

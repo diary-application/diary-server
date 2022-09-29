@@ -6,3 +6,7 @@ data class OccupationRequestForm(
     @field:NotBlank
     var name: String
 )
+
+data class OccupationListResponse(
+    var occupations: List<String>
+)
