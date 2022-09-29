@@ -1,12 +1,11 @@
 package diary.capstone.config
 
 import diary.capstone.auth.AuthService
-import diary.capstone.auth.SessionMethod
 import diary.capstone.domain.file.FILE_SAVE_PATH
-import diary.capstone.domain.user.UserRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.CacheControl
+import org.springframework.http.HttpMethod
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
@@ -38,9 +37,18 @@ class AppConfig(private val authService: AuthService): WebMvcConfigurer {
 
     // CORS 설정
     override fun addCorsMappings(registry: CorsRegistry) {
-        registry.addMapping("/**")
-            .allowedMethods("*") // http 모든 메소드 요청 허용
-            .allowedHeaders("*") // 헤더 정보 모두 허용
+        registry
+            .addMapping("/**")
+            .allowedOrigins("https://di4ry.com")
+            .allowedMethods(
+                HttpMethod.GET.name,
+                HttpMethod.POST.name,
+                HttpMethod.PUT.name,
+                HttpMethod.DELETE.name,
+                HttpMethod.PATCH.name,
+                HttpMethod.OPTIONS.name,
+                HttpMethod.HEAD.name,
+            ) // http 모든 메소드 요청 허용
     }
 }
 

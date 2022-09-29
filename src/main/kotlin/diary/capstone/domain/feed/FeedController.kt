@@ -25,13 +25,14 @@ class FeedController(private val feedService: FeedService) {
     fun createFeed(@Valid @ModelAttribute form: FeedRequestForm, user: User) =
         FeedSimpleResponse(feedService.createFeed(form, user), user)
 
-    // 피드 목록 조회 (유저 아이디, 피드라인 아이디는 둘 중 하나만 요청해야 함)
+    // 피드 목록 조회 (요청 파라미터는 하나만 요청 가능)
     @GetMapping
     fun getFeeds(@PageableDefault(sort = ["id"], direction = Sort.Direction.DESC, size = FEED_PAGE_SIZE) pageable: Pageable,
                  @RequestParam(name = "userid", required = false) userId: Long?,
                  @RequestParam(name = "feedlineid", required = false) feedLineId: Long?,
+                 @RequestParam(name = "content", required = false) keyword: String?,
                  user: User
-    ) = FeedPagedResponse(feedService.getFeeds(pageable, userId, feedLineId, user), user)
+    ) = FeedPagedResponse(feedService.getFeeds(pageable, userId, feedLineId, keyword, user), user)
 
     // 피드 상세 보기
     @GetMapping("/{feedId}")
