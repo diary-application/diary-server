@@ -1,4 +1,4 @@
-package diary.capstone.domain.user.feedline
+package diary.capstone.domain.feedline
 
 import diary.capstone.domain.user.User
 import javax.persistence.*

@@ -19,7 +19,7 @@ class MailService(private val javaMailSender: JavaMailSender) {
 
             mailHelper.setTo(email)
             mailHelper.setFrom("ahdwjdtprtm@naver.com", "모두의 일기장")
-            mailHelper.setSubject("메일 인증 코드")
+            mailHelper.setSubject("[모두의 일기장] 메일 인증 코드")
             text += "<html>" +
                     "<head><meta charset='utf-8'></head>" +
                     "<body>"
@@ -49,7 +49,7 @@ class MailService(private val javaMailSender: JavaMailSender) {
 
             mailHelper.setTo(email)
             mailHelper.setFrom("ahdwjdtprtm@naver.com", "모두의 일기장")
-            mailHelper.setSubject("메일 인증 코드")
+            mailHelper.setSubject("[모두의 일기장] 메일 인증 코드")
             text += "<html>" +
                     "<head><meta charset='utf-8'></head>" +
                     "<body>"

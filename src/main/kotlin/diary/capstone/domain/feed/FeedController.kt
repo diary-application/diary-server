@@ -21,23 +21,17 @@ import javax.validation.Valid
 class FeedController(private val feedService: FeedService) {
 
     // 피드 생성
-    @PostMapping // @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping
     fun createFeed(@Valid @ModelAttribute form: FeedRequestForm, user: User) =
         FeedSimpleResponse(feedService.createFeed(form, user), user)
 
-    // 피드 목록 조회 (모든 피드, 특정 유저의 피드): 기본 피드라인 또는 프로필
+    // 피드 목록 조회 (유저 아이디, 피드라인 아이디는 둘 중 하나만 요청해야 함)
     @GetMapping
     fun getFeeds(@PageableDefault(sort = ["id"], direction = Sort.Direction.DESC, size = FEED_PAGE_SIZE) pageable: Pageable,
                  @RequestParam(name = "userid", required = false) userId: Long?,
+                 @RequestParam(name = "feedlineid", required = false) feedLineId: Long?,
                  user: User
-    ) = FeedPagedResponse(feedService.getFeeds(pageable, userId, user), user)
-
-    // 피드 목록 조회 (피드라인으로)
-    @GetMapping("/{feedLineId}")
-    fun getFeedsByFeedLine(@PathVariable("feedLineId") feedLineId: Long,
-                           @PageableDefault(size = FEED_PAGE_SIZE) pageable: Pageable,
-                           user: User
-    ) = FeedPagedResponse(feedService.getFeedsByFeedLine(pageable, feedLineId, user), user)
+    ) = FeedPagedResponse(feedService.getFeeds(pageable, userId, feedLineId, user), user)
 
     // 피드 상세 보기
     @GetMapping("/{feedId}")
@@ -87,11 +81,11 @@ class CommentController(private val feedService: FeedService) {
                         @PageableDefault pageable: Pageable,
                         loginUser: User
     ) = CommentPagedResponse(
-        when (user) {
-            "me" -> feedService.getMyComments(feedId, pageable, loginUser)
-            else -> feedService.getRootComments(feedId, pageable, loginUser)
-        }
-    )
+            when (user) {
+                "me" -> feedService.getMyComments(feedId, pageable, loginUser)
+                else -> feedService.getRootComments(feedId, pageable, loginUser)
+            }
+        )
 
     // 특정 댓글의 대댓글 목록 조회
     @GetMapping("/{commentId}")

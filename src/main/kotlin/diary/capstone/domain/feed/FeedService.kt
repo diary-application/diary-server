@@ -46,7 +46,8 @@ class FeedService(
 
     // 피드 목록 검색 (페이징)
     @Transactional(readOnly = true)
-    fun getFeeds(pageable: Pageable, userId: Long?, loginUser: User): Page<Feed> =
+    fun getFeeds(pageable: Pageable, userId: Long?, feedLineId: Long?, loginUser: User): Page<Feed> {
+        if (userId != null && feedLineId != null) throw FeedException(INVALID_FEED_URI)
         // 특정 유저의 피드만 조회 (프로필 통해 조회)
         userId?.let { userId ->
             val user = userService.getUser(userId)
@@ -64,11 +65,16 @@ class FeedService(
                     .filterNotShowMeFeed()
                     .sortedByDescending { it.id }
             )
-        } ?:
-        // 모든 피드 조회
-        run {
-            return feedRepository.findByShowScope(pageable, SHOW_ALL)
         }
+        // 피드라인으로 조회
+        feedLineId?.let {
+            val feedLine = loginUser.feedLines.find { feedLine ->  feedLine.id == it }
+            // TODO 피드라인으로 피드 목록 조회 로직
+        }
+
+        // 모든 피드 조회
+        return feedRepository.findByShowScope(pageable, SHOW_ALL)
+    }
 
     // 피드 목록 검색 (페이징, 피드라인으로)
     fun getFeedsByFeedLine(pageable: Pageable, feedLineId: Long, loginUser: User): Page<Feed> {

@@ -13,7 +13,7 @@ import javax.validation.Valid
 @RequestMapping("/auth")
 class LoginController(private val loginService: LoginService) {
 
-    // 로그인
+    // 로그인 (인증 메일 재전송 필요할 시 해당 메소드로 다시 요청)
     @PostMapping("/login")
     fun login(@Valid @RequestBody form: LoginForm, request: HttpServletRequest) =
         UserDetailResponse(loginService.login(form, request))
@@ -38,6 +38,7 @@ class LoginController(private val loginService: LoginService) {
     fun checkEmailAuthMail(@Valid @RequestBody form: AuthCodeForm) =
         loginService.checkEmailAuthMail(form)
 
+    // 로그아웃
     @GetMapping("/logout")
     fun logout(request: HttpServletRequest) = loginService.logout(request)
 }
@@ -51,7 +52,10 @@ class UserController(
 ) {
     // 내 정보 조회
     @GetMapping
-    fun getUser(user: User) = UserDetailResponse(user)
+    fun getMyInfo(user: User) = UserDetailResponse(user)
+
+    // 내 피드라인 목록 조회
+    fun getMyFeedLines(user: User) = user.feedLines.map { FeedLineResponse(it) }
 
     // 특정 유저의 유저 정보 조회
     @GetMapping("/{userId}")

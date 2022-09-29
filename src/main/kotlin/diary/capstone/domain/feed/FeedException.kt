@@ -4,6 +4,7 @@ package diary.capstone.domain.feed
 const val FEED_NOT_FOUND = "해당 글을 찾을 수 없습니다."
 const val FEED_ACCESS_DENIED = "해당 글에 대한 접근 권한이 없습니다."
 const val INVALID_FEED_FORM = "클라이언트 : 입력 폼이 잘못되었습니다."
+const val INVALID_FEED_URI = "요청 파라미터에는 유저id/피드라인id 둘 중 하나만 사용 가능합니다."
 
 // 피드 라인
 const val FEED_LINE_NOT_FOUND = "해당 피드 라인을 찾을 수 없습니다."

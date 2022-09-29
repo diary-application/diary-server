@@ -1,5 +1,6 @@
 package diary.capstone.domain.user
 
+import diary.capstone.domain.feedline.FeedLine
 import diary.capstone.domain.file.ProfileImageFileResponse
 import org.springframework.data.domain.Page
 import javax.validation.constraints.Email
@@ -95,13 +96,9 @@ data class UserOccupationUpdateForm(
     var occupation: String
 )
 
-data class UserInterestsUpdateForm(
-    var interests: List<String>
-)
+data class UserInterestsUpdateForm(var interests: List<String>)
 
-data class UserDeleteForm(
-    var password: String
-)
+data class UserDeleteForm(var password: String)
 
 data class UserSimpleResponse(
     var id: Long,
@@ -112,6 +109,16 @@ data class UserSimpleResponse(
         id = user.id!!,
         name = user.name,
         image = user.profileImage?.let { ProfileImageFileResponse(it) }
+    )
+}
+
+data class FeedLineResponse(
+    var id: Long,
+    var title: String
+) {
+    constructor(feedLine: FeedLine): this(
+        id = feedLine.id!!,
+        title = feedLine.title
     )
 }
 
