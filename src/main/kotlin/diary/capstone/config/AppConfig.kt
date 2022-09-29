@@ -35,15 +35,6 @@ class AppConfig(private val authService: AuthService): WebMvcConfigurer {
             .addResourceLocations("file:$FILE_SAVE_PATH")
             .setCacheControl(CacheControl.maxAge(CACHING_MINUTES, TimeUnit.MINUTES))
     }
-
-    // CORS 설정
-    override fun addCorsMappings(registry: CorsRegistry) {
-        registry
-            .addMapping("/**")
-            .allowedOrigins("*")
-            .allowedMethods("*") // http 모든 메소드 요청 허용
-            .allowedHeaders("*") // 헤더 정보 모두 허용
-    }
 }
 
 // JPAQueryFactory 빈 등록
