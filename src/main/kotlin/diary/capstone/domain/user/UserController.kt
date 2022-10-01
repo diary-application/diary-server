@@ -6,11 +6,12 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import springfox.documentation.annotations.ApiIgnore
 import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/auth", produces = ["application/json"])
 class LoginController(private val loginService: LoginService) {
 
     // 로그인 (인증 메일 재전송 필요할 시 해당 메소드로 다시 요청)
@@ -45,17 +46,17 @@ class LoginController(private val loginService: LoginService) {
 
 @Auth
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/user", produces = ["application/json"])
 class UserController(
     private val userService: UserService,
     private val authService: AuthService
 ) {
     // 내 정보 조회
     @GetMapping
-    fun getMyInfo(user: User) = UserDetailResponse(user)
+    fun getMyInfo(@ApiIgnore user: User) = UserDetailResponse(user)
 
     // 내 피드라인 목록 조회
-    fun getMyFeedLines(user: User) = user.feedLines.map { FeedLineResponse(it) }
+    fun getMyFeedLines(@ApiIgnore user: User) = user.feedLines.map { FeedLineResponse(it) }
 
     // 특정 유저의 유저 정보 조회
     @GetMapping("/{userId}")
@@ -76,42 +77,42 @@ class UserController(
 
     // 해당 유저 팔로우
     @PostMapping("/{userId}/follow")
-    fun followUser(@PathVariable("userId") userId: Long, user: User) =
+    fun followUser(@PathVariable("userId") userId: Long, @ApiIgnore user: User) =
         userService.followUser(userId, user)
 
     // 해당 유저 팔로우 취소
     @DeleteMapping("/{userId}/follow")
-    fun unfollowUser(@PathVariable("userId") userId: Long, user: User) =
+    fun unfollowUser(@PathVariable("userId") userId: Long, @ApiIgnore user: User) =
         userService.unfollowUser(userId, user)
 
     // 내 정보 수정(이름, 메일)
     @PutMapping("/info")
-    fun updateUserInfo(form: UserInfoUpdateForm, user: User) =
+    fun updateUserInfo(form: UserInfoUpdateForm, @ApiIgnore user: User) =
         UserDetailResponse(userService.updateUserInfo(form, user))
 
     // 직종 수정
     @PutMapping("/occupation")
-    fun updateUserOccupation(@Valid @RequestBody form: UserOccupationUpdateForm, user: User) =
+    fun updateUserOccupation(@Valid @RequestBody form: UserOccupationUpdateForm, @ApiIgnore user: User) =
         UserDetailResponse(userService.updateUserOccupation(form, user))
     
     // 관심 분야 수정
     @PutMapping("/interests")
-    fun updateUserInterests(@RequestBody form: UserInterestsUpdateForm, user: User) =
+    fun updateUserInterests(@RequestBody form: UserInterestsUpdateForm, @ApiIgnore user: User) =
         UserDetailResponse(userService.updateUserInterests(form, user))
 
     // 프로필 이미지 변경
     @PutMapping("/profile-image")
-    fun updateProfileImage(@RequestPart("image") image: MultipartFile, user: User) =
+    fun updateProfileImage(@RequestPart("image") image: MultipartFile, @ApiIgnore user: User) =
         UserDetailResponse(userService.updateProfileImage(image, user))
 
     // 비밀번호 변경
     @PutMapping("/password")
-    fun updatePassword(form: PasswordUpdateForm, user: User) =
+    fun updatePassword(form: PasswordUpdateForm, @ApiIgnore user: User) =
         userService.updatePassword(form, user)
 
     // 회원 삭제 (비밀번호와 함께 요청)
     @DeleteMapping
-    fun deleteUser(@RequestBody form: UserDeleteForm, user: User, request: HttpServletRequest) {
+    fun deleteUser(@RequestBody form: UserDeleteForm, @ApiIgnore user: User, request: HttpServletRequest) {
         if (form.password == user.password) {
             userService.deleteUser(form, user)
             authService.logout(request)

@@ -7,7 +7,7 @@ import javax.validation.Valid
 
 @Auth
 @RestController
-@RequestMapping("/occupation")
+@RequestMapping("/occupation", produces = ["application/json"])
 class OccupationController(private val occupationService: OccupationService) {
 
     // 직종 이름 목록 반환

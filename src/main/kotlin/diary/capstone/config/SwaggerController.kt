@@ -12,8 +12,8 @@ class SwaggerController {
     fun redirectSwagger() = "redirect:/swagger-ui/#"
 }
 
-@RestController
-class GlobalController {
+@Controller
+class PageViewController {
     @GetMapping
-    fun welcome() = "diary server is running very fast!!!"
+    fun welcome() = "forward:/index.html"
 }
