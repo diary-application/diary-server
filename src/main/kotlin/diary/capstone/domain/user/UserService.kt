@@ -9,6 +9,7 @@ import diary.capstone.domain.occupation.OCCUPATION_NOT_FOUND
 import diary.capstone.domain.occupation.OccupationException
 import diary.capstone.domain.occupation.OccupationService
 import diary.capstone.domain.mail.MailService
+import diary.capstone.util.getIp
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -36,7 +37,7 @@ class LoginService(
          * 다른 ip로 접속 시 or 로그인 하려는 유저가 로그인 대기 상태일 시
          * 인증 코드 생성 -> 인증 메일 발송 -> 인증 예외 발생
          */
-        if (user.ip != request.remoteAddr || user.loginWaiting) {
+        if (user.ip != request.getIp() || user.loginWait) {
             user.update(loginWaiting = true)
             mailService.sendLoginAuthMail(authManager.generateCode(user.id!!.toString()), user.email)
             throw AuthException(MAIL_AUTH_REQUIRED)
@@ -56,7 +57,7 @@ class LoginService(
         if (form.code == authManager.getAuthCode(user.id!!.toString())) {
             // 최근 접속 IP를 현재 접속 IP로 수정, 로그인 대기 상태 해제 후 로그인
             authManager.removeUsedAuthCode(user.id!!.toString())
-            user.update(ip = request.remoteAddr, loginWaiting = false)
+            user.update(ip = request.getIp(), loginWaiting = false)
             return authService.login(request, user)
         }
         else throw AuthException(AUTH_CODE_MISMATCH)
@@ -93,7 +94,7 @@ class LoginService(
                 password = form.password,
                 name = form.name,
                 email = form.email,
-                ip = request.remoteAddr
+                ip = request.getIp()
             )
         )
 

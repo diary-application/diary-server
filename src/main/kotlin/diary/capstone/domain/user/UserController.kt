@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/auth", produces = ["application/json"])
+@RequestMapping("/auth")
 class LoginController(private val loginService: LoginService) {
 
     // 로그인 (인증 메일 재전송 필요할 시 해당 메소드로 다시 요청)
@@ -46,7 +46,7 @@ class LoginController(private val loginService: LoginService) {
 
 @Auth
 @RestController
-@RequestMapping("/user", produces = ["application/json"])
+@RequestMapping("/user")
 class UserController(
     private val userService: UserService,
     private val authService: AuthService

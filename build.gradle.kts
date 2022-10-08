@@ -31,13 +31,16 @@ dependencies {
 	runtimeOnly("mysql:mysql-connector-java")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 
+	// Spring Security
+	implementation("org.springframework.boot:spring-boot-starter-web")
+
 	// mail
 	implementation("org.springframework.boot:spring-boot-starter-mail")
 
 	// AOP
 	implementation("org.springframework.boot:spring-boot-starter-aop")
 
-	// swagger
+	// Swagger
 	implementation("io.springfox:springfox-boot-starter:3.0.0")
 	implementation("io.springfox:springfox-swagger-ui:3.0.0")
 

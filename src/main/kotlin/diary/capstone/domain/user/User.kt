@@ -4,6 +4,7 @@ import diary.capstone.domain.feed.Feed
 import diary.capstone.domain.feedline.FeedLine
 import diary.capstone.domain.file.File
 import diary.capstone.domain.occupation.Occupation
+import diary.capstone.domain.schedule.Schedule
 import diary.capstone.util.BaseTimeEntity
 import javax.persistence.*
 
@@ -20,10 +21,10 @@ class User(
 
     // 최근 접속 ip
     var ip: String = "",
-    var loginWaiting: Boolean = false,
+    var loginWait: Boolean = false,
 
     @OneToOne(cascade = [CascadeType.ALL])
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "occupation_id")
     var occupation: Occupation? = null, // 직종
     var interests: String = "", // 관심 분야(직종 이름들): ,로 구분하여 3개까지
 
@@ -41,7 +42,10 @@ class User(
     var following: MutableList<Follow> = mutableListOf(),
 
     @OneToMany(mappedBy = "target", cascade = [CascadeType.ALL], orphanRemoval = true)
-    var follower: MutableList<Follow> = mutableListOf()
+    var follower: MutableList<Follow> = mutableListOf(),
+
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
+    var schedules: MutableList<Schedule> = mutableListOf()
 
 ): BaseTimeEntity() {
     fun update(
@@ -58,7 +62,7 @@ class User(
         name?.let { this.name = name }
         email?.let { this.email = email }
         ip?.let { this.ip = ip }
-        loginWaiting?.let { this.loginWaiting = loginWaiting }
+        loginWaiting?.let { this.loginWait = loginWaiting }
         occupation?.let { this.occupation = occupation }
         interests?.let { this.interests = interests }
         profileImage?.let { this.profileImage = profileImage }
@@ -71,6 +75,10 @@ class User(
      */
     fun getInterests(): List<String> {
         return if (this.interests == "") listOf() else this.interests.split(",")
+    }
+
+    fun addSchedule(schedule: Schedule) {
+        this.schedules.add(schedule)
     }
 }
 

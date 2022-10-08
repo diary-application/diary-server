@@ -14,7 +14,7 @@ spring:
 #    properties.hibernate.format_sql: true
 
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
       use-new-id-generator-mappings: true
     properties:
       hibernate:
@@ -45,9 +45,20 @@ spring:
       enabled: always
 
 server:
+  port: 8080
   error:
     include-stacktrace: on_param
     include-exception: true
   servlet:
     session:
+      timeout: 30
       tracking-modes: cookie
+  # SSL/TLS 인증서 설정
+#  ssl:
+#    enabled: true
+#      key-alias: diary-key
+#      key-store: diarykey.jks
+#      key-store-password: '@ayotera@'
+#      key-password: '@ayotera@'
+#      trust-store: diary.pkcs12
+#      trust-store-password: '@ayotera@'
