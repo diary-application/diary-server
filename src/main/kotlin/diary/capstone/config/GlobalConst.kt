@@ -1,5 +1,11 @@
 package diary.capstone.config
 
+/**
+ * 미디어 파일 저장 경로 (테스트/운영)
+ */
+//const val FILE_SAVE_PATH = "C:\\diary\\"
+const val FILE_SAVE_PATH = "/home/ubuntu/diary-server/file"
+
 // 관심 분야 최대 개수
 const val INTERESTS_LIMIT = 3
 
