@@ -13,12 +13,9 @@ import org.springframework.web.bind.annotation.*
 import springfox.documentation.annotations.ApiIgnore
 import javax.validation.Valid
 
-/**
- * 피드 CRUD 컨트롤러
- */
 @Auth
 @RestController
-@RequestMapping("/feed", produces = ["application/json"])
+@RequestMapping("/feed")
 class FeedController(private val feedService: FeedService) {
 
     // 피드 생성
@@ -58,7 +55,7 @@ class FeedController(private val feedService: FeedService) {
  */
 @Auth
 @RestController
-@RequestMapping("/feed/{feedId}/comment", produces = ["application/json"])
+@RequestMapping("/feed/{feedId}/comment")
 class CommentController(private val feedService: FeedService) {
 
     // 루트 댓글 생성
@@ -117,7 +114,7 @@ class CommentController(private val feedService: FeedService) {
  */
 @Auth
 @RestController
-@RequestMapping("/feed/{feedId}/like", produces = ["application/json"])
+@RequestMapping("/feed/{feedId}/like")
 class FeedLikeController(private val feedService: FeedService) {
 
     @PostMapping
