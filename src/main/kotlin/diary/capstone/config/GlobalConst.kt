@@ -4,7 +4,7 @@ package diary.capstone.config
  * 미디어 파일 저장 경로 (테스트/운영)
  */
 //const val FILE_SAVE_PATH = "C:\\diary\\"
-const val FILE_SAVE_PATH = "///home/ubuntu/diary-server/file"
+const val FILE_SAVE_PATH = "///home/ubuntu/diary-server/file/"
 
 // 정적 파일 요청 URL
 const val RESOURCE_URL = "https://di4ry.com/resource/"
