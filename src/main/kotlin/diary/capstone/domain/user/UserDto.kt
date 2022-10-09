@@ -51,29 +51,6 @@ data class JoinForm(
     fun checkPassword(): Boolean = this.password == this.passwordCheck
 }
 
-data class MailAuthJoinForm(
-    @field:NotBlank
-    var uid: String,
-
-    @field:NotBlank
-    var password: String,
-
-    @field:NotBlank
-    var passwordCheck: String,
-
-    @field:NotBlank
-    @field:Email
-    var email: String,
-
-    @field:NotBlank
-    var code: String,
-
-    @field:NotBlank
-    var name: String
-) {
-    fun checkPassword(): Boolean = this.password == this.passwordCheck
-}
-
 data class PasswordUpdateForm(
     var currentPassword: String,
     var newPassword: String,
@@ -91,10 +68,7 @@ data class UserInfoUpdateForm(
     var email: String,
 )
 
-data class UserOccupationUpdateForm(
-    @field:NotBlank
-    var occupation: String
-)
+data class UserOccupationUpdateForm(@field:NotBlank var occupation: String)
 
 data class UserInterestsUpdateForm(var interests: List<String>)
 
@@ -112,10 +86,7 @@ data class UserSimpleResponse(
     )
 }
 
-data class FeedLineResponse(
-    var id: Long,
-    var title: String
-) {
+data class FeedLineResponse(var id: Long, var title: String) {
     constructor(feedLine: FeedLine): this(
         id = feedLine.id!!,
         title = feedLine.title

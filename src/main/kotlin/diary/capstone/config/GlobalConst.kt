@@ -6,6 +6,9 @@ package diary.capstone.config
 //const val FILE_SAVE_PATH = "C:\\diary\\"
 const val FILE_SAVE_PATH = "/home/ubuntu/diary-server/file"
 
+// 정적 파일 요청 URL
+const val RESOURCE_URL = "https://di4ry.com/resource/"
+
 // 관심 분야 최대 개수
 const val INTERESTS_LIMIT = 3
 
