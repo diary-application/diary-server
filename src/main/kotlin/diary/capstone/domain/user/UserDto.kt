@@ -62,10 +62,6 @@ data class PasswordUpdateForm(
 data class UserInfoUpdateForm(
     @field:NotBlank
     var name: String,
-
-    @field:NotBlank
-    @field:Email
-    var email: String,
 )
 
 data class UserOccupationUpdateForm(@field:NotBlank var occupation: String)
