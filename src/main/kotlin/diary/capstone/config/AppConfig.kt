@@ -1,14 +1,10 @@
 package diary.capstone.config
 
 import diary.capstone.auth.AuthService
-import diary.capstone.auth.SessionMethod
-import diary.capstone.domain.file.FILE_SAVE_PATH
-import diary.capstone.domain.user.UserRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.CacheControl
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
-import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import springfox.documentation.builders.ApiInfoBuilder
