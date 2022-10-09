@@ -1,5 +1,6 @@
 package diary.capstone.domain.file
 
+import diary.capstone.config.FILE_SAVE_PATH
 import diary.capstone.util.logger
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
