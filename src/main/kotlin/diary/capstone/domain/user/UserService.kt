@@ -1,7 +1,7 @@
 package diary.capstone.domain.user
 
-import diary.capstone.auth.AuthService
 import diary.capstone.auth.AuthManager
+import diary.capstone.auth.JwtProvider
 import diary.capstone.config.INTERESTS_LIMIT
 import diary.capstone.domain.file.FileService
 import diary.capstone.domain.occupation.INTERESTS_EXCEEDED
@@ -13,6 +13,7 @@ import diary.capstone.util.getIp
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
@@ -21,17 +22,20 @@ import kotlin.math.min
 
 @Service
 class LoginService(
-    private val authService: AuthService,
+//    private val authService: AuthService,
     private val userRepository: UserRepository,
     private val authManager: AuthManager,
-    private val mailService: MailService
+    private val mailService: MailService,
+    private val passwordEncoder: PasswordEncoder,
+    private val jwtProvider: JwtProvider
 ) {
 
     // 로그인, IP 다르면 메일 인증 로그인으로 해야 함
     @Transactional
-    fun login(form: LoginForm, request: HttpServletRequest): User {
-        val user = userRepository.findByUidAndPassword(form.uid, form.password)
-            ?: throw AuthException(LOGIN_FAILED)
+    fun login(form: LoginForm, request: HttpServletRequest): String {
+        // 이메일/비밀번호 검증
+        val user = userRepository.findByEmail(form.email) ?: throw AuthException(LOGIN_FAILED)
+        if (!passwordEncoder.matches(form.password, user.password)) throw AuthException(LOGIN_FAILED)
 
         /**
          * 다른 ip로 접속 시 or 로그인 하려는 유저가 로그인 대기 상태일 시
@@ -42,15 +46,14 @@ class LoginService(
             mailService.sendLoginAuthMail(authManager.generateCode(user.id!!.toString()), user.email)
             throw AuthException(MAIL_AUTH_REQUIRED)
         }
-        else authService.login(request, user)
 
-        return user
+        return jwtProvider.createToken(user.email)
     }
 
     // 메일 인증 로그인
     @Transactional
-    fun mailAuthenticationLogin(form: MailAuthLoginForm, request: HttpServletRequest): User {
-        val user = userRepository.findByUidAndPassword(form.uid, form.password)
+    fun mailAuthenticationLogin(form: MailAuthLoginForm, request: HttpServletRequest): String {
+        val user = userRepository.findByEmailAndPassword(form.email, form.password)
             ?: throw AuthException(LOGIN_FAILED)
 
         // 인증 코드 일치 확인, 불일치 시 예외 발생
@@ -58,7 +61,7 @@ class LoginService(
             // 최근 접속 IP를 현재 접속 IP로 수정, 로그인 대기 상태 해제 후 로그인
             authManager.removeUsedAuthCode(user.id!!.toString())
             user.update(ip = request.getIp(), loginWaiting = false)
-            return authService.login(request, user)
+            return jwtProvider.createToken(form.email)
         }
         else throw AuthException(AUTH_CODE_MISMATCH)
     }
@@ -83,25 +86,21 @@ class LoginService(
     @Transactional
     fun join(form: JoinForm, request: HttpServletRequest): User {
         if (!form.checkPassword()) throw UserException(PASSWORD_MISMATCH)
-        if (userRepository.existsByUid(form.uid)) throw UserException(DUPLICATE_ID)
         if (userRepository.existsByEmail(form.email)) throw UserException(DUPLICATE_EMAIL)
         if (!authManager.emails.contains(form.email)) throw UserException(MAIL_AUTH_REQUIRED)
         authManager.emails.remove(form.email)
 
-        userRepository.save(
+        return userRepository.save(
             User(
-                uid = form.uid,
-                password = form.password,
-                name = form.name,
                 email = form.email,
+                password = passwordEncoder.encode(form.password),
+                name = form.name,
                 ip = request.getIp()
             )
         )
-
-        return login(LoginForm(form.uid, form.password), request)
     }
 
-    fun logout(request: HttpServletRequest) = authService.logout(request)
+//    fun logout(request: HttpServletRequest) = authService.logout(request)
 }
 
 @Service

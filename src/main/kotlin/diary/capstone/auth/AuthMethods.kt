@@ -1,8 +1,7 @@
 package diary.capstone.auth
 
 import diary.capstone.domain.user.*
-import diary.capstone.util.logger
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import javax.servlet.http.HttpServletRequest
 
@@ -13,11 +12,11 @@ import javax.servlet.http.HttpServletRequest
 const val AUTH_KEY = "user"
 
 // 세션 방식
-@Service
+@Component
 class SessionMethod(private val userRepository: UserRepository): AuthService {
 
     override fun login(request: HttpServletRequest, user: User): User {
-        request.getSession(true).setAttribute(AUTH_KEY, user.uid)
+        request.getSession(true).setAttribute(AUTH_KEY, user.email)
         return user
     }
 
@@ -29,7 +28,7 @@ class SessionMethod(private val userRepository: UserRepository): AuthService {
 
     @Transactional(readOnly = true)
     override fun getUser(request: HttpServletRequest): User? =
-        userRepository.findByUid(
+        userRepository.findByEmail(
             request.session.getAttribute(AUTH_KEY)?.let { it.toString() } ?: ""
         )
 

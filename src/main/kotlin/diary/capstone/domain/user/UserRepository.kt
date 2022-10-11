@@ -7,9 +7,8 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 
 interface UserRepository: JpaRepository<User, Long> {
-    fun findByUidAndPassword(uid: String, password: String): User?
-    fun findByUid(uid: String): User?
-    fun existsByUid(uid: String): Boolean
+    fun findByEmailAndPassword(email: String, password: String): User?
+    fun findByEmail(email: String): User?
     fun existsByEmail(email: String): Boolean
 
     @Query("SELECT u FROM User u WHERE u.name LIKE %:keyword%")

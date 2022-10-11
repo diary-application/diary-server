@@ -14,10 +14,9 @@ class User(
     @Column(name = "user_id")
     var id: Long? = null,
 
-    var uid: String,
+    var email: String,
     var password: String,
     var name: String,
-    var email: String,
 
     // 최근 접속 ip
     var ip: String = "",

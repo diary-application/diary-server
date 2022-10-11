@@ -8,7 +8,8 @@ import javax.validation.constraints.NotBlank
 
 data class LoginForm(
     @field:NotBlank
-    var uid: String,
+    @field:Email
+    var email: String,
 
     @field:NotBlank
     var password: String
@@ -16,7 +17,8 @@ data class LoginForm(
 
 data class MailAuthLoginForm(
     @field:NotBlank
-    var uid: String,
+    @field:Email
+    var email: String,
 
     @field:NotBlank
     var password: String,
@@ -31,19 +33,19 @@ data class AuthMailForm(@field:NotBlank @field:Email var email: String)
 // 해당 메일에 대한 인증 코드와 함께 요청
 data class AuthCodeForm(@field:NotBlank @field:Email var email: String, @field:NotBlank var code: String)
 
+// 로그인 성공 시 토큰 응답
+data class TokenResponse(var token: String)
+
 data class JoinForm(
     @field:NotBlank
-    var uid: String,
+    @field:Email
+    var email: String,
 
     @field:NotBlank
     var password: String,
 
     @field:NotBlank
     var passwordCheck: String,
-
-    @field:NotBlank
-    @field:Email
-    var email: String,
 
     @field:NotBlank
     var name: String

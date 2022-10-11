@@ -31,8 +31,16 @@ dependencies {
 	runtimeOnly("mysql:mysql-connector-java")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 
-	// Spring Security
-	implementation("org.springframework.boot:spring-boot-starter-web")
+	// JWT
+	val jwtVersion = "0.11.5"
+	implementation("javax.xml.bind:jaxb-api")
+	implementation("io.jsonwebtoken:jjwt-api:$jwtVersion")
+	runtimeOnly("io.jsonwebtoken:jjwt-impl:$jwtVersion")
+	runtimeOnly("io.jsonwebtoken:jjwt-jackson:$jwtVersion")
+
+	// Security
+	implementation("org.springframework.boot:spring-boot-starter-security")
+	testImplementation("org.springframework.security:spring-security-test")
 
 	// mail
 	implementation("org.springframework.boot:spring-boot-starter-mail")
