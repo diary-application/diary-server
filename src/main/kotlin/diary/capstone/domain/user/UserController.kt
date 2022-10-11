@@ -17,12 +17,12 @@ class LoginController(private val loginService: LoginService) {
     // 로그인 (인증 메일 재전송 필요할 시 해당 메소드로 다시 요청)
     @PostMapping("/login")
     fun login(@Valid @RequestBody form: LoginForm, request: HttpServletRequest) =
-        UserDetailResponse(loginService.login(form, request))
+        TokenResponse(loginService.login(form, request))
 
     // 메일 인증과 함께 로그인
     @PostMapping("/mail-auth-login")
     fun mailAuthenticationLogin(@Valid @RequestBody form: MailAuthLoginForm, request: HttpServletRequest) =
-        UserDetailResponse(loginService.mailAuthenticationLogin(form, request))
+        TokenResponse(loginService.mailAuthenticationLogin(form, request))
 
     // 회원 가입, 이메일은 인증된 이메일을 입력해야 함
     @PostMapping("/join")
@@ -40,8 +40,8 @@ class LoginController(private val loginService: LoginService) {
         loginService.checkEmailAuthMail(form)
 
     // 로그아웃
-    @GetMapping("/logout")
-    fun logout(request: HttpServletRequest) = loginService.logout(request)
+//    @GetMapping("/logout")
+//    fun logout(request: HttpServletRequest) = loginService.logout(request)
 }
 
 @Auth

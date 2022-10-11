@@ -1,6 +1,8 @@
 package diary.capstone.config
 
 import diary.capstone.auth.AuthService
+import diary.capstone.auth.JwtProvider
+import diary.capstone.domain.user.UserRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.CacheControl
@@ -17,11 +19,14 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2
 import java.util.concurrent.TimeUnit
 
 @Configuration
-class AppConfig(private val authService: AuthService): WebMvcConfigurer {
+class AppConfig(
+//    private val authService: AuthService,
+    private val jwtProvider: JwtProvider
+): WebMvcConfigurer {
     
     // ArgumentResolver 등록
     override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {
-        resolvers.add(LoginUserArgumentResolver(authService))
+        resolvers.add(LoginUserArgumentResolver(jwtProvider))
     }
 
     // 정적 리소스 조회 경로 설정
