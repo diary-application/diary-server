@@ -166,7 +166,7 @@ class UserService(
         )
 
     // 내 정보(이름) 수정
-    fun updateUserInfo(form: UserInfoUpdateForm, loginUser: User): User =
+    fun updateUserName(form: UserInfoUpdateForm, loginUser: User): User =
         loginUser.update(name = form.name,)
 
     // 내 직종 수정
