@@ -53,8 +53,8 @@ class LoginService(
     // 메일 인증 로그인
     @Transactional
     fun mailAuthenticationLogin(form: MailAuthLoginForm, request: HttpServletRequest): String {
-        val user = userRepository.findByEmailAndPassword(form.email, form.password)
-            ?: throw AuthException(LOGIN_FAILED)
+        val user = userRepository.findByEmail(form.email) ?: throw AuthException(LOGIN_FAILED)
+        if (!passwordEncoder.matches(form.password, user.password)) throw AuthException(LOGIN_FAILED)
 
         // 인증 코드 일치 확인, 불일치 시 예외 발생
         if (form.code == authManager.getAuthCode(user.id!!.toString())) {
