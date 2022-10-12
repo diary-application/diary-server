@@ -1,11 +1,8 @@
 package diary.capstone.aop
 
-import diary.capstone.auth.AuthService
 import diary.capstone.auth.JwtProvider
-import diary.capstone.domain.user.ADMIN_ONLY
 import diary.capstone.domain.user.AuthException
 import diary.capstone.domain.user.INVALID_TOKEN
-import diary.capstone.domain.user.NOT_LOGIN_USER
 import diary.capstone.util.logger
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around

@@ -5,9 +5,13 @@
 #    descriptor:
 #      sql: trace
 
+jwt:
+  secret-key: asldknosdijgoihoicvxbjnpjwpojewsdpogipogiqqqwekljocipvjoixcvxcknlrknt
+
 spring:
   config:
     import: application-secret.yml
+
   jpa:
     # JPA sql 쿼리 로그 출력
 #    show-sql: true
@@ -47,7 +51,7 @@ server:
   error:
     include-stacktrace: on_param
     include-exception: true
-  servlet:
-    session:
-      timeout: 30
-      tracking-modes: cookie
+#  servlet:
+#    session:
+#      timeout: 30
+#      tracking-modes: cookie
