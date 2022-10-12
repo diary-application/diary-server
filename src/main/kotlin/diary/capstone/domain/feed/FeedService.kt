@@ -46,7 +46,7 @@ class FeedService(
 
     // 피드 목록 검색 (페이징)
     @Transactional(readOnly = true)
-    fun getFeeds(pageable: Pageable, userId: Long?, feedLineId: Long?, keyword: String?, loginUser: User): Page<Feed> {
+    fun getFeeds(pageable: Pageable, userId: Long?, feedLineId: Long?, loginUser: User): Page<Feed> {
         // 특정 유저의 피드만 조회 (프로필 통해 조회)
         userId?.let { userId ->
             // 로그인 유저가 해당 유저일 경우 모든 피드 조회
@@ -68,10 +68,6 @@ class FeedService(
         feedLineId?.let {
             val feedLine = loginUser.feedLines.find { feedLine ->  feedLine.id == it }
             // TODO 피드라인으로 피드 목록 조회 로직
-        }
-        // 피드 내용으로 검색
-        keyword?.let { keyword ->
-            return getPagedFeed(pageable, loginUser.feeds.filter { it.content.contains(keyword) })
         }
 
         // 모든 피드 조회
