@@ -1,22 +1,26 @@
 package diary.capstone.auth
 
 import diary.capstone.config.TOKEN_VALID_TIME
+import diary.capstone.domain.user.AuthException
+import diary.capstone.domain.user.INVALID_TOKEN
 import diary.capstone.domain.user.User
 import diary.capstone.domain.user.UserRepository
-import io.jsonwebtoken.ExpiredJwtException
-import io.jsonwebtoken.Header
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
+import io.jsonwebtoken.*
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.PropertySource
 import org.springframework.stereotype.Component
 import java.util.*
+import javax.crypto.SecretKey
 import javax.crypto.spec.SecretKeySpec
 import javax.servlet.http.HttpServletRequest
 import javax.xml.bind.DatatypeConverter
 
 @Component
-class JwtProvider(private val userRepository: UserRepository) {
-
-    private val secretKey = "qijsdogoxcvojkwoehuihnbknoiernobnpsdfjopsjmfposdnmfkncxlv"
+class JwtProvider(
+    private val userRepository: UserRepository,
+) {
+    @Value("\${jwt.secret-key}")
+    private lateinit var secretKey: String
 
     fun createToken(subject: String): String {
 
@@ -49,19 +53,12 @@ class JwtProvider(private val userRepository: UserRepository) {
         userRepository.findByEmail(getSubject(token))
 
     // 토큰의 유효성 + 만료일자 확인
-    fun validateToken(token: String): Boolean {
-        return try {
-            !Jwts.parserBuilder()
-                .setSigningKey(DatatypeConverter.parseBase64Binary(secretKey))
-                .build()
-                .parseClaimsJws(token)
-                .body
-                .expiration
-                .before(Date())
-        } catch (e: ExpiredJwtException) {
-            true
-        } catch (e: Exception) {
-            false
-        }
-    }
+    fun validateToken(token: String): Boolean =
+        !Jwts.parserBuilder()
+            .setSigningKey(DatatypeConverter.parseBase64Binary(secretKey))
+            .build()
+            .parseClaimsJws(token)
+            .body
+            .expiration
+            .before(Date())
 }

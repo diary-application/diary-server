@@ -5,6 +5,11 @@ import org.springframework.http.ResponseEntity
 
 data class ErrorResponse(val cause: String = "", val message: String = "")
 
+fun found(ex: Exception) =
+    ResponseEntity
+        .status(HttpStatus.FOUND)
+        .body(ErrorResponse(ex.javaClass.simpleName, ex.message!!))
+
 fun badRequest(ex: Exception) =
     ResponseEntity
         .status(HttpStatus.BAD_REQUEST)
@@ -20,7 +25,7 @@ fun unauthorized(ex: Exception) =
         .status(HttpStatus.UNAUTHORIZED)
         .body(ErrorResponse(ex.javaClass.simpleName, ex.message!!))
 
-fun found(ex: Exception) =
+fun forbidden(ex: Exception) =
     ResponseEntity
-        .status(HttpStatus.FOUND)
+        .status(HttpStatus.FORBIDDEN)
         .body(ErrorResponse(ex.javaClass.simpleName, ex.message!!))

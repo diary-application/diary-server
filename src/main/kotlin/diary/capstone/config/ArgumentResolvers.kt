@@ -1,6 +1,5 @@
 package diary.capstone.config
 
-import diary.capstone.auth.AuthService
 import diary.capstone.auth.JwtProvider
 import diary.capstone.domain.user.*
 import org.springframework.core.MethodParameter
@@ -11,10 +10,7 @@ import org.springframework.web.method.support.ModelAndViewContainer
 import javax.servlet.http.HttpServletRequest
 
 // 요청하는 클라이언트가 로그인 한 유저 정보를 얻기 위한 ArgumentResolver
-class LoginUserArgumentResolver(
-//    private val authService: AuthService,
-    private val jwtProvider: JwtProvider
-): HandlerMethodArgumentResolver {
+class LoginUserArgumentResolver(private val jwtProvider: JwtProvider): HandlerMethodArgumentResolver {
 
     // 핸들러 메소드 파라미터에 User 엔티티 클래스가 존재할 경우
     override fun supportsParameter(parameter: MethodParameter): Boolean =
@@ -27,7 +23,7 @@ class LoginUserArgumentResolver(
                                  binderFactory: WebDataBinderFactory?
     ): User {
         return jwtProvider.extractToken(webRequest.nativeRequest as HttpServletRequest)?.let {
-            if (!jwtProvider.validateToken(it)) throw AuthException(INVALID_TOKEN)
+            jwtProvider.validateToken(it)
             jwtProvider.getUser(it) ?: throw AuthException(USER_NOT_FOUND)
         } ?: throw AuthException(NOT_LOGIN_USER)
     }
