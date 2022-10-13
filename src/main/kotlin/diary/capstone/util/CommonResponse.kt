@@ -5,6 +5,11 @@ import org.springframework.http.ResponseEntity
 
 data class ErrorResponse(val cause: String = "", val message: String = "")
 
+fun created(ex: Exception) =
+    ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(ErrorResponse(ex.javaClass.simpleName, ex.message!!))
+
 fun found(ex: Exception) =
     ResponseEntity
         .status(HttpStatus.FOUND)

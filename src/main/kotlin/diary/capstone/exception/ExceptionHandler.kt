@@ -19,8 +19,7 @@ class ExceptionHandler {
     fun loginExceptionHandle(ex: AuthException): ResponseEntity<ErrorResponse> {
         log.warn("[인증 예외] : {}", ex.message)
         return when (ex.message) {
-            MAIL_AUTH_REQUIRED -> found(ex)
-            INVALID_TOKEN -> forbidden(ex)
+            MAIL_AUTH_REQUIRED -> created(ex)
             else -> unauthorized(ex)
         }
     }
@@ -29,7 +28,7 @@ class ExceptionHandler {
     @ExceptionHandler(JwtException::class)
     fun tokenExceptionHandle(ex: JwtException): ResponseEntity<ErrorResponse> {
         log.warn("[JWT 예외] : {}", ex.message)
-        return forbidden(ex)
+        return unauthorized(ex)
     }
 
     // 검증 예외 처리

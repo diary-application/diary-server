@@ -7,7 +7,7 @@ package diary.capstone.config
 const val FILE_SAVE_PATH = "///home/ubuntu/diary-server/file/"
 
 // 토큰 유효 시간
-const val TOKEN_VALID_TIME = 3 * 1000 * 60
+const val TOKEN_VALID_TIME = 180 * 1000 * 60 // 180분
 
 // 정적 파일 요청 루트 URL
 const val RESOURCE_URL = "https://di4ry.com/resource/"
