@@ -41,7 +41,7 @@ class LoginService(
          * 다른 ip로 접속 시 or 로그인 하려는 유저가 로그인 대기 상태일 시
          * 인증 코드 생성 -> 인증 메일 발송 -> 인증 예외 발생
          */
-        if (!passwordEncoder.matches(user.ip, request.getIp()) || user.loginWait) {
+        if (!passwordEncoder.matches(request.getIp(), user.ip) || user.loginWait) {
             user.update(loginWaiting = true)
             mailService.sendLoginAuthMail(authManager.generateCode(user.id!!.toString()), user.email)
             throw AuthException(MAIL_AUTH_REQUIRED)
