@@ -6,6 +6,7 @@ import diary.capstone.config.INTERESTS_LIMIT
 import io.swagger.annotations.ApiOperation
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import springfox.documentation.annotations.ApiIgnore
@@ -68,7 +69,8 @@ class LoginController(private val loginService: LoginService) {
 @RequestMapping("/user")
 class UserController(
     private val userService: UserService,
-    private val authService: AuthService
+    private val authService: AuthService,
+    private val passwordEncoder: PasswordEncoder
 ) {
     @ApiOperation(value = "내 정보 조회")
     @GetMapping
@@ -132,7 +134,7 @@ class UserController(
     @ApiOperation(value = "회원 탈퇴", notes = "!! 현재 회원 탈퇴시 데이터베이스에서 바로 해당 유저를 삭제")
     @DeleteMapping
     fun deleteUser(@RequestBody form: UserDeleteForm, @ApiIgnore user: User, request: HttpServletRequest) {
-        if (form.password == user.password) {
+        if (passwordEncoder.matches(form.password, user.password)) {
             userService.deleteUser(form, user)
             authService.logout(request)
         }
