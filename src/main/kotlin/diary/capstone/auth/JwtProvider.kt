@@ -1,16 +1,15 @@
 package diary.capstone.auth
 
 import diary.capstone.config.TOKEN_VALID_TIME
-import diary.capstone.domain.user.AuthException
-import diary.capstone.domain.user.INVALID_TOKEN
 import diary.capstone.domain.user.User
 import diary.capstone.domain.user.UserRepository
-import io.jsonwebtoken.*
+import io.jsonwebtoken.Header
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.annotation.PropertySource
+import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Component
 import java.util.*
-import javax.crypto.SecretKey
 import javax.crypto.spec.SecretKeySpec
 import javax.servlet.http.HttpServletRequest
 import javax.xml.bind.DatatypeConverter
@@ -38,7 +37,8 @@ class JwtProvider(private val userRepository: UserRepository) {
     }
 
     fun extractToken(request: HttpServletRequest): String? =
-        request.getHeader("Authorization")
+        request.getHeader(HttpHeaders.AUTHORIZATION)
+//            ?: request.cookies.find { it.name == "token" }.toString()
 
     fun getSubject(token: String): String =
         Jwts.parserBuilder()

@@ -6,7 +6,6 @@ import java.time.format.DateTimeFormatter
 import javax.persistence.EntityListeners
 import javax.persistence.MappedSuperclass
 import javax.persistence.PrePersist
-import javax.persistence.PreUpdate
 
 // 생성일, 수정일 입력을 위한 엔티티 (상속받아서 사용)
 @MappedSuperclass
