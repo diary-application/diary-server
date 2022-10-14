@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.CacheControl
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import springfox.documentation.builders.ApiInfoBuilder
 import springfox.documentation.builders.PathSelectors
@@ -14,7 +13,6 @@ import springfox.documentation.service.ApiInfo
 import springfox.documentation.spi.DocumentationType
 import springfox.documentation.spring.web.plugins.Docket
 import springfox.documentation.swagger2.annotations.EnableSwagger2
-import java.util.concurrent.TimeUnit
 
 @Configuration
 class AppConfig(private val jwtProvider: JwtProvider): WebMvcConfigurer {
@@ -25,12 +23,12 @@ class AppConfig(private val jwtProvider: JwtProvider): WebMvcConfigurer {
     }
 
     // 정적 리소스 조회 경로 설정: 현재 미사용, 스토리지를 S3 로 이전함
-    override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
-        registry
-            .addResourceHandler("/resource/**")
-            .addResourceLocations("file:$FILE_SAVE_PATH")
-            .setCacheControl(CacheControl.maxAge(CACHING_MINUTES, TimeUnit.MINUTES))
-    }
+//    override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
+//        registry
+//            .addResourceHandler("/resource/**")
+//            .addResourceLocations("file:$FILE_SAVE_PATH")
+//            .setCacheControl(CacheControl.maxAge(CACHING_MINUTES, TimeUnit.MINUTES))
+//    }
 }
 
 // JPAQueryFactory 빈 등록
