@@ -23,6 +23,7 @@ class FeedService(
     // 피드의 사진을 저장
     private fun setAndSaveFiles(feed: Feed, form: FeedRequestForm) {
         if (form.images.size == form.descriptions.size) {
+            feed.files.forEach { fileService.deleteFile(it) }
             // 이미지 파일들과 설명들을 합쳐서 하나의 리스트로 묶고 순회
             form.images.zip(form.descriptions) { file, desc ->
                 fileService.saveFile(file, desc).setFeed(feed)
@@ -74,16 +75,6 @@ class FeedService(
         return feedRepository.findByShowScope(pageable, SHOW_ALL)
     }
 
-    // 피드 목록 검색 (페이징, 피드라인으로)
-    fun getFeedsByFeedLine(pageable: Pageable, feedLineId: Long, loginUser: User): Page<Feed> {
-        loginUser.feedLines
-            .find { it.id == feedLineId }
-            ?.let {
-                // TODO 피드 라인에 따른 피드 목록 조회 로직
-            }
-            .run { throw FeedException(FEED_LINE_NOT_FOUND) }
-    }
-
     // Pageable, Feed 리스트로 페이징된 Feed 객체 반환
     @Transactional(readOnly = true)
     fun getPagedFeed(pageable: Pageable, feeds: List<Feed>): Page<Feed> {
@@ -124,9 +115,10 @@ class FeedService(
         }
 
     fun deleteFeed(feedId: Long, loginUser: User) =
-        getFeed(feedId).let {
-            feedPermissionCheck(it, loginUser)
-            feedRepository.delete(it)
+        getFeed(feedId).let { feed ->
+            feedPermissionCheck(feed, loginUser)
+            feed.files.forEach { fileService.deleteFile(it) }
+            feedRepository.delete(feed)
         }
 
     // 피드 접근 권한 체크

@@ -60,7 +60,7 @@ class LoginController(private val loginService: LoginService) {
     )
     @PostMapping("/join")
     fun join(@Valid @RequestBody form: JoinForm, request: HttpServletRequest) =
-        UserDetailResponse(loginService.join(form, request))
+        TokenResponse(loginService.join(form, request))
 }
 
 @ApiOperation("유저 관련 API")
