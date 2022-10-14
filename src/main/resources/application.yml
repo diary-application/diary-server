@@ -5,9 +5,6 @@
 #    descriptor:
 #      sql: trace
 
-jwt:
-  secret-key: asldknosdijgoihoicvxbjnpjwpojewsdpogipogiqqqwekljocipvjoixcvxcknlrknt
-
 spring:
   config:
     import: application-secret.yml

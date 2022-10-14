@@ -1,7 +1,7 @@
 package diary.capstone.domain.mail
 
 import diary.capstone.config.AUTH_CODE_DIGITS
-import diary.capstone.config.AUTH_VALID_MINUTE
+import diary.capstone.config.AUTH_CODE_VALID_MINUTE
 import diary.capstone.util.logger
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessageHelper
@@ -26,7 +26,7 @@ class MailService(private val javaMailSender: JavaMailSender) {
 
             text += "<h2>로그인 하기 위해 아래 인증 코드 ${AUTH_CODE_DIGITS}자리를 입력해주세요.</h2>" +
                     "<h3>인증 코드 : <strong>$code</strong></h3><br/>" +
-                    "해당 메일은 다른 IP로 로그인을 시도할 경우 발송되며, ${AUTH_VALID_MINUTE}분간 유효합니다.<br/>" +
+                    "해당 메일은 다른 IP로 로그인을 시도할 경우 발송되며, ${AUTH_CODE_VALID_MINUTE}분간 유효합니다.<br/>" +
                     "만일 본인이 로그인을 시도하지 않았을 경우 비밀번호를 교체해주세요."
 
             text += "</body>" +
@@ -56,7 +56,7 @@ class MailService(private val javaMailSender: JavaMailSender) {
 
             text += "<h2>이메일 인증을 위해 아래 인증 코드 ${AUTH_CODE_DIGITS}자리를 입력해주세요.</h2>" +
                     "<h3>인증 코드 : <strong>$code</strong></h3><br/>" +
-                    "해당 메일은 회원 가입 시 이메일 확인을 위해 발송되며, ${AUTH_VALID_MINUTE}분간 유효합니다.<br/>"
+                    "해당 메일은 회원 가입 시 이메일 확인을 위해 발송되며, ${AUTH_CODE_VALID_MINUTE}분간 유효합니다.<br/>"
 
             text += "</body>" +
                     "</html>"
