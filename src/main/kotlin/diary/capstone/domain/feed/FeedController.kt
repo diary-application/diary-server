@@ -1,11 +1,11 @@
 package diary.capstone.domain.feed
 
-import diary.capstone.domain.user.User
 import diary.capstone.auth.Auth
 import diary.capstone.config.FEED_PAGE_SIZE
 import diary.capstone.domain.feed.comment.CommentPagedResponse
 import diary.capstone.domain.feed.comment.CommentRequestForm
 import diary.capstone.domain.feed.comment.CommentResponse
+import diary.capstone.domain.user.User
 import io.swagger.annotations.ApiOperation
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort

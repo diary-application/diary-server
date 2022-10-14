@@ -2,12 +2,13 @@ package diary.capstone.domain.feed
 
 import diary.capstone.domain.feed.comment.Comment
 import diary.capstone.domain.feed.comment.CommentRequestForm
-import diary.capstone.domain.file.File
 import diary.capstone.domain.file.FileService
 import diary.capstone.domain.user.User
 import diary.capstone.domain.user.UserService
 import diary.capstone.util.*
-import org.springframework.data.domain.*
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import kotlin.math.min

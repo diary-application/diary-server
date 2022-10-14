@@ -5,7 +5,6 @@ import diary.capstone.domain.user.User
 import diary.capstone.domain.user.UserSimpleResponse
 import org.springframework.data.domain.Page
 import org.springframework.web.multipart.MultipartFile
-import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Pattern
 
 data class FeedRequestForm(

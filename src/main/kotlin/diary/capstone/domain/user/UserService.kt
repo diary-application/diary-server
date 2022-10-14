@@ -4,11 +4,11 @@ import diary.capstone.auth.AuthManager
 import diary.capstone.auth.JwtProvider
 import diary.capstone.config.INTERESTS_LIMIT
 import diary.capstone.domain.file.FileService
+import diary.capstone.domain.mail.MailService
 import diary.capstone.domain.occupation.INTERESTS_EXCEEDED
 import diary.capstone.domain.occupation.OCCUPATION_NOT_FOUND
 import diary.capstone.domain.occupation.OccupationException
 import diary.capstone.domain.occupation.OccupationService
-import diary.capstone.domain.mail.MailService
 import diary.capstone.util.getIp
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl

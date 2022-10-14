@@ -69,7 +69,6 @@ class LoginController(private val loginService: LoginService) {
 @RequestMapping("/user")
 class UserController(
     private val userService: UserService,
-    private val authService: AuthService,
     private val passwordEncoder: PasswordEncoder
 ) {
     @ApiOperation(value = "내 정보 조회")
@@ -134,10 +133,8 @@ class UserController(
     @ApiOperation(value = "회원 탈퇴", notes = "!! 현재 회원 탈퇴시 데이터베이스에서 바로 해당 유저를 삭제")
     @DeleteMapping
     fun deleteUser(@RequestBody form: UserDeleteForm, @ApiIgnore user: User, request: HttpServletRequest) {
-        if (passwordEncoder.matches(form.password, user.password)) {
+        if (passwordEncoder.matches(form.password, user.password))
             userService.deleteUser(form, user)
-            authService.logout(request)
-        }
         else throw UserException(PASSWORD_MISMATCH)
     }
 }
