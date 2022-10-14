@@ -18,7 +18,7 @@ class User(
     var password: String,
     var name: String,
 
-    // 최근 접속 ip
+    // 최근 접속 ip, 로그인 대기 상태
     var ip: String = "",
     var loginWait: Boolean = false,
 

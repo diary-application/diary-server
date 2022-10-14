@@ -2,7 +2,7 @@ package diary.capstone.auth
 
 import diary.capstone.config.AUTH_CODE_CHARS
 import diary.capstone.config.AUTH_CODE_DIGITS
-import diary.capstone.config.AUTH_VALID_MINUTE
+import diary.capstone.config.AUTH_CODE_VALID_MINUTE
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -40,11 +40,11 @@ class AuthManager {
     // 만료된 코드, 이메일 삭제
     fun removeExpiredCodesAndEmails() {
         table.forEach {
-            if (ChronoUnit.MINUTES.between(it.value.second, LocalDateTime.now()) > AUTH_VALID_MINUTE)
+            if (ChronoUnit.MINUTES.between(it.value.second, LocalDateTime.now()) > AUTH_CODE_VALID_MINUTE)
                 table.remove(it.key)
         }
         emails.forEach {
-            if (ChronoUnit.MINUTES.between(it.value, LocalDateTime.now()) > AUTH_VALID_MINUTE)
+            if (ChronoUnit.MINUTES.between(it.value, LocalDateTime.now()) > AUTH_CODE_VALID_MINUTE)
                 emails.remove(it.key)
         }
     }
