@@ -16,9 +16,8 @@ import javax.servlet.http.HttpServletRequest
 import javax.xml.bind.DatatypeConverter
 
 @Component
-class JwtProvider(
-    private val userRepository: UserRepository,
-) {
+class JwtProvider(private val userRepository: UserRepository) {
+
     @Value("\${jwt.secret-key}")
     private lateinit var secretKey: String
 
@@ -40,7 +39,6 @@ class JwtProvider(
 
     fun extractToken(request: HttpServletRequest): String? =
         request.getHeader("Authorization")
-//            ?: request.getHeader("authorization")
 
     fun getSubject(token: String): String =
         Jwts.parserBuilder()
@@ -52,7 +50,7 @@ class JwtProvider(
     fun getUser(token: String): User? =
         userRepository.findByEmail(getSubject(token))
 
-    // 토큰의 유효성 + 만료일자 확인
+    // 토큰의 유효성 + 만료일자 확인, 예외는 ExceptionHandler 에서 처리
     fun validateToken(token: String): Boolean =
         !Jwts.parserBuilder()
             .setSigningKey(DatatypeConverter.parseBase64Binary(secretKey))

@@ -84,20 +84,22 @@ class LoginService(
 
     // 회원 가입 (인증받은 이메일로 요청해야 함)
     @Transactional
-    fun join(form: JoinForm, request: HttpServletRequest): User {
+    fun join(form: JoinForm, request: HttpServletRequest): String {
         if (!form.checkPassword()) throw UserException(PASSWORD_MISMATCH)
         if (userRepository.existsByEmail(form.email)) throw UserException(DUPLICATE_EMAIL)
         if (!authManager.emails.contains(form.email)) throw UserException(MAIL_AUTH_REQUIRED)
         authManager.emails.remove(form.email)
 
-        return userRepository.save(
+        userRepository.save(
             User(
                 email = form.email,
                 password = passwordEncoder.encode(form.password),
                 name = form.name,
                 ip = request.getIp()
             )
-        )
+        ).let {
+            return jwtProvider.createToken(it.email)
+        }
     }
 
 //    fun logout(request: HttpServletRequest) = authService.logout(request)

@@ -1,8 +1,6 @@
 package diary.capstone.config
 
-import diary.capstone.auth.AuthService
 import diary.capstone.auth.JwtProvider
-import diary.capstone.domain.user.UserRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.CacheControl
@@ -19,17 +17,14 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2
 import java.util.concurrent.TimeUnit
 
 @Configuration
-class AppConfig(
-//    private val authService: AuthService,
-    private val jwtProvider: JwtProvider
-): WebMvcConfigurer {
+class AppConfig(private val jwtProvider: JwtProvider): WebMvcConfigurer {
     
     // ArgumentResolver 등록
     override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {
         resolvers.add(LoginUserArgumentResolver(jwtProvider))
     }
 
-    // 정적 리소스 조회 경로 설정
+    // 정적 리소스 조회 경로 설정: 현재 미사용, 스토리지를 S3 로 이전함
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
         registry
             .addResourceHandler("/resource/**")
@@ -64,7 +59,7 @@ class SwaggerConfig {
     private fun apiInfo(): ApiInfo {
         return ApiInfoBuilder()
             .title("모두의 일기장 API")
-            .description("동양미래대학교 7팀 졸업작품 - 모두의 일기장 API 명세서")
+            .description("모두의 일기장 API 명세서")
             .build()
     }
 }
