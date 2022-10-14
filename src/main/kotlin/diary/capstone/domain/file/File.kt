@@ -1,6 +1,5 @@
 package diary.capstone.domain.file
 
-import diary.capstone.config.FILE_SAVE_PATH
 import diary.capstone.domain.feed.Feed
 import javax.persistence.*
 
