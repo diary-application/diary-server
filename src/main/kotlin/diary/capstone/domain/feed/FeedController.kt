@@ -60,7 +60,7 @@ class FeedController(private val feedService: FeedService) {
         feedService.deleteFeed(feedId, user)
 }
 
-@ApiIgnore("댓글 관련 API")
+@ApiOperation("댓글 관련 API")
 @Auth
 @RestController
 @RequestMapping("/feed/{feedId}/comment")
