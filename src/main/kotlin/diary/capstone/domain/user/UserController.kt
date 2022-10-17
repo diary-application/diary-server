@@ -21,7 +21,7 @@ class LoginController(private val loginService: LoginService) {
     @ApiOperation(
         value = "로그인",
         notes = "이메일, 비밀번호로 인증, 성공 시 액세스 토큰 발급\n " +
-                "로그인하려는 유저의 IP가 이전 접근 IP와 다를 경우 메일 인증 코드 발송, " +
+                "로그인하려는 유저의 IP가 이전 접근 IP와 다를 경우 메일 인증 코드 발송,\n " +
                 "이후 /mail-auth-login 을 통한 로그인 필요\n " +
                 "메일 인증 코드 재발송 필요 시 해당 API 재요청"
     )
@@ -76,6 +76,7 @@ class UserController(
     fun getMyInfo(@ApiIgnore user: User) = UserDetailResponse(user)
 
     @ApiOperation(value = "내 피드라인 목록 조회")
+    @GetMapping("/feedlines")
     fun getMyFeedLines(@ApiIgnore user: User) = user.feedLines.map { FeedLineResponse(it) }
 
     @ApiOperation(value = "특정 유저의 유저 정보 조회")

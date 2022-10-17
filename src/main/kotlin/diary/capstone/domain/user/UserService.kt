@@ -22,7 +22,6 @@ import kotlin.math.min
 
 @Service
 class LoginService(
-//    private val authService: AuthService,
     private val userRepository: UserRepository,
     private val authManager: AuthManager,
     private val mailService: MailService,
@@ -101,8 +100,6 @@ class LoginService(
             return jwtProvider.createToken(it.email)
         }
     }
-
-//    fun logout(request: HttpServletRequest) = authService.logout(request)
 }
 
 @Service
