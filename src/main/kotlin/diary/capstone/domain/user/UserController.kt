@@ -6,6 +6,7 @@ import diary.capstone.config.INTERESTS_LIMIT
 import io.swagger.annotations.ApiOperation
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import springfox.documentation.annotations.ApiIgnore
@@ -20,7 +21,7 @@ class LoginController(private val loginService: LoginService) {
     @ApiOperation(
         value = "로그인",
         notes = "이메일, 비밀번호로 인증, 성공 시 액세스 토큰 발급\n " +
-                "로그인하려는 유저의 IP가 이전 접근 IP와 다를 경우 메일 인증 코드 발송, " +
+                "로그인하려는 유저의 IP가 이전 접근 IP와 다를 경우 메일 인증 코드 발송,\n " +
                 "이후 /mail-auth-login 을 통한 로그인 필요\n " +
                 "메일 인증 코드 재발송 필요 시 해당 API 재요청"
     )
@@ -59,7 +60,7 @@ class LoginController(private val loginService: LoginService) {
     )
     @PostMapping("/join")
     fun join(@Valid @RequestBody form: JoinForm, request: HttpServletRequest) =
-        UserDetailResponse(loginService.join(form, request))
+        TokenResponse(loginService.join(form, request))
 }
 
 @ApiOperation("유저 관련 API")
@@ -68,13 +69,14 @@ class LoginController(private val loginService: LoginService) {
 @RequestMapping("/user")
 class UserController(
     private val userService: UserService,
-    private val authService: AuthService
+    private val passwordEncoder: PasswordEncoder
 ) {
     @ApiOperation(value = "내 정보 조회")
     @GetMapping
     fun getMyInfo(@ApiIgnore user: User) = UserDetailResponse(user)
 
     @ApiOperation(value = "내 피드라인 목록 조회")
+    @GetMapping("/feedlines")
     fun getMyFeedLines(@ApiIgnore user: User) = user.feedLines.map { FeedLineResponse(it) }
 
     @ApiOperation(value = "특정 유저의 유저 정보 조회")
@@ -132,10 +134,8 @@ class UserController(
     @ApiOperation(value = "회원 탈퇴", notes = "!! 현재 회원 탈퇴시 데이터베이스에서 바로 해당 유저를 삭제")
     @DeleteMapping
     fun deleteUser(@RequestBody form: UserDeleteForm, @ApiIgnore user: User, request: HttpServletRequest) {
-        if (form.password == user.password) {
+        if (passwordEncoder.matches(form.password, user.password))
             userService.deleteUser(form, user)
-            authService.logout(request)
-        }
         else throw UserException(PASSWORD_MISMATCH)
     }
 }

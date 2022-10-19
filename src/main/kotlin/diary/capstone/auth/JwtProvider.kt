@@ -1,24 +1,22 @@
 package diary.capstone.auth
 
 import diary.capstone.config.TOKEN_VALID_TIME
-import diary.capstone.domain.user.AuthException
-import diary.capstone.domain.user.INVALID_TOKEN
 import diary.capstone.domain.user.User
 import diary.capstone.domain.user.UserRepository
-import io.jsonwebtoken.*
+import io.jsonwebtoken.Header
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.annotation.PropertySource
+import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Component
 import java.util.*
-import javax.crypto.SecretKey
 import javax.crypto.spec.SecretKeySpec
 import javax.servlet.http.HttpServletRequest
 import javax.xml.bind.DatatypeConverter
 
 @Component
-class JwtProvider(
-    private val userRepository: UserRepository,
-) {
+class JwtProvider(private val userRepository: UserRepository) {
+
     @Value("\${jwt.secret-key}")
     private lateinit var secretKey: String
 
@@ -39,8 +37,8 @@ class JwtProvider(
     }
 
     fun extractToken(request: HttpServletRequest): String? =
-        request.getHeader("Authorization")
-//            ?: request.getHeader("authorization")
+        request.getHeader(HttpHeaders.AUTHORIZATION)
+//            ?: request.cookies.find { it.name == "token" }.toString()
 
     fun getSubject(token: String): String =
         Jwts.parserBuilder()
@@ -52,7 +50,7 @@ class JwtProvider(
     fun getUser(token: String): User? =
         userRepository.findByEmail(getSubject(token))
 
-    // 토큰의 유효성 + 만료일자 확인
+    // 토큰의 유효성 + 만료일자 확인, 예외는 ExceptionHandler 에서 처리
     fun validateToken(token: String): Boolean =
         !Jwts.parserBuilder()
             .setSigningKey(DatatypeConverter.parseBase64Binary(secretKey))

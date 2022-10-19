@@ -1,6 +1,7 @@
 package diary.capstone.domain.user
 
 import diary.capstone.domain.feed.Feed
+import diary.capstone.domain.feed.FeedLike
 import diary.capstone.domain.feedline.FeedLine
 import diary.capstone.domain.file.File
 import diary.capstone.domain.occupation.Occupation
@@ -18,7 +19,7 @@ class User(
     var password: String,
     var name: String,
 
-    // 최근 접속 ip
+    // 최근 접속 ip, 로그인 대기 상태
     var ip: String = "",
     var loginWait: Boolean = false,
 
@@ -27,12 +28,15 @@ class User(
     var occupation: Occupation? = null, // 직종
     var interests: String = "", // 관심 분야(직종 이름들): ,로 구분하여 3개까지
 
-    @OneToOne(cascade = [CascadeType.ALL])
+    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "file_id")
     var profileImage: File? = null,
 
-    @OneToMany(mappedBy = "writer", cascade = [CascadeType.ALL])
+    @OneToMany(mappedBy = "writer", cascade = [CascadeType.ALL], orphanRemoval = true)
     var feeds: MutableList<Feed> = mutableListOf(),
+
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
+    var feedLikes: MutableList<FeedLike> = mutableListOf(),
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
     var feedLines: MutableList<FeedLine> = mutableListOf(),

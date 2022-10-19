@@ -1,7 +1,6 @@
 package diary.capstone.exception
 
 import diary.capstone.domain.user.AuthException
-import diary.capstone.domain.user.INVALID_TOKEN
 import diary.capstone.domain.user.MAIL_AUTH_REQUIRED
 import diary.capstone.util.*
 import io.jsonwebtoken.JwtException
