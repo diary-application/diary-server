@@ -25,8 +25,4 @@ class File (
         this.feedFile = feed
         return this
     }
-
-    // 엔티티 삭제 전 서버에 저장된 해당 파일 삭제
-//    @PreRemove
-//    fun deleteStoredFile() { java.io.File(FILE_SAVE_PATH + this.source).delete() }
 }
