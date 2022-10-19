@@ -13,7 +13,6 @@ package diary.capstone.config
 // 토큰 유효 시간
 const val TOKEN_VALID_TIME = 180 * 1000 * 60 // 180분
 
-
 // 관심 분야 최대 개수
 const val INTERESTS_LIMIT = 3
 
