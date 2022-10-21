@@ -7,8 +7,16 @@ import springfox.documentation.annotations.ApiIgnore
 @Controller
 @ApiIgnore
 class PageViewController {
-    @GetMapping
-    fun welcome() = "forward:/index.html"
+    @GetMapping(value = [
+        "",
+        "/",
+        "/login",
+        "/profile",
+        "/chat",
+        "/schedule",
+        "/setting"
+    ])
+    fun index() = "forward:/index.html"
 
     @GetMapping("/api")
     fun redirectSwagger() = "redirect:/swagger-ui/#"
