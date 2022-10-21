@@ -91,20 +91,22 @@ class FeedService(
         feedRepository.findById(feedId).orElseThrow { throw FeedException(FEED_NOT_FOUND) }
 
     // 피드 좋아요 등록
-    fun likeFeed(feedId: Long, loginUser: User) =
+    fun likeFeed(feedId: Long, loginUser: User): Feed =
         getFeed(feedId).let { feed ->
             if (feed.likes.none { it.user == loginUser })
                 feed.likes.add(FeedLike(feed = feed, user = loginUser))
             else
                 throw FeedLikeException(ALREADY_LIKED_FEED)
+            feed
         }
 
     // 피드 좋아요 취소
-    fun cancelLikeFeed(feedId: Long, loginUser: User) =
+    fun cancelLikeFeed(feedId: Long, loginUser: User): Feed =
         getFeed(feedId).let { feed ->
             feed.likes.remove(
                 feed.likes.find { it.user.id == loginUser.id }
             )
+            feed
         }
 
     fun updateFeed(feedId: Long, form: FeedRequestForm, loginUser: User): Feed =

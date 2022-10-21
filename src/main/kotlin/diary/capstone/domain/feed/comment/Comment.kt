@@ -28,7 +28,7 @@ class Comment(
     @JoinColumn(name = "parent_id")
     var parent: Comment? = null,
 
-    @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL])
+    @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true)
     var children: MutableList<Comment> = mutableListOf(),
 
     ): BaseTimeEntity() {

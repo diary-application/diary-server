@@ -130,10 +130,10 @@ class FeedLikeController(private val feedService: FeedService) {
     @ApiOperation(value = "해당 피드 좋아요 등록")
     @PostMapping
     fun likeFeed(@PathVariable("feedId") feedId: Long, @ApiIgnore user: User) =
-        feedService.likeFeed(feedId, user)
+        FeedDetailResponse(feedService.likeFeed(feedId, user), user)
 
     @ApiOperation(value = "해당 피드 좋아요 취소")
     @DeleteMapping
     fun cancelLikeFeed(@PathVariable("feedId") feedId: Long, @ApiIgnore user: User) =
-        feedService.cancelLikeFeed(feedId, user)
+        FeedDetailResponse(feedService.cancelLikeFeed(feedId, user), user)
 }
