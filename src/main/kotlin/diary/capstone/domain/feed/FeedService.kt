@@ -178,7 +178,7 @@ class FeedService(
             getFeed(feedId).comments
                 .filterRootComments()
                 .filterNotSpecificUserComments(loginUser.id!!)
-                .sortedBy { it.id }
+                .sortedByDescending { it.id }
         )
 
     // 해당 피드의 내가 쓴 루트 댓글만 조회 (부모 댓글 x, 로그인한 유저가 쓴 댓글만)

@@ -13,7 +13,7 @@ data class CommentResponse(
     var id: Long?,
     var writer: UserSimpleResponse,
     var content: String,
-    var hasChild: Boolean,
+    var childCount: Int,
     var createTime: String,
     var layer: Int
 ) {
@@ -21,7 +21,7 @@ data class CommentResponse(
         id = comment.id,
         writer = UserSimpleResponse(comment.writer),
         content = comment.content,
-        hasChild = comment.children.size != 0,
+        childCount = comment.children.size,
         createTime = comment.createTime,
         layer = comment.layer
     )
