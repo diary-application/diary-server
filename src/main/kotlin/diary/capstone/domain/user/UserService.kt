@@ -108,7 +108,6 @@ class LoginService(
 class UserService(
     private val userRepository: UserRepository,
     private val occupationService: OccupationService,
-    private val feedService: FeedService,
     private val fileService: FileService
 ) {
 
@@ -204,7 +203,9 @@ class UserService(
     // TODO 추후에 아예 삭제할지, 유예 기간을 설정할지 생각해봐야됨
     fun deleteUser(form: UserDeleteForm, loginUser: User) {
         loginUser.profileImage?.let { fileService.deleteFile(it) }
-        loginUser.feeds.forEach { feedService.deleteFeed(it.id!!, loginUser) }
+        loginUser.feeds.forEach { feed ->
+            feed.files.forEach { fileService.deleteFile(it) }
+        }
         userRepository.delete(loginUser)
     }
 }
