@@ -14,6 +14,7 @@ data class CommentResponse(
     var writer: UserSimpleResponse,
     var content: String,
     var hasChild: Boolean,
+    var createTime: String,
     var layer: Int
 ) {
     constructor(comment: Comment): this(
@@ -21,6 +22,7 @@ data class CommentResponse(
         writer = UserSimpleResponse(comment.writer),
         content = comment.content,
         hasChild = comment.children.size != 0,
+        createTime = comment.createTime,
         layer = comment.layer
     )
 }
