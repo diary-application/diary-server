@@ -3,6 +3,7 @@ package diary.capstone.domain.user
 import diary.capstone.auth.AuthManager
 import diary.capstone.auth.JwtProvider
 import diary.capstone.config.INTERESTS_LIMIT
+import diary.capstone.domain.feed.FeedService
 import diary.capstone.domain.file.FileService
 import diary.capstone.domain.mail.MailService
 import diary.capstone.domain.occupation.INTERESTS_EXCEEDED
@@ -107,6 +108,7 @@ class LoginService(
 class UserService(
     private val userRepository: UserRepository,
     private val occupationService: OccupationService,
+    private val feedService: FeedService,
     private val fileService: FileService
 ) {
 
@@ -200,6 +202,9 @@ class UserService(
 
     // 회원 탈퇴(비밀번호와 함께 요청)
     // TODO 추후에 아예 삭제할지, 유예 기간을 설정할지 생각해봐야됨
-    fun deleteUser(form: UserDeleteForm, loginUser: User) =
+    fun deleteUser(form: UserDeleteForm, loginUser: User) {
+        loginUser.profileImage?.let { fileService.deleteFile(it) }
+        loginUser.feeds.forEach { feedService.deleteFeed(it.id!!, loginUser) }
         userRepository.delete(loginUser)
+    }
 }
