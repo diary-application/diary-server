@@ -63,8 +63,11 @@ data class PasswordUpdateForm(
 
 data class UserInfoUpdateForm(
     @field:NotBlank
-    var name: String,
-    var message: String,
+    var name: String
+)
+
+data class UserMessageUpdateForm(
+    var message: String
 )
 
 data class UserOccupationUpdateForm(@field:NotBlank var occupation: String)
@@ -101,8 +104,7 @@ data class UserDetailResponse(
     var occupation: String?,
     var interests: List<String>,
     var followingCount: Int,
-    var followerCount: Int,
-    var ip: String
+    var followerCount: Int
 ) {
     constructor(user: User): this(
         id = user.id!!,
@@ -113,8 +115,7 @@ data class UserDetailResponse(
         occupation = user.occupation?.name,
         interests = user.getInterests(),
         followingCount = user.following.count(),
-        followerCount = user.follower.count(),
-        ip = user.ip
+        followerCount = user.follower.count()
     )
 }
 

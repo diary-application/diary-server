@@ -111,6 +111,11 @@ class UserController(
     fun updateName(form: UserInfoUpdateForm, @ApiIgnore user: User) =
         UserDetailResponse(userService.updateUserName(form, user))
 
+    @ApiOperation(value = "오늘의 한 마디 수정")
+    @PutMapping("/message")
+    fun updateMessage(form: UserMessageUpdateForm, @ApiIgnore user: User) =
+        UserDetailResponse(userService.updateUserMessage(form, user))
+
     @ApiOperation(value = "내 직종 수정")
     @PutMapping("/occupation")
     fun updateUserOccupation(@Valid @RequestBody form: UserOccupationUpdateForm, @ApiIgnore user: User) =
