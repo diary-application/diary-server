@@ -67,7 +67,7 @@ data class UserInfoUpdateForm(
 )
 
 data class UserMessageUpdateForm(
-    var message: String
+    var message: String = ""
 )
 
 data class UserOccupationUpdateForm(@field:NotBlank var occupation: String)
