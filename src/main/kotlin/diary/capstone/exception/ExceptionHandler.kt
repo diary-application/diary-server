@@ -48,10 +48,8 @@ class ExceptionHandler {
     // 이외 모든 예외 처리
     @ExceptionHandler(Exception::class)
     fun globalErrorHandle(ex: Exception): ResponseEntity<ErrorResponse> {
-        log.warn("=====================================================================")
-        log.warn("[{}]: {} {}", ex.javaClass.simpleName, ex.message, LocalDateTime.now())
-        log.warn("{}", ex.stackTraceToString())
-        log.warn("=====================================================================")
+        log.warn("\n=====================================================================")
+        log.warn("[{}]: {}", ex.javaClass.simpleName, ex.message)
         return badRequest(ex)
     }
 }
