@@ -18,6 +18,7 @@ class User(
     var email: String,
     var password: String,
     var name: String,
+    var message: String = "",
 
     // 최근 접속 ip, 로그인 대기 상태
     var ip: String = "",
@@ -54,6 +55,7 @@ class User(
     fun update(
         password: String? = null,
         name: String? = null,
+        message: String? = null,
         email: String? = null,
         ip: String? = null,
         loginWaiting: Boolean? = null,
@@ -63,6 +65,7 @@ class User(
     ): User {
         password?.let { this.password = password }
         name?.let { this.name = name }
+        message?.let { this.message = message }
         email?.let { this.email = email }
         ip?.let { this.ip = ip }
         loginWaiting?.let { this.loginWait = loginWaiting }
