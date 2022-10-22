@@ -7,6 +7,7 @@ data class OccupationRequestForm(
     var name: String
 )
 
-data class OccupationListResponse(
-    var occupations: List<String>
+data class OccupationResponse(
+    var id: Long,
+    var name: String
 )

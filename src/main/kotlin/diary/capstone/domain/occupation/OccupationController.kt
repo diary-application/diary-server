@@ -9,12 +9,13 @@ import javax.validation.Valid
 @ApiOperation("직종 관련 API")
 @Auth
 @RestController
-@RequestMapping("/occupation", produces = ["application/json"])
+@RequestMapping("/occupation")
 class OccupationController(private val occupationService: OccupationService) {
 
     @ApiOperation(value = "직종 목록 조회")
     @GetMapping
-    fun getOccupations(): List<String> = occupationService.getOccupations()
+    fun getOccupations(): List<OccupationResponse> =
+        occupationService.getOccupations().map { OccupationResponse(it.id!!, it.name) }
     
     @ApiOperation(value = "[관리자] 직종 생성")
     @Admin
