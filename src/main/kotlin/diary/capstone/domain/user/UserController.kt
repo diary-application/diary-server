@@ -108,8 +108,13 @@ class UserController(
 
     @ApiOperation(value = "내 이름 수정")
     @PutMapping("/name")
-    fun updateName(form: UserInfoUpdateForm, @ApiIgnore user: User) =
+    fun updateName(@RequestBody form: UserInfoUpdateForm, @ApiIgnore user: User) =
         UserDetailResponse(userService.updateUserName(form, user))
+
+    @ApiOperation(value = "오늘의 한 마디 수정")
+    @PutMapping("/message")
+    fun updateMessage(@RequestBody form: UserMessageUpdateForm, @ApiIgnore user: User) =
+        UserDetailResponse(userService.updateUserMessage(form, user))
 
     @ApiOperation(value = "내 직종 수정")
     @PutMapping("/occupation")
@@ -128,7 +133,7 @@ class UserController(
 
     @ApiOperation(value = "내 비밀번호 변경")
     @PutMapping("/password")
-    fun updatePassword(form: PasswordUpdateForm, @ApiIgnore user: User) =
+    fun updatePassword(@RequestBody form: PasswordUpdateForm, @ApiIgnore user: User) =
         userService.updatePassword(form, user)
 
     @ApiOperation(value = "회원 탈퇴", notes = "!! 현재 회원 탈퇴시 데이터베이스에서 바로 해당 유저를 삭제")

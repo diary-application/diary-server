@@ -165,9 +165,13 @@ class UserService(
                 .find { it.user.id == loginUser.id && it.target.id == getUser(userId).id }
         )
 
-    // 내 정보(이름) 수정
+    // 내 이름 수정
     fun updateUserName(form: UserInfoUpdateForm, loginUser: User): User =
-        loginUser.update(name = form.name,)
+        loginUser.update(name = form.name)
+
+    // 오늘의 한 마디 수정
+    fun updateUserMessage(form: UserMessageUpdateForm, loginUser: User): User =
+        loginUser.update(message = form.message)
 
     // 내 직종 수정
     fun updateUserOccupation(form: UserOccupationUpdateForm, loginUser: User): User =

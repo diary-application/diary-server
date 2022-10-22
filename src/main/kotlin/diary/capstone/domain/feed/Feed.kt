@@ -21,6 +21,7 @@ class Feed(
     @JoinColumn(name = "user_id")
     var writer: User,
 
+    @Column(length = 5000)
     var content: String,
 
     @OneToMany(mappedBy = "feedFile", cascade = [CascadeType.ALL], orphanRemoval = true)

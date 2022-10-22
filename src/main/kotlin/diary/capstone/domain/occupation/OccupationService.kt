@@ -17,7 +17,7 @@ class OccupationService(private val occupationRepository: OccupationRepository) 
         occupationRepository.findByName(name) ?: throw OccupationException(OCCUPATION_NOT_FOUND)
 
     @Transactional(readOnly = true)
-    fun getOccupations(): List<String> = occupationRepository.findAll().map { it.name }
+    fun getOccupations(): List<Occupation> = occupationRepository.findAll()
 
     @Transactional(readOnly = true)
     fun isExists(name: String): Boolean = occupationRepository.existsByName(name)

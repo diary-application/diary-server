@@ -1,6 +1,10 @@
 package diary.capstone.domain.file
 
-import com.amazonaws.services.s3.AmazonS3Client
+import com.amazonaws.auth.AWSCredentials
+import com.amazonaws.auth.AWSStaticCredentialsProvider
+import com.amazonaws.auth.BasicAWSCredentials
+import com.amazonaws.services.s3.AmazonS3
+import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.amazonaws.services.s3.model.CannedAccessControlList
 import com.amazonaws.services.s3.model.DeleteObjectRequest
 import com.amazonaws.services.s3.model.ObjectMetadata
@@ -11,15 +15,33 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import java.util.*
+import javax.annotation.PostConstruct
 
 @Service
 @Transactional
-class FileService(
-    private val fileRepository: FileRepository,
-    private val amazonS3Client: AmazonS3Client
-) {
+class FileService(private val fileRepository: FileRepository) {
+    private lateinit var s3Client: AmazonS3
+
     @Value("\${cloud.aws.s3.bucket}")
-    private lateinit var s3Bucket: String
+    private lateinit var bucketName: String
+
+    @Value("\${cloud.aws.credentials.accessKey}")
+    private lateinit var accessKey: String
+
+    @Value("\${cloud.aws.credentials.secretKey}")
+    private lateinit var secretKey: String
+
+    @Value("\${cloud.aws.region.static}")
+    private lateinit var region: String
+
+    @PostConstruct
+    fun setS3Client() {
+        val credentials: AWSCredentials = BasicAWSCredentials(accessKey, secretKey)
+        s3Client = AmazonS3ClientBuilder.standard()
+            .withCredentials(AWSStaticCredentialsProvider(credentials))
+            .withRegion(region)
+            .build()
+    }
 
     // 서버에 파일 업로드 & DB에 파일 저장
     fun saveFile(file: MultipartFile, description: String = ""): File {
@@ -31,30 +53,32 @@ class FileService(
             val ext = originalName.substring(originalName.lastIndexOf(".") + 1)
             val source = UUID.randomUUID().toString() + "." + ext
 
-            // 서버 스토리지의 설정된 경로에 MultipartFile 저장
-//            file.transferTo(java.io.File(FILE_SAVE_PATH + savedName))
             // S3 에 파일 업로드
-            amazonS3Client.putObject(
-                PutObjectRequest(this.s3Bucket, source, file.inputStream, objectMetadata)
+            s3Client.putObject(
+                PutObjectRequest(this.bucketName, source, file.inputStream, objectMetadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead)
             )
+            logger().info("$originalName Uploaded: {}", source)
 
             return fileRepository.save(
                 File(
                     originalName = originalName,
-                    source = amazonS3Client.getUrl(this.s3Bucket, source).toString(),
+                    source = s3Client.getUrl(this.bucketName, source).toString(),
                     description = description
                 )
             )
         } catch (e: Exception) {
             logger().warn(e.stackTraceToString())
-            throw FileException(e.message ?: "파일 업로드 오류")
+            throw FileException(e.message ?: "Amazon S3 객체 업로드 오류")
         }
     }
 
     fun deleteFile(file: File) {
-        amazonS3Client.deleteObject(
-            DeleteObjectRequest(this.s3Bucket, file.source)
+        s3Client.deleteObject(
+            DeleteObjectRequest(
+                this.bucketName,
+                file.source.substring(file.source.lastIndexOf('/') + 1)
+            )
         )
         fileRepository.delete(file)
     }
