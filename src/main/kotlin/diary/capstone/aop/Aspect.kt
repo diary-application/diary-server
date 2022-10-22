@@ -1,6 +1,8 @@
 package diary.capstone.aop
 
 import diary.capstone.auth.JwtProvider
+import diary.capstone.config.ADMIN_EMAIL
+import diary.capstone.domain.user.ADMIN_ONLY
 import diary.capstone.domain.user.AuthException
 import diary.capstone.domain.user.INVALID_TOKEN
 import diary.capstone.util.logger
@@ -14,15 +16,12 @@ import org.springframework.web.context.request.ServletRequestAttributes
 
 @Aspect
 @Component
-class Aspect(
-//    private val authService: AuthService,
-    private val jwtProvider: JwtProvider
-) {
+class Aspect(private val jwtProvider: JwtProvider) {
 
     /**
      * domain 내 모든 메소드 실행 시간 측정
      */
-    @Around("execution(* diary.capstone.domain..*.*(..))")
+/*    @Around("execution(* diary.capstone.domain..*.*(..))")
     fun logExecutionTime(joinPoint: ProceedingJoinPoint): Any? {
         val start = System.currentTimeMillis()
         try { return joinPoint.proceed() }
@@ -32,7 +31,7 @@ class Aspect(
                         "${System.currentTimeMillis() - start}ms taken"
             )
         }
-    }
+    }*/
 
     /**
      * Auth 어노테이션이 부착된 클래스, 메소드의 실행 전
@@ -53,6 +52,9 @@ class Aspect(
     @Before("@within(diary.capstone.auth.Admin) || @annotation(diary.capstone.auth.Admin)")
     fun adminCheck() {
         val request = RequestContextHolder.currentRequestAttributes() as ServletRequestAttributes
-//        authService.adminCheck(request.request)
+        jwtProvider.extractToken(request.request)?.let {
+            jwtProvider.validateToken(it)
+            if (jwtProvider.getSubject(it) != ADMIN_EMAIL) throw AuthException(ADMIN_ONLY)
+        } ?: run { throw AuthException(INVALID_TOKEN) }
     }
 }

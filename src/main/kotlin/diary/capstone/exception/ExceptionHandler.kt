@@ -1,5 +1,6 @@
 package diary.capstone.exception
 
+import diary.capstone.domain.user.ADMIN_ONLY
 import diary.capstone.domain.user.AuthException
 import diary.capstone.domain.user.MAIL_AUTH_REQUIRED
 import diary.capstone.util.*
@@ -8,6 +9,8 @@ import org.springframework.http.ResponseEntity
 import org.springframework.validation.BindException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import java.time.LocalDateTime
+import java.util.*
 
 @RestControllerAdvice
 class ExceptionHandler {
@@ -19,6 +22,7 @@ class ExceptionHandler {
         log.warn("[인증 예외] : {}", ex.message)
         return when (ex.message) {
             MAIL_AUTH_REQUIRED -> created(ex)
+            ADMIN_ONLY -> forbidden(ex)
             else -> unauthorized(ex)
         }
     }
@@ -44,7 +48,10 @@ class ExceptionHandler {
     // 이외 모든 예외 처리
     @ExceptionHandler(Exception::class)
     fun globalErrorHandle(ex: Exception): ResponseEntity<ErrorResponse> {
-        log.warn("[{}] handled: {}", ex.javaClass.simpleName, ex.message)
+        log.warn("=====================================================================")
+        log.warn("[{}]: {} {}", ex.javaClass.simpleName, ex.message, LocalDateTime.now())
+        log.warn("{}", ex.stackTraceToString())
+        log.warn("=====================================================================")
         return badRequest(ex)
     }
 }

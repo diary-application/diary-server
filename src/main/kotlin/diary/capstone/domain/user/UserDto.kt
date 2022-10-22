@@ -64,6 +64,7 @@ data class PasswordUpdateForm(
 data class UserInfoUpdateForm(
     @field:NotBlank
     var name: String,
+    var message: String,
 )
 
 data class UserOccupationUpdateForm(@field:NotBlank var occupation: String)
@@ -95,6 +96,7 @@ data class UserDetailResponse(
     var id: Long,
     var image: ProfileImageFileResponse?,
     var name: String,
+    var message: String,
     var email: String,
     var occupation: String?,
     var interests: List<String>,
@@ -106,6 +108,7 @@ data class UserDetailResponse(
         id = user.id!!,
         image = user.profileImage?.let { ProfileImageFileResponse(it) },
         name = user.name,
+        message = user.message,
         email = user.email,
         occupation = user.occupation?.name,
         interests = user.getInterests(),
