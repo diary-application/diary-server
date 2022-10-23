@@ -72,7 +72,7 @@ class UserController(
 ) {
     @ApiOperation(value = "내 정보 조회")
     @GetMapping
-    fun getMyInfo(@ApiIgnore user: User) = UserDetailResponse(user)
+    fun getMyInfo(@ApiIgnore user: User) = UserDetailResponse(user, user)
 
     @ApiOperation(value = "내 피드라인 목록 조회")
     @GetMapping("/feedlines")
@@ -80,8 +80,8 @@ class UserController(
 
     @ApiOperation(value = "특정 유저의 유저 정보 조회")
     @GetMapping("/{userId}")
-    fun getUser(@PathVariable("userId") userId: Long) =
-        UserDetailResponse(userService.getUser(userId))
+    fun getUser(@PathVariable("userId") userId: Long, @ApiIgnore user: User) =
+        UserDetailResponse(userService.getUser(userId), user)
 
     @ApiOperation(value = "해당 유저가 팔로우한 유저 목록 조회")
     @GetMapping("/{userId}/following")
@@ -110,27 +110,27 @@ class UserController(
     @ApiOperation(value = "내 이름 수정")
     @PutMapping("/name")
     fun updateUserName(@RequestBody form: UserInfoUpdateForm, @ApiIgnore user: User) =
-        UserDetailResponse(userService.updateUserName(form, user))
+        UserDetailResponse(userService.updateUserName(form, user), user)
 
     @ApiOperation(value = "오늘의 한 마디 수정")
     @PutMapping("/message")
     fun updateUserMessage(@RequestBody form: UserMessageUpdateForm, @ApiIgnore user: User) =
-        UserDetailResponse(userService.updateUserMessage(form, user))
+        UserDetailResponse(userService.updateUserMessage(form, user), user)
 
     @ApiOperation(value = "내 직종 수정")
     @PutMapping("/occupation")
     fun updateUserOccupation(@Valid @RequestBody form: UserOccupationUpdateForm, @ApiIgnore user: User) =
-        UserDetailResponse(userService.updateUserOccupation(form, user))
+        UserDetailResponse(userService.updateUserOccupation(form, user), user)
     
     @ApiOperation(value = "내 관심 분야 수정", notes = "관심 분야는 최대 ${INTERESTS_LIMIT}개 까지 수정 가능")
     @PutMapping("/interests")
     fun updateUserInterests(@RequestBody form: UserInterestsUpdateForm, @ApiIgnore user: User) =
-        UserDetailResponse(userService.updateUserInterests(form, user))
+        UserDetailResponse(userService.updateUserInterests(form, user), user)
 
     @ApiOperation(value = "내 프로필 사진 수정")
     @PutMapping("/profile-image")
     fun updateUserProfileImage(@RequestPart("image") image: MultipartFile, @ApiIgnore user: User) =
-        UserDetailResponse(userService.updateProfileImage(image, user))
+        UserDetailResponse(userService.updateProfileImage(image, user), user)
 
     @ApiOperation(value = "내 비밀번호 변경")
     @PutMapping("/password")
