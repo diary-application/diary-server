@@ -2,6 +2,7 @@ package diary.capstone.domain.user
 
 import diary.capstone.domain.feed.Feed
 import diary.capstone.domain.feed.FeedLike
+import diary.capstone.domain.feed.comment.Comment
 import diary.capstone.domain.feedline.FeedLine
 import diary.capstone.domain.file.File
 import diary.capstone.domain.occupation.Occupation
@@ -26,7 +27,7 @@ class User(
     var ip: String = "",
     var loginWait: Boolean = false,
 
-    @OneToOne(cascade = [CascadeType.ALL])
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "occupation_id")
     var occupation: Occupation? = null, // 직종
     var interests: String = "", // 관심 분야(직종 이름들): ,로 구분하여 3개까지
@@ -37,6 +38,9 @@ class User(
 
     @OneToMany(mappedBy = "writer", cascade = [CascadeType.ALL], orphanRemoval = true)
     var feeds: MutableList<Feed> = mutableListOf(),
+
+    @OneToMany(mappedBy = "writer", cascade = [CascadeType.ALL], orphanRemoval = true)
+    var comments: MutableList<Comment> = mutableListOf(),
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
     var feedLikes: MutableList<FeedLike> = mutableListOf(),

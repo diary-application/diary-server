@@ -16,7 +16,7 @@ class FeedLine (
     // 피드라인 작성자
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    var user: User,
+    var user: User? = null,
 
     // 피드라인 제목
     var title: String = "",
