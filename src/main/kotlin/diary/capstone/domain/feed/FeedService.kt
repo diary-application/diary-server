@@ -90,6 +90,10 @@ class FeedService(
     fun getFeed(feedId: Long): Feed =
         feedRepository.findById(feedId).orElseThrow { throw FeedException(FEED_NOT_FOUND) }
 
+    @Transactional(readOnly = true)
+    fun getFeedLikes(feedId: Long): List<User> =
+        getFeed(feedId).let { feed -> feed.likes.map { it.user } }
+
     // 피드 좋아요 등록
     fun likeFeed(feedId: Long, loginUser: User): Feed =
         getFeed(feedId).let { feed ->

@@ -2,9 +2,11 @@ package diary.capstone.domain.user
 
 import diary.capstone.domain.feedline.FeedLine
 import diary.capstone.domain.file.ProfileImageFileResponse
+import org.hibernate.validator.constraints.Length
 import org.springframework.data.domain.Page
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
+import javax.validation.constraints.Size
 
 data class LoginForm(
     @field:NotBlank
@@ -67,10 +69,11 @@ data class UserInfoUpdateForm(
 )
 
 data class UserMessageUpdateForm(
+    @field:Length(min = 0, max = 100)
     var message: String = ""
 )
 
-data class UserOccupationUpdateForm(@field:NotBlank var occupation: String)
+data class UserOccupationUpdateForm(var occupation: String?)
 
 data class UserInterestsUpdateForm(var interests: List<String>)
 

@@ -6,6 +6,7 @@ import diary.capstone.domain.feed.comment.CommentPagedResponse
 import diary.capstone.domain.feed.comment.CommentRequestForm
 import diary.capstone.domain.feed.comment.CommentResponse
 import diary.capstone.domain.user.User
+import diary.capstone.domain.user.UserSimpleResponse
 import io.swagger.annotations.ApiOperation
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
@@ -126,6 +127,11 @@ class CommentController(private val feedService: FeedService) {
 @RestController
 @RequestMapping("/feed/{feedId}/like")
 class FeedLikeController(private val feedService: FeedService) {
+
+    @ApiOperation(value = "해당 피드를 좋아요한 유저 목록")
+    @GetMapping
+    fun getFeedLikeUsers(@PathVariable("feedId") feedId: Long) =
+        feedService.getFeedLikes(feedId).map { UserSimpleResponse(it) }
 
     @ApiOperation(value = "해당 피드 좋아요 등록")
     @PostMapping

@@ -23,6 +23,14 @@ class OccupationController(private val occupationService: OccupationService) {
     fun createOccupation(@Valid @RequestBody form: OccupationRequestForm) =
         occupationService.createOccupation(form.name)
 
+    @ApiOperation(value = "[관리자] 직종 수정")
+    @Admin
+    @PutMapping("/{occupationId}")
+    fun updateOccupation(
+        @PathVariable("occupationId") occupationId: Long,
+        @RequestBody form: OccupationRequestForm
+    ) = occupationService.updateOccupation(occupationId, form)
+
     @ApiOperation(value = "[관리자] 직종 삭제")
     @Admin
     @DeleteMapping
