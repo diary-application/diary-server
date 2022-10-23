@@ -96,15 +96,16 @@ class CommentController(private val feedService: FeedService) {
             when (user) {
                 "me" -> feedService.getMyComments(feedId, pageable, loginUser)
                 else -> feedService.getRootComments(feedId, pageable, loginUser)
-            }
+            }, loginUser
         )
 
     @ApiOperation(value = "해당 댓글의 대댓글 목록 조회")
     @GetMapping("/{commentId}")
     fun getChildComments(@PathVariable("feedId") feedId: Long,
                          @PathVariable("commentId") commentId: Long,
-                         @PageableDefault pageable: Pageable
-    ) = CommentPagedResponse(feedService.getChildComments(feedId, commentId, pageable))
+                         @PageableDefault pageable: Pageable,
+                         @ApiIgnore user: User
+    ) = CommentPagedResponse(feedService.getChildComments(feedId, commentId, pageable), user)
 
     @ApiOperation(value = "댓글 수정")
     @PutMapping("/{commentId}")
@@ -112,7 +113,7 @@ class CommentController(private val feedService: FeedService) {
                       @PathVariable("commentId") commentId: Long,
                       @Valid @RequestBody form: CommentRequestForm,
                       @ApiIgnore user: User
-    ) = CommentResponse(feedService.updateComment(feedId, commentId, form, user))
+    ) = CommentResponse(feedService.updateComment(feedId, commentId, form, user), user)
 
     @ApiOperation(value = "댓글 삭제")
     @DeleteMapping("/{commentId}")
@@ -130,8 +131,8 @@ class FeedLikeController(private val feedService: FeedService) {
 
     @ApiOperation(value = "해당 피드를 좋아요한 유저 목록")
     @GetMapping
-    fun getFeedLikeUsers(@PathVariable("feedId") feedId: Long) =
-        feedService.getFeedLikes(feedId).map { UserSimpleResponse(it) }
+    fun getFeedLikeUsers(@PathVariable("feedId") feedId: Long, @ApiIgnore user: User) =
+        feedService.getFeedLikes(feedId).map { UserSimpleResponse(it, user) }
 
     @ApiOperation(value = "해당 피드 좋아요 등록")
     @PostMapping
