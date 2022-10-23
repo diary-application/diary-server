@@ -86,14 +86,16 @@ class UserController(
     @ApiOperation(value = "해당 유저가 팔로우한 유저 목록 조회")
     @GetMapping("/{userId}/following")
     fun getFollowing(@PageableDefault pageable: Pageable,
-                     @PathVariable("userId") userId: Long) =
-        UserPagedResponse(userService.getFollowing(pageable, userId))
+                     @PathVariable("userId") userId: Long,
+                     @ApiIgnore user: User
+    ) = UserPagedResponse(userService.getFollowing(pageable, userId), user)
 
     @ApiOperation(value = "해당 유저의 팔로워 목록 조회")
     @GetMapping("/{userId}/follower")
     fun getFollowers(@PageableDefault pageable: Pageable,
-                     @PathVariable("userId") userId: Long) =
-        UserPagedResponse(userService.getFollowers(pageable, userId))
+                     @PathVariable("userId") userId: Long,
+                     @ApiIgnore user: User
+    ) = UserPagedResponse(userService.getFollowers(pageable, userId), user)
 
     @ApiOperation(value = "해당 유저 팔로우")
     @PostMapping("/{userId}/follow")

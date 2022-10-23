@@ -82,12 +82,15 @@ data class UserDeleteForm(var password: String)
 data class UserSimpleResponse(
     var id: Long,
     var name: String,
-    var image: ProfileImageFileResponse?
+    var image: ProfileImageFileResponse?,
+    var isFollowed: Boolean
 ) {
-    constructor(user: User): this(
+    constructor(user: User, me: User): this(
         id = user.id!!,
         name = user.name,
-        image = user.profileImage?.let { ProfileImageFileResponse(it) }
+        image = user.profileImage?.let { ProfileImageFileResponse(it) },
+        isFollowed = me.following
+            .any { it.target.id == user.id }
     )
 }
 
@@ -128,12 +131,12 @@ data class UserPagedResponse(
     var totalElements: Long,
     var users: List<UserSimpleResponse>
 ) {
-    constructor(users: Page<User>): this(
+    constructor(users: Page<User>, me: User): this(
         currentPage = users.number + 1,
         totalPages = users.totalPages,
         totalElements = users.totalElements,
         users = users.content
-            .map { UserSimpleResponse(it) }
+            .map { UserSimpleResponse(it, me) }
             .toList()
     )
 }

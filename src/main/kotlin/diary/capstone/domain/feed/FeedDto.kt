@@ -31,7 +31,7 @@ data class FeedSimpleResponse(
 ) {
     constructor(feed: Feed, user: User): this(
         id = feed.id!!,
-        writer = UserSimpleResponse(feed.writer),
+        writer = UserSimpleResponse(feed.writer, user),
         content = feed.content,
         files = feed.files.map { FileResponse(it) },
         commentCount = feed.comments.size,
@@ -60,7 +60,7 @@ data class FeedDetailResponse(
 ) {
     constructor(feed: Feed, user: User): this(
         id = feed.id!!,
-        writer = UserSimpleResponse(feed.writer),
+        writer = UserSimpleResponse(feed.writer, user),
         content = feed.content,
         files = feed.files.map { FileResponse(it) },
         commentCount = feed.comments.size,
