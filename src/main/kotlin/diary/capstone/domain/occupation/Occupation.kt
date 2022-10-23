@@ -9,4 +9,6 @@ class Occupation (
     var id: Long? = null,
 
     var name: String,
-)
+) {
+    fun update(name: String) { this.name = name }
+}

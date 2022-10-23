@@ -1,7 +1,6 @@
 package diary.capstone.domain.user
 
 import diary.capstone.auth.Auth
-import diary.capstone.auth.AuthService
 import diary.capstone.config.INTERESTS_LIMIT
 import io.swagger.annotations.ApiOperation
 import org.springframework.data.domain.Pageable
@@ -108,12 +107,12 @@ class UserController(
 
     @ApiOperation(value = "내 이름 수정")
     @PutMapping("/name")
-    fun updateName(@RequestBody form: UserInfoUpdateForm, @ApiIgnore user: User) =
+    fun updateUserName(@RequestBody form: UserInfoUpdateForm, @ApiIgnore user: User) =
         UserDetailResponse(userService.updateUserName(form, user))
 
     @ApiOperation(value = "오늘의 한 마디 수정")
     @PutMapping("/message")
-    fun updateMessage(@RequestBody form: UserMessageUpdateForm, @ApiIgnore user: User) =
+    fun updateUserMessage(@RequestBody form: UserMessageUpdateForm, @ApiIgnore user: User) =
         UserDetailResponse(userService.updateUserMessage(form, user))
 
     @ApiOperation(value = "내 직종 수정")
@@ -128,12 +127,12 @@ class UserController(
 
     @ApiOperation(value = "내 프로필 사진 수정")
     @PutMapping("/profile-image")
-    fun updateProfileImage(@RequestPart("image") image: MultipartFile, @ApiIgnore user: User) =
+    fun updateUserProfileImage(@RequestPart("image") image: MultipartFile, @ApiIgnore user: User) =
         UserDetailResponse(userService.updateProfileImage(image, user))
 
     @ApiOperation(value = "내 비밀번호 변경")
     @PutMapping("/password")
-    fun updatePassword(@RequestBody form: PasswordUpdateForm, @ApiIgnore user: User) =
+    fun updateUserPassword(@RequestBody form: PasswordUpdateForm, @ApiIgnore user: User) =
         userService.updatePassword(form, user)
 
     @ApiOperation(value = "회원 탈퇴", notes = "!! 현재 회원 탈퇴시 데이터베이스에서 바로 해당 유저를 삭제")

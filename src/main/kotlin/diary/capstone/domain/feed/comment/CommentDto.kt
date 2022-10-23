@@ -15,7 +15,8 @@ data class CommentResponse(
     var content: String,
     var childCount: Int,
     var createTime: String,
-    var layer: Int
+    var layer: Int,
+    var parentId: Long
 ) {
     constructor(comment: Comment): this(
         id = comment.id,
@@ -23,7 +24,8 @@ data class CommentResponse(
         content = comment.content,
         childCount = comment.children.size,
         createTime = comment.createTime,
-        layer = comment.layer
+        layer = comment.layer,
+        parentId = comment.parent?.let { it.id } ?: 0L
     )
 }
 

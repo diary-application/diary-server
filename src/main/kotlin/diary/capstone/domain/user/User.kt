@@ -18,6 +18,8 @@ class User(
     var email: String,
     var password: String,
     var name: String,
+
+    @Column(length = 100)
     var message: String = "",
 
     // 최근 접속 ip, 로그인 대기 상태

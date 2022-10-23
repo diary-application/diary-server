@@ -175,7 +175,9 @@ class UserService(
 
     // 내 직종 수정
     fun updateUserOccupation(form: UserOccupationUpdateForm, loginUser: User): User =
-        loginUser.update(occupation = occupationService.getOccupation(form.occupation))
+        form.occupation?.let {
+            loginUser.update(occupation = occupationService.getOccupation(it))
+        } ?: run { loginUser.update(occupation = null) }
 
     // 내 관심 분야 수정
     fun updateUserInterests(form: UserInterestsUpdateForm, loginUser: User): User {

@@ -22,5 +22,10 @@ class OccupationService(private val occupationRepository: OccupationRepository) 
     @Transactional(readOnly = true)
     fun isExists(name: String): Boolean = occupationRepository.existsByName(name)
 
+    fun updateOccupation(occupationId: Long, form: OccupationRequestForm) =
+        getOccupations()
+            .find { it.id == occupationId }?.update(form.name)
+            ?: run { throw OccupationException(OCCUPATION_NOT_FOUND) }
+
     fun deleteOccupation(name: String) = occupationRepository.deleteByName(name)
 }
