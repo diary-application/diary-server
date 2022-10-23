@@ -12,6 +12,7 @@ class PageViewController {
         "/",
         "/login",
         "/profile",
+        "/profile/**",
         "/chat",
         "/schedule",
         "/setting"
