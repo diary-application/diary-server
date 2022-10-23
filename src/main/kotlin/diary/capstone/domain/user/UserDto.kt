@@ -110,9 +110,10 @@ data class UserDetailResponse(
     var occupation: String?,
     var interests: List<String>,
     var followingCount: Int,
-    var followerCount: Int
+    var followerCount: Int,
+    var isFollowed: Boolean
 ) {
-    constructor(user: User): this(
+    constructor(user: User, me: User): this(
         id = user.id!!,
         image = user.profileImage?.let { ProfileImageFileResponse(it) },
         name = user.name,
@@ -121,7 +122,9 @@ data class UserDetailResponse(
         occupation = user.occupation?.name,
         interests = user.getInterests(),
         followingCount = user.following.count(),
-        followerCount = user.follower.count()
+        followerCount = user.follower.count(),
+        isFollowed = me.following
+            .any { it.target.id == user.id }
     )
 }
 
