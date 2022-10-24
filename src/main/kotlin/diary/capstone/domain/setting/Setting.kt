@@ -8,11 +8,11 @@ class Setting (
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
-    @OneToOne(cascade = [CascadeType.ALL])
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    var user: User,
+    var user: User? = null,
 
-    var lastLogin: String,
+    var lastLogin: String = "",
     var darkMode: Boolean = false,
     var profileShow: Boolean = true,
     
