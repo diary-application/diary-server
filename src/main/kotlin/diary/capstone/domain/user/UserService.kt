@@ -192,12 +192,12 @@ class UserService(
     }
 
     // 프로필 사진 수정
-    fun updateProfileImage(image: MultipartFile?, loginUser: User): User =
+    fun updateProfileImage(image: MultipartFile?, loginUser: User): User {
         // 등록된 프로필 사진이 있다면 원래 사진 삭제 후 새 사진 저장
-        image?.let { file ->
-            loginUser.profileImage?.let { fileService.deleteFile(it) }
-            loginUser.update(profileImage = fileService.saveFile(file))
-        } ?: loginUser
+        loginUser.profileImage?.let { fileService.deleteFile(it) }
+        return image?.let { loginUser.update(profileImage = fileService.saveFile(it)) }
+            ?: loginUser
+    }
 
     // 비밀번호 수정
     fun updatePassword(form: PasswordUpdateForm, loginUser: User) {
