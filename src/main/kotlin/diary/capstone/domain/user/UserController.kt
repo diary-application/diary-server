@@ -130,9 +130,13 @@ class UserController(
     @ApiOperation(value = "내 프로필 사진 수정")
     @PutMapping("/profile-image")
     fun updateUserProfileImage(
-        @RequestPart(name = "image", required = false) image: MultipartFile?,
+        @RequestPart("image") image: MultipartFile,
+        @RequestParam(name = "default", required = false) default: Boolean,
         @ApiIgnore user: User
-    ) = UserDetailResponse(userService.updateProfileImage(image, user), user)
+    ): UserDetailResponse {
+        return if (default) UserDetailResponse(userService.updateProfileImage(image, user), user)
+        else UserDetailResponse(userService.updateProfileImageDefault(user), user)
+    }
 
     @ApiOperation(value = "내 비밀번호 변경")
     @PutMapping("/password")
