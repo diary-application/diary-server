@@ -2,6 +2,8 @@ package diary.capstone.domain.user
 
 import diary.capstone.auth.Auth
 import diary.capstone.config.INTERESTS_LIMIT
+import diary.capstone.domain.feed.FeedPagedResponse
+import diary.capstone.domain.feed.FeedService
 import io.swagger.annotations.ApiOperation
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
@@ -68,15 +70,29 @@ class LoginController(private val loginService: LoginService) {
 @RequestMapping("/user")
 class UserController(
     private val userService: UserService,
+    private val feedService: FeedService,
     private val passwordEncoder: PasswordEncoder
 ) {
-    @ApiOperation(value = "내 정보 조회")
+    @ApiOperation(value = "유저 정보 조회")
     @GetMapping
-    fun getMyInfo(@ApiIgnore user: User) = UserDetailResponse(user, user)
+    fun getMyInfo(
+        @ApiIgnore user: User,
+        @RequestParam("keyword", required = false) keyword: String?,
+        @PageableDefault(size = 5) pageable: Pageable
+    ) = keyword?.let { userService.searchUser(pageable, it) } ?: UserDetailResponse(user, user)
 
     @ApiOperation(value = "내 피드라인 목록 조회")
     @GetMapping("/feedlines")
     fun getMyFeedLines(@ApiIgnore user: User) = user.feedLines.map { FeedLineResponse(it) }
+
+    @ApiOperation(value = "특정 유저의 피드 조회")
+    @GetMapping("/{userId}/feed")
+    fun searchUserFeed(
+        @PageableDefault pageable: Pageable,
+        @PathVariable("userId") userId: Long,
+        @RequestParam(name = "keyword", required = true) keyword: String,
+        @ApiIgnore user: User
+    ) = FeedPagedResponse(feedService.searchFeedsByUserAndKeyword(pageable, userId, keyword), user)
 
     @ApiOperation(value = "특정 유저의 유저 정보 조회")
     @GetMapping("/{userId}")
