@@ -53,7 +53,9 @@ class FeedService(
         userId?.let { userId ->
             // 로그인 유저가 해당 유저일 경우 모든 피드 조회
             if (loginUser.id == userId)
-                return getPagedFeed(pageable, loginUser.feeds.sortedByDescending { it.id })
+                return getPagedFeed(pageable,
+                    loginUser.feeds.sortedByDescending { it.id }
+                )
 
             val user = userService.getUser(userId)
 

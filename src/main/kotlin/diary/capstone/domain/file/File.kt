@@ -16,6 +16,10 @@ class File (
     var description: String = "",
 
     // 파일 타입 구분(피드 첨부 이미지, 프로필 이미지..)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    var profileImage: File? = null,
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_id")
     var feedFile: Feed? = null
