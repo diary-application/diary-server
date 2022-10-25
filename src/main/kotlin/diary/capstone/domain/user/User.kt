@@ -32,7 +32,7 @@ class User(
     var occupation: Occupation? = null, // 직종
     var interests: String = "", // 관심 분야(직종 이름들): ,로 구분하여 3개까지
 
-    @OneToOne(mappedBy = "profileImage", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToOne(mappedBy = "userFile", cascade = [CascadeType.ALL], orphanRemoval = true)
     var profileImage: File? = null,
 
     @OneToMany(mappedBy = "writer", cascade = [CascadeType.ALL], orphanRemoval = true)
