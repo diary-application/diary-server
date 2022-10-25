@@ -199,11 +199,10 @@ class UserService(
     }
 
     // 기본 프로필 사진으로 변경
-    fun updateProfileImageDefault(loginUser: User): User =
-        loginUser.profileImage?.let {
-            loginUser.update(profileImage = null)
-            fileService.deleteFile(it)
-        }.run { loginUser }
+    fun deleteProfileImage(loginUser: User): User {
+        loginUser.profileImage?.let { fileService.deleteFile(it) }
+        return loginUser
+    }
 
     // 비밀번호 수정
     fun updatePassword(form: PasswordUpdateForm, loginUser: User) {
