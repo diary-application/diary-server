@@ -66,6 +66,7 @@ class FeedService(
                         !user.follower.map { it.user.id }.contains(loginUser.id)
                     )
                     .filterNotShowMeFeed()
+                    .sortedByDescending { it.id }
             )
         }
         // 피드라인으로 조회
@@ -77,6 +78,18 @@ class FeedService(
         // 모든 피드 조회
         return feedRepository.findByShowScope(pageable, SHOW_ALL)
     }
+
+    // 피드 내용 또는 파일 설명으로 댓글 조회
+    @Transactional(readOnly = true)
+    fun searchFeedsByUserAndKeyword(pageable: Pageable, userId: Long, keyword: String): Page<Feed> =
+        getPagedFeed(pageable,
+            userService.getUser(userId).feeds
+                .filter { feed ->
+                    feed.content.contains(keyword) ||
+                            feed.files.any { it.description.contains(keyword) }
+                }
+                .sortedByDescending { it.id }
+        )
 
     // Pageable, Feed 리스트로 페이징된 Feed 객체 반환
     @Transactional(readOnly = true)

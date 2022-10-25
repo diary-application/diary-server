@@ -37,10 +37,11 @@ class FeedController(private val feedService: FeedService) {
                 "* feedlineid: 해당 피드라인으로 피드 목록 조회\n "
     )
     @GetMapping
-    fun getFeeds(@PageableDefault(sort = ["id"], direction = Sort.Direction.DESC, size = FEED_PAGE_SIZE) pageable: Pageable,
-                 @RequestParam(name = "userid", required = false) userId: Long?,
-                 @RequestParam(name = "feedlineid", required = false) feedLineId: Long?,
-                 @ApiIgnore user: User
+    fun getFeeds(
+        @PageableDefault(sort = ["id"], direction = Sort.Direction.DESC, size = FEED_PAGE_SIZE) pageable: Pageable,
+        @RequestParam(name = "userid", required = false) userId: Long?,
+        @RequestParam(name = "feedlineid", required = false) feedLineId: Long?,
+        @ApiIgnore user: User
     ) = FeedPagedResponse(feedService.getFeeds(pageable, userId, feedLineId, user), user)
 
     @ApiOperation(value = "피드 상세 조회")
