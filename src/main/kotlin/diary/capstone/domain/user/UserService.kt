@@ -112,7 +112,8 @@ class LoginService(
 class UserService(
     private val userRepository: UserRepository,
     private val occupationService: OccupationService,
-    private val fileService: FileService
+    private val fileService: FileService,
+    private val passwordEncoder: PasswordEncoder
 ) {
 
     @Transactional(readOnly = true)
@@ -208,8 +209,9 @@ class UserService(
     // 비밀번호 수정
     fun updatePassword(form: PasswordUpdateForm, loginUser: User) {
         if (!form.checkPassword()) throw UserException(NEW_PASSWORD_MISMATCH)
-        if (form.currentPassword != loginUser.password) throw UserException(CURRENT_PASSWORD_MISMATCH)
-        loginUser.update(form.currentPassword)
+        if (passwordEncoder.matches(form.currentPassword, loginUser.password))
+            loginUser.update(form.currentPassword)
+        else throw UserException(CURRENT_PASSWORD_MISMATCH)
     }
 
     // 회원 탈퇴(비밀번호와 함께 요청)
