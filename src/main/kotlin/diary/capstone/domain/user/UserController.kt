@@ -76,10 +76,12 @@ class UserController(
     @ApiOperation(value = "유저 정보 조회")
     @GetMapping
     fun getMyInfo(
-        @ApiIgnore user: User,
+        @PageableDefault(size = 5) pageable: Pageable,
         @RequestParam("keyword", required = false) keyword: String?,
-        @PageableDefault(size = 5) pageable: Pageable
-    ) = keyword?.let { userService.searchUser(pageable, it) } ?: UserDetailResponse(user, user)
+        @ApiIgnore user: User
+    ) = keyword?.let {
+        UserPagedResponse(userService.searchUser(pageable, it), user)
+    } ?: UserDetailResponse(user, user)
 
     @ApiOperation(value = "내 피드라인 목록 조회")
     @GetMapping("/feedlines")
@@ -154,6 +156,11 @@ class UserController(
     @DeleteMapping("/profile-image")
     fun deleteUserProfileImage(@ApiIgnore user: User) =
         UserDetailResponse(userService.deleteProfileImage(user), user)
+
+    @ApiOperation(value = "프로필 공개 여부 설정")
+    @PutMapping("/profile-show")
+    fun updateUserProfileShow(@RequestBody isShown: Boolean, @ApiIgnore user: User) =
+        UserDetailResponse(userService.updateUserProfileShow(isShown, user), user)
 
     @ApiOperation(value = "내 비밀번호 변경")
     @PutMapping("/password")

@@ -132,8 +132,11 @@ class FeedLikeController(private val feedService: FeedService) {
 
     @ApiOperation(value = "해당 피드를 좋아요한 유저 목록")
     @GetMapping
-    fun getFeedLikeUsers(@PathVariable("feedId") feedId: Long, @ApiIgnore user: User) =
-        feedService.getFeedLikes(feedId).map { UserSimpleResponse(it, user) }
+    fun getFeedLikeUsers(
+        @PageableDefault pageable: Pageable,
+        @PathVariable("feedId") feedId: Long,
+        @ApiIgnore user: User
+    ) = feedService.getFeedLikes(pageable, feedId).map { UserSimpleResponse(it, user) }
 
     @ApiOperation(value = "해당 피드 좋아요 등록")
     @PostMapping
@@ -144,4 +147,27 @@ class FeedLikeController(private val feedService: FeedService) {
     @DeleteMapping
     fun cancelLikeFeed(@PathVariable("feedId") feedId: Long, @ApiIgnore user: User) =
         FeedDetailResponse(feedService.cancelLikeFeed(feedId, user), user)
+}
+
+@ApiOperation("댓글 좋아요 관런 API")
+@Auth
+@RestController
+@RequestMapping("/feed/{feedId}/comment/{commentId}/like")
+class CommentLikeController(private val feedService: FeedService) {
+
+    @ApiOperation(value = "해당 댓글 좋아요 등록")
+    @PostMapping
+    fun likeComment(
+        @PathVariable("feedId") feedId: Long,
+        @PathVariable("commentId") commentId: Long,
+        @ApiIgnore user: User
+    ) = CommentResponse(feedService.likeComment(feedId, commentId, user), user)
+
+    @ApiOperation(value = "해당 댓글 좋아요 취소")
+    @DeleteMapping
+    fun cancelLikeComment(
+        @PathVariable("feedId") feedId: Long,
+        @PathVariable("commentId") commentId: Long,
+        @ApiIgnore user: User
+    ) = CommentResponse(feedService.cancelLikeComment(feedId, commentId, user), user)
 }

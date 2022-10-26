@@ -26,7 +26,7 @@ class File (
     var feedFile: Feed? = null
 ) {
     // 파일이 등록된 유저 설정
-    fun setUser(user: User): File {
+    fun setUser(user: User?): File {
         this.userFile = user
         return this
     }
