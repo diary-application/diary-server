@@ -15,18 +15,27 @@ data class CommentResponse(
     var writer: UserSimpleResponse,
     var content: String,
     var childCount: Int,
-    var createTime: String,
     var layer: Int,
-    var parentId: Long
+    var parentId: Long,
+    var likeCount: Int,
+    var isLiked: Boolean,
+    var isFollowed: Boolean,
+    var createTime: String,
 ) {
     constructor(comment: Comment, user: User): this(
         id = comment.id,
         writer = UserSimpleResponse(comment.writer, user),
         content = comment.content,
         childCount = comment.children.size,
-        createTime = comment.createTime,
         layer = comment.layer,
-        parentId = comment.parent?.let { it.id } ?: 0L
+        parentId = comment.parent?.let { it.id } ?: 0L,
+        likeCount = comment.likes
+            .count { it.comment.id == comment.id },
+        isLiked = comment.likes
+            .any { it.comment.id == comment.id && it.user.id == user.id },
+        isFollowed = user.following // 조회하는 유저의 피드 작성자 팔로우 유무
+            .any { it.target.id == comment.writer.id },
+        createTime = comment.createTime,
     )
 }
 

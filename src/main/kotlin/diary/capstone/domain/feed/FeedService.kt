@@ -1,8 +1,10 @@
 package diary.capstone.domain.feed
 
 import diary.capstone.domain.feed.comment.Comment
+import diary.capstone.domain.feed.comment.CommentLike
 import diary.capstone.domain.feed.comment.CommentRequestForm
 import diary.capstone.domain.file.FileService
+import diary.capstone.domain.user.SavedFeed
 import diary.capstone.domain.user.User
 import diary.capstone.domain.user.UserService
 import diary.capstone.util.*
@@ -79,7 +81,7 @@ class FeedService(
         return feedRepository.findByShowScope(pageable, SHOW_ALL)
     }
 
-    // 피드 내용 또는 파일 설명으로 댓글 조회
+    // 피드 내용 또는 파일 설명으로 피드 조회
     @Transactional(readOnly = true)
     fun searchFeedsByUserAndKeyword(pageable: Pageable, userId: Long, keyword: String): Page<Feed> =
         getPagedFeed(pageable,
@@ -91,31 +93,21 @@ class FeedService(
                 .sortedByDescending { it.id }
         )
 
-    // Pageable, Feed 리스트로 페이징된 Feed 객체 반환
-    @Transactional(readOnly = true)
-    fun getPagedFeed(pageable: Pageable, feeds: List<Feed>): Page<Feed> {
-        val total = feeds.size
-        val start = pageable.offset.toInt()
-        val end = min((start + pageable.pageSize), total)
-        return PageImpl(feeds.subList(start, end), pageable, total.toLong())
-    }
-
     // 피드 하나의 상세 정보
     @Transactional(readOnly = true)
     fun getFeed(feedId: Long): Feed =
         feedRepository.findById(feedId).orElseThrow { throw FeedException(FEED_NOT_FOUND) }
 
     @Transactional(readOnly = true)
-    fun getFeedLikes(feedId: Long): List<User> =
+    fun getFeedLikes(pageable: Pageable, feedId: Long): List<User> =
         getFeed(feedId).let { feed -> feed.likes.map { it.user } }
 
     // 피드 좋아요 등록
     fun likeFeed(feedId: Long, loginUser: User): Feed =
         getFeed(feedId).let { feed ->
-            if (feed.likes.none { it.user == loginUser })
+            if (feed.likes.none { it.user.id == loginUser.id })
                 feed.likes.add(FeedLike(feed = feed, user = loginUser))
-            else
-                throw FeedLikeException(ALREADY_LIKED_FEED)
+            else throw FeedLikeException(ALREADY_LIKED_FEED)
             feed
         }
 
@@ -126,6 +118,20 @@ class FeedService(
                 feed.likes.find { it.user.id == loginUser.id }
             )
             feed
+        }
+
+    // 피드 저장
+    fun saveFeed(feedId: Long, loginUser: User) =
+        getFeed(feedId).let { feed ->
+            if (feed.saves.none { it.user == loginUser })
+                feed.saves.add(SavedFeed(user = loginUser, feed = feed))
+            else throw FeedSaveException(ALREADY_SAVED_FEED)
+        }
+
+    // 피드 저장 삭제
+    fun removeSavedFeed(feedId: Long, loginUser: User) =
+        getFeed(feedId).let { feed ->
+            feed.saves.remove(feed.saves.find { it.user.id == loginUser.id })
         }
 
     fun updateFeed(feedId: Long, form: FeedRequestForm, loginUser: User): Feed =
@@ -146,14 +152,6 @@ class FeedService(
     // 피드 접근 권한 체크
     private fun feedPermissionCheck(feed: Feed, loginUser: User) {
         if (feed.writer.id != loginUser.id) throw FeedException(FEED_ACCESS_DENIED)
-    }
-
-    // 댓글 리스트를 Page 객체에 담아서 반환
-    private fun getPagedComments(pageable: Pageable, comments: List<Comment>): Page<Comment> {
-        val total = comments.size
-        val start = pageable.offset.toInt()
-        val end = min((start + pageable.pageSize), total)
-        return PageImpl(comments.subList(start, end), pageable, total.toLong())
     }
 
     private fun getComment(feedId: Long, commentId: Long): Comment =
@@ -219,18 +217,45 @@ class FeedService(
                 .sortedBy { it.id }
         )
 
+    // 댓글 수정
     fun updateComment(feedId: Long, commentId: Long, form: CommentRequestForm, loginUser: User): Comment =
         getComment(feedId, commentId).let {
             commentPermissionCheck(it, loginUser)
             it.update(form.content)
         }
 
+    // 댓글 삭제
     fun deleteComment(feedId: Long, commentId: Long, loginUser: User) =
         getFeed(feedId).let {
             getComment(feedId, commentId).let { comment ->
                 commentPermissionCheck(comment, loginUser)
                 it.comments.remove(comment)
             }
+        }
+
+    // 댓글 좋아요한 사람 목록 조회
+    @Transactional(readOnly = true)
+    fun getCommentLikes(feedId: Long, commentId: Long, loginUser: User): List<User> =
+        getComment(feedId, commentId).let { comment ->
+            comment.likes.map { it.user }
+        }
+
+    // 피드 좋아요 등록
+    fun likeComment(feedId: Long, commentId: Long, loginUser: User): Comment =
+        getComment(feedId, commentId).let { comment ->
+            if (comment.likes.none { it.user.id == loginUser.id })
+                comment.likes.add(CommentLike(user = loginUser, comment = comment))
+            else throw CommentLikeException(ALREADY_LIKED_COMMENT)
+            comment
+        }
+
+    // 피드 좋아요 취소
+    fun cancelLikeComment(feedId: Long, commentId: Long, loginUser: User): Comment =
+        getComment(feedId, commentId).let { comment ->
+            comment.likes.remove(
+                comment.likes.find { it.user.id == loginUser.id }
+            )
+            comment
         }
 
     // 댓글 접근 권한 체크

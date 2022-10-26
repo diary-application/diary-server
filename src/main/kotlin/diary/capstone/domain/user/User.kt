@@ -3,11 +3,14 @@ package diary.capstone.domain.user
 import diary.capstone.domain.feed.Feed
 import diary.capstone.domain.feed.FeedLike
 import diary.capstone.domain.feed.comment.Comment
+import diary.capstone.domain.feed.comment.CommentLike
 import diary.capstone.domain.feedline.FeedLine
 import diary.capstone.domain.file.File
 import diary.capstone.domain.occupation.Occupation
 import diary.capstone.domain.schedule.Schedule
 import diary.capstone.util.BaseTimeEntity
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import javax.persistence.*
 
 @Entity
@@ -27,6 +30,12 @@ class User(
     var ip: String = "",
     var loginWait: Boolean = false,
 
+    var lastLogin: String = "",
+    var darkMode: Boolean = false,
+    
+    // 프로필 공개 여부
+    var profileShow: Boolean = true,
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "occupation_id")
     var occupation: Occupation? = null, // 직종
@@ -43,6 +52,12 @@ class User(
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
     var feedLikes: MutableList<FeedLike> = mutableListOf(),
+
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
+    var commentLikes: MutableList<CommentLike> = mutableListOf(),
+
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
+    var savedFeeds: MutableList<SavedFeed> = mutableListOf(),
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
     var feedLines: MutableList<FeedLine> = mutableListOf(),
@@ -64,6 +79,8 @@ class User(
         email: String? = null,
         ip: String? = null,
         loginWaiting: Boolean? = null,
+        darkMode: Boolean? = null,
+        profileShow: Boolean? = null,
         occupation: Occupation? = null,
         interests: String? = null,
         profileImage: File? = null
@@ -74,6 +91,8 @@ class User(
         email?.let { this.email = email }
         ip?.let { this.ip = ip }
         loginWaiting?.let { this.loginWait = loginWaiting }
+        darkMode?.let { this.darkMode = darkMode }
+        profileShow?.let { this.profileShow = profileShow }
         occupation?.let { this.occupation = occupation }
         interests?.let { this.interests = interests }
         profileImage?.let { this.profileImage = profileImage }
@@ -90,6 +109,11 @@ class User(
 
     fun addSchedule(schedule: Schedule) {
         this.schedules.add(schedule)
+    }
+
+    fun setLastLogin(): User {
+        this.lastLogin = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+        return this
     }
 }
 
@@ -108,4 +132,19 @@ class Follow(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "target_user_id")
     var target: User,
+)
+
+@Entity
+class SavedFeed(
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "saved_feed_id")
+    var id: Long? = null,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    var user: User, // 유저
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "feed_id")
+    var feed: Feed, // 저장한 피드
 )

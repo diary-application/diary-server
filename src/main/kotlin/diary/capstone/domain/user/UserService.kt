@@ -11,6 +11,7 @@ import diary.capstone.domain.occupation.OCCUPATION_NOT_FOUND
 import diary.capstone.domain.occupation.OccupationException
 import diary.capstone.domain.occupation.OccupationService
 import diary.capstone.util.getIp
+import diary.capstone.util.getPagedUsers
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -18,6 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import javax.servlet.http.HttpServletRequest
 import kotlin.math.min
 
@@ -47,7 +50,7 @@ class LoginService(
             throw AuthException(MAIL_AUTH_REQUIRED)
         }
 
-        return jwtProvider.createToken(user.email)
+        return jwtProvider.createToken(user.setLastLogin().email)
     }
 
     // 메일 인증 로그인
@@ -61,6 +64,7 @@ class LoginService(
             // 최근 접속 IP를 현재 접속 IP로 수정, 로그인 대기 상태 해제 후 로그인
             authManager.removeUsedAuthCode(user.id!!.toString())
             user.update(ip = passwordEncoder.encode(request.getIp()), loginWaiting = false)
+                .setLastLogin()
             return jwtProvider.createToken(form.email)
         }
         else throw AuthException(AUTH_CODE_MISMATCH)
@@ -96,7 +100,7 @@ class LoginService(
                 password = passwordEncoder.encode(form.password),
                 name = form.name,
                 ip = passwordEncoder.encode(request.getIp())
-            )
+            ).setLastLogin()
         ).let {
             return jwtProvider.createToken(it.email)
         }
@@ -115,10 +119,10 @@ class UserService(
     fun getUser(userId: Long): User =
         userRepository.findById(userId).orElseThrow { throw UserException(USER_NOT_FOUND) }
 
-    // 이름으로 유저 검색
+    // 이름, 이메일로 유저 검색
     @Transactional(readOnly = true)
     fun searchUser(pageable: Pageable, keyword: String): Page<User> =
-        userRepository.searchAllByName(pageable, keyword)
+        userRepository.searchAllByNameOrEmail(pageable, keyword, keyword)
 
     // 내가 팔로우 중인 유저 목록
     @Transactional(readOnly = true)
@@ -137,13 +141,6 @@ class UserService(
                 .map { it.user }
                 .sortedBy { it.name }
         )
-
-    private fun getPagedUsers(pageable: Pageable, users: List<User>): Page<User> {
-        val total = users.size
-        val start = pageable.offset.toInt()
-        val end = min((start + pageable.pageSize), total)
-        return PageImpl(users.subList(start, end), pageable, total.toLong())
-    }
 
     // 해당 유저 팔로우
     fun followUser(userId: Long, loginUser: User) {
@@ -200,9 +197,13 @@ class UserService(
 
     // 기본 프로필 사진으로 변경
     fun deleteProfileImage(loginUser: User): User {
-        loginUser.profileImage?.let { fileService.deleteFile(it) }
+        loginUser.profileImage?.let { fileService.deleteFile(it.setUser(null)) }
         return loginUser.update(profileImage = null)
     }
+
+    // 프로필 공개 여부 변경
+    fun updateUserProfileShow(isShown: Boolean, loginUser: User): User =
+        loginUser.update(profileShow = isShown)
 
     // 비밀번호 수정
     fun updatePassword(form: PasswordUpdateForm, loginUser: User) {

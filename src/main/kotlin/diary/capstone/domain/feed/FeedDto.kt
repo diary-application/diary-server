@@ -27,6 +27,7 @@ data class FeedSimpleResponse(
     var likeCount: Int,
     var isLiked: Boolean,
     var isFollowed: Boolean,
+    var showScope: String,
     var createTime: String
 ) {
     constructor(feed: Feed, user: User): this(
@@ -41,6 +42,7 @@ data class FeedSimpleResponse(
             .any { it.feed.id == feed.id && it.user.id == user.id },
         isFollowed = user.following // 조회하는 유저의 피드 작성자 팔로우 유무
             .any { it.target.id == feed.writer.id },
+        showScope = feed.showScope,
         createTime = feed.createTime
     )
 }
@@ -56,6 +58,7 @@ data class FeedDetailResponse(
     var likeCount: Int,
     var isLiked: Boolean,
     var isFollowed: Boolean,
+    var showScope: String,
     var createTime: String
 ) {
     constructor(feed: Feed, user: User): this(
@@ -72,6 +75,7 @@ data class FeedDetailResponse(
             .any { it.user.id == user.id },
         isFollowed = user.following
             .any { it.target.id == feed.writer.id },
+        showScope = feed.showScope,
         createTime = feed.createTime,
     )
 }
