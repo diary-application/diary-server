@@ -134,6 +134,7 @@ class FeedService(
             feed.saves.remove(feed.saves.find { it.user.id == loginUser.id })
         }
 
+    // 피드 수정
     fun updateFeed(feedId: Long, form: FeedRequestForm, loginUser: User): Feed =
         getFeed(feedId).let { feed ->
             feedPermissionCheck(feed, loginUser)
@@ -142,6 +143,7 @@ class FeedService(
             feed
         }
 
+    // 피드 삭제
     fun deleteFeed(feedId: Long, loginUser: User) =
         getFeed(feedId).let { feed ->
             feedPermissionCheck(feed, loginUser)
