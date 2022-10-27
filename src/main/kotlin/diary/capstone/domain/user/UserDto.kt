@@ -56,8 +56,13 @@ data class JoinForm(
 }
 
 data class PasswordUpdateForm(
+    @field:NotBlank
     var currentPassword: String,
+
+    @field:NotBlank
     var newPassword: String,
+
+    @field:NotBlank
     var newPasswordCheck: String
 ) {
     fun checkPassword(): Boolean = this.newPassword == this.newPasswordCheck

@@ -73,10 +73,10 @@ class UserController(
     private val feedService: FeedService,
     private val passwordEncoder: PasswordEncoder
 ) {
-    @ApiOperation(value = "유저 정보 조회")
+    @ApiOperation(value = "유저 정보 조회/유저 검색")
     @GetMapping
     fun getMyInfo(
-        @PageableDefault(size = 5) pageable: Pageable,
+        @PageableDefault(size = 15) pageable: Pageable,
         @RequestParam("keyword", required = false) keyword: String?,
         @ApiIgnore user: User
     ) = keyword?.let {

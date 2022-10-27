@@ -210,7 +210,7 @@ class UserService(
     fun updatePassword(form: PasswordUpdateForm, loginUser: User) {
         if (!form.checkPassword()) throw UserException(NEW_PASSWORD_MISMATCH)
         if (passwordEncoder.matches(form.currentPassword, loginUser.password))
-            loginUser.update(form.currentPassword)
+            loginUser.update(password = passwordEncoder.encode(form.newPassword))
         else throw UserException(CURRENT_PASSWORD_MISMATCH)
     }
 
