@@ -2,6 +2,8 @@ package diary.capstone.domain.user
 
 import diary.capstone.auth.Auth
 import diary.capstone.config.INTERESTS_LIMIT
+import diary.capstone.domain.feed.FeedPagedResponse
+import diary.capstone.domain.feed.FeedService
 import io.swagger.annotations.ApiOperation
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
@@ -68,15 +70,31 @@ class LoginController(private val loginService: LoginService) {
 @RequestMapping("/user")
 class UserController(
     private val userService: UserService,
+    private val feedService: FeedService,
     private val passwordEncoder: PasswordEncoder
 ) {
-    @ApiOperation(value = "내 정보 조회")
+    @ApiOperation(value = "유저 정보 조회")
     @GetMapping
-    fun getMyInfo(@ApiIgnore user: User) = UserDetailResponse(user, user)
+    fun getMyInfo(
+        @PageableDefault(size = 5) pageable: Pageable,
+        @RequestParam("keyword", required = false) keyword: String?,
+        @ApiIgnore user: User
+    ) = keyword?.let {
+        UserPagedResponse(userService.searchUser(pageable, it), user)
+    } ?: UserDetailResponse(user, user)
 
     @ApiOperation(value = "내 피드라인 목록 조회")
     @GetMapping("/feedlines")
     fun getMyFeedLines(@ApiIgnore user: User) = user.feedLines.map { FeedLineResponse(it) }
+
+    @ApiOperation(value = "특정 유저의 피드 조회")
+    @GetMapping("/{userId}/feed")
+    fun searchUserFeed(
+        @PageableDefault pageable: Pageable,
+        @PathVariable("userId") userId: Long,
+        @RequestParam(name = "keyword", required = true) keyword: String,
+        @ApiIgnore user: User
+    ) = FeedPagedResponse(feedService.searchFeedsByUserAndKeyword(pageable, userId, keyword), user)
 
     @ApiOperation(value = "특정 유저의 유저 정보 조회")
     @GetMapping("/{userId}")
@@ -129,8 +147,20 @@ class UserController(
 
     @ApiOperation(value = "내 프로필 사진 수정")
     @PutMapping("/profile-image")
-    fun updateUserProfileImage(@RequestPart("image") image: MultipartFile, @ApiIgnore user: User) =
-        UserDetailResponse(userService.updateProfileImage(image, user), user)
+    fun updateUserProfileImage(
+        @RequestPart("image") image: MultipartFile,
+        @ApiIgnore user: User
+    ) = UserDetailResponse(userService.updateProfileImage(image, user), user)
+
+    @ApiOperation(value = "프로필 사진 삭제(기본 사진으로 변경)")
+    @DeleteMapping("/profile-image")
+    fun deleteUserProfileImage(@ApiIgnore user: User) =
+        UserDetailResponse(userService.deleteProfileImage(user), user)
+
+    @ApiOperation(value = "프로필 공개 여부 설정")
+    @PutMapping("/profile-show")
+    fun updateUserProfileShow(@RequestBody isShown: Boolean, @ApiIgnore user: User) =
+        UserDetailResponse(userService.updateUserProfileShow(isShown, user), user)
 
     @ApiOperation(value = "내 비밀번호 변경")
     @PutMapping("/password")
