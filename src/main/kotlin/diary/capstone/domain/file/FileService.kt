@@ -80,6 +80,10 @@ class FileService(private val fileRepository: FileRepository) {
                 file.source.substring(file.source.lastIndexOf('/') + 1)
             )
         )
+        file.userFile?.let {
+            it.profileImage = null
+            file.setUser(null)
+        }
         fileRepository.delete(file)
     }
 }
