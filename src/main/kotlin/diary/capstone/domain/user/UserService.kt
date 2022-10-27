@@ -198,7 +198,7 @@ class UserService(
 
     // 기본 프로필 사진으로 변경
     fun deleteProfileImage(loginUser: User): User {
-        loginUser.profileImage?.let { fileService.deleteFile(it.setUser(null)) }
+        loginUser.profileImage?.let { fileService.deleteFile(it) }
         return loginUser.update(profileImage = null)
     }
 

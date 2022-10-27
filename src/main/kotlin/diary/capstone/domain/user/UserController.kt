@@ -164,7 +164,7 @@ class UserController(
 
     @ApiOperation(value = "내 비밀번호 변경")
     @PutMapping("/password")
-    fun updateUserPassword(@RequestBody form: PasswordUpdateForm, @ApiIgnore user: User) =
+    fun updateUserPassword(@Valid @RequestBody form: PasswordUpdateForm, @ApiIgnore user: User) =
         userService.updatePassword(form, user)
 
     @ApiOperation(value = "회원 탈퇴", notes = "!! 현재 회원 탈퇴시 데이터베이스에서 바로 해당 유저를 삭제")
