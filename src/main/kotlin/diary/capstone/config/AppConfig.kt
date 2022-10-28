@@ -1,5 +1,6 @@
 package diary.capstone.config
 
+import com.querydsl.jpa.impl.JPAQueryFactory
 import diary.capstone.auth.JwtProvider
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -12,6 +13,8 @@ import springfox.documentation.service.ApiInfo
 import springfox.documentation.spi.DocumentationType
 import springfox.documentation.spring.web.plugins.Docket
 import springfox.documentation.swagger2.annotations.EnableSwagger2
+import javax.persistence.EntityManager
+import javax.persistence.PersistenceContext
 
 @Configuration
 class AppConfig(private val jwtProvider: JwtProvider): WebMvcConfigurer {
@@ -31,11 +34,10 @@ class AppConfig(private val jwtProvider: JwtProvider): WebMvcConfigurer {
 }
 
 // JPAQueryFactory 빈 등록
-//@Configuration
-//class QuerydslConfig(@PersistenceContext private val em: EntityManager) {
-//    @Bean
-//    fun jpaQueryFactory(): JPAQueryFactory = JPAQueryFactory(this.em)
-//}
+@Configuration
+class QuerydslConfig(@PersistenceContext private val em: EntityManager) {
+    @Bean fun jpaQueryFactory(): JPAQueryFactory = JPAQueryFactory(this.em)
+}
 
 // Swagger 2.0 등록
 @Configuration

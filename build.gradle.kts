@@ -55,18 +55,21 @@ dependencies {
 	implementation("io.springfox:springfox-boot-starter:3.0.0")
 	implementation("io.springfox:springfox-swagger-ui:3.0.0")
 
+	// WebSocket
+	implementation("org.springframework.boot:spring-boot-starter-websocket")
+
 	// Querydsl-jpa
-//	val querydslVersion = "5.0.0"
-//	implementation("com.querydsl:querydsl-jpa:$querydslVersion")
-//	apply(plugin = "kotlin-kapt")
-//	kapt("com.querydsl:querydsl-apt:$querydslVersion:jpa")
-//	kapt("org.springframework.boot:spring-boot-configuration-processor")
+	val querydslVersion = "5.0.0"
+	implementation("com.querydsl:querydsl-jpa:$querydslVersion")
+	apply(plugin = "kotlin-kapt")
+	kapt("com.querydsl:querydsl-apt:$querydslVersion:jpa")
+	kapt("org.springframework.boot:spring-boot-configuration-processor")
 }
 
 // Querydsl 추가 설정
-//sourceSets["main"].withConvention(org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet::class) {
-//	kotlin.srcDir("$buildDir/generated/source/kapt/main")
-//}
+sourceSets["main"].withConvention(org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet::class) {
+	kotlin.srcDir("$buildDir/generated/source/kapt/main")
+}
 
 allOpen {
 	annotation("javax.persistence.Entity")

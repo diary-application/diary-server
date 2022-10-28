@@ -13,16 +13,12 @@ import diary.capstone.domain.occupation.OccupationService
 import diary.capstone.util.getIp
 import diary.capstone.util.getPagedUsers
 import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import javax.servlet.http.HttpServletRequest
-import kotlin.math.min
 
 @Service
 class LoginService(
@@ -164,7 +160,7 @@ class UserService(
         )
 
     // 내 이름 수정
-    fun updateUserName(form: UserInfoUpdateForm, loginUser: User): User =
+    fun updateUserName(form: UserNameUpdateForm, loginUser: User): User =
         loginUser.update(name = form.name)
 
     // 오늘의 한 마디 수정
