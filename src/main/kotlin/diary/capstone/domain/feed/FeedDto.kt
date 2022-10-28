@@ -7,10 +7,22 @@ import org.springframework.data.domain.Page
 import org.springframework.web.multipart.MultipartFile
 import javax.validation.constraints.Pattern
 
-data class FeedRequestForm(
+data class FeedCreateForm(
     var content: String,
 
     // 이미지와 설명은 일대일 대응, 설명이 없을 경우 빈 문자열로 전송
+    var images: List<MultipartFile> = listOf(),
+    var descriptions: List<String> = listOf(),
+
+    @field:Pattern(regexp = "^(all|followers|me)$", message = "all, followers, me 로만 입력 가능합니다.")
+    var showScope: String
+)
+
+data class FeedUpdateForm(
+    var content: String,
+
+    // 기존에 있던 파일 중 수정하며 삭제될 파일의 소스 리스트
+    var deletedImages: List<String> = listOf(),
     var images: List<MultipartFile> = listOf(),
     var descriptions: List<String> = listOf(),
 

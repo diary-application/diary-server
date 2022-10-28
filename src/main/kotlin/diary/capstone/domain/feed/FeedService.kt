@@ -9,11 +9,10 @@ import diary.capstone.domain.user.User
 import diary.capstone.domain.user.UserService
 import diary.capstone.util.*
 import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import kotlin.math.min
+import org.springframework.web.multipart.MultipartFile
 
 @Service
 @Transactional
@@ -24,18 +23,18 @@ class FeedService(
 ) {
 
     // 피드의 사진을 저장
-    private fun setAndSaveFiles(feed: Feed, form: FeedRequestForm) {
-        if (form.images.size == form.descriptions.size) {
+    private fun setAndSaveFiles(feed: Feed, images: List<MultipartFile>, descriptions: List<String>) {
+        if (images.size == descriptions.size) {
             feed.files.forEach { fileService.deleteFile(it) }
             // 이미지 파일들과 설명들을 합쳐서 하나의 리스트로 묶고 순회
-            form.images.zip(form.descriptions) { file, desc ->
-                fileService.saveFile(file, desc).setFeed(feed)
+            images.zip(descriptions) { file, desc ->
+                feed.files.add(fileService.saveFile(file, desc).setFeed(feed))
             }
-        } else throw FeedException(INVALID_FEED_FORM)
+        } else throw FeedException("$INVALID_FEED_FORM 파일: ${images.size} / 설명: ${descriptions.size}")
     }
 
     // 피드 작성
-    fun createFeed(form: FeedRequestForm, loginUser: User): Feed =
+    fun createFeed(form: FeedCreateForm, loginUser: User): Feed =
         feedRepository.save(
             Feed(
                 writer = loginUser,
@@ -43,8 +42,7 @@ class FeedService(
                 showScope = form.showScope
             )
         ).let {
-            setAndSaveFiles(it, form)
-            feedRepository.flush()
+            setAndSaveFiles(it, form.images, form.descriptions)
             it
         }
 
@@ -134,12 +132,17 @@ class FeedService(
             feed.saves.remove(feed.saves.find { it.user.id == loginUser.id })
         }
 
-    // 피드 수정
-    fun updateFeed(feedId: Long, form: FeedRequestForm, loginUser: User): Feed =
+    // 피드 수정(원래 있던 파일 중 삭제된 파일은 삭제, 추가로 업로드된 파일은 추가)
+    fun updateFeed(feedId: Long, form: FeedUpdateForm, loginUser: User): Feed =
         getFeed(feedId).let { feed ->
             feedPermissionCheck(feed, loginUser)
             feed.update(form.content, form.showScope)
-            setAndSaveFiles(feed, form)
+            form.deletedImages.forEach { source ->
+                feed.files
+                    .find { it.source == source }
+                    .let { fileService.deleteFile(it!!) }
+            }
+            setAndSaveFiles(feed, form.images, form.descriptions)
             feed
         }
 
