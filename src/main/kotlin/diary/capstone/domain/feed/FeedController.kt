@@ -27,7 +27,7 @@ class FeedController(private val feedService: FeedService) {
                 "한 이미지에 설명글이 없을 경우 해당 images 의 descriptions 는 빈 문자열로 요청"
     )
     @PostMapping
-    fun createFeed(@Valid @ModelAttribute form: FeedRequestForm, @ApiIgnore user: User) =
+    fun createFeed(@Valid @ModelAttribute form: FeedCreateForm, @ApiIgnore user: User) =
         FeedSimpleResponse(feedService.createFeed(form, user), user)
 
     @ApiOperation(
@@ -52,7 +52,7 @@ class FeedController(private val feedService: FeedService) {
     @ApiOperation(value = "피드 수정")
     @PutMapping("/{feedId}")
     fun updateFeed(@PathVariable("feedId") feedId: Long,
-                   @Valid @ModelAttribute form: FeedRequestForm,
+                   @Valid @ModelAttribute form: FeedUpdateForm,
                    @ApiIgnore user: User
     ) = FeedDetailResponse(feedService.updateFeed(feedId, form, user), user)
 
