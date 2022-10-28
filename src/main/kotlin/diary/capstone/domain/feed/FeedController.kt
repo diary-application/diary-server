@@ -50,7 +50,7 @@ class FeedController(private val feedService: FeedService) {
         FeedDetailResponse(feedService.getFeed(feedId), user)
 
     @ApiOperation(value = "피드 수정")
-    @PatchMapping("/{feedId}")
+    @PutMapping("/{feedId}")
     fun updateFeed(@PathVariable("feedId") feedId: Long,
                    @Valid @ModelAttribute form: FeedRequestForm,
                    @ApiIgnore user: User
@@ -73,7 +73,7 @@ class CommentController(private val feedService: FeedService) {
     fun createRootComment(@PathVariable("feedId") feedId: Long,
                           @Valid @RequestBody form: CommentRequestForm,
                           @ApiIgnore user: User
-    ) = feedService.createRootComment(feedId, form, user)
+    ) = CommentResponse(feedService.createRootComment(feedId, form, user), user)
 
     @ApiOperation(value = "대댓글 생성")
     @PostMapping("/{commentId}")
@@ -81,7 +81,7 @@ class CommentController(private val feedService: FeedService) {
                            @PathVariable("commentId") commentId: Long,
                            @Valid @RequestBody form: CommentRequestForm,
                            @ApiIgnore user: User
-    ) = feedService.createChildComment(feedId, commentId, form, user)
+    ) = CommentResponse(feedService.createChildComment(feedId, commentId, form, user), user)
 
     @ApiOperation(
         value = "해당 피드의 루트 댓글만 조회", 
