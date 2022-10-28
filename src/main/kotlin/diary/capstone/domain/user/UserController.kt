@@ -2,6 +2,7 @@ package diary.capstone.domain.user
 
 import diary.capstone.auth.Auth
 import diary.capstone.config.INTERESTS_LIMIT
+import diary.capstone.config.PASSWORD_CREATE_POLICY
 import diary.capstone.domain.feed.FeedPagedResponse
 import diary.capstone.domain.feed.FeedService
 import io.swagger.annotations.ApiOperation
@@ -57,7 +58,8 @@ class LoginController(private val loginService: LoginService) {
     @ApiOperation(
         value = "회원가입",
         notes = "/mail-auth-check 를 통해 검증된 이메일을 포함한 회원가입 폼으로 회원가입 시도\n " +
-                "password 와 passwordCheck 는 일치해야 한다."
+                "password 와 passwordCheck 는 일치해야 한다.\n" +
+                "비밀번호 정규식: $PASSWORD_CREATE_POLICY"
     )
     @PostMapping("/join")
     fun join(@Valid @RequestBody form: JoinForm, request: HttpServletRequest) =
@@ -103,16 +105,18 @@ class UserController(
 
     @ApiOperation(value = "해당 유저가 팔로우한 유저 목록 조회")
     @GetMapping("/{userId}/following")
-    fun getFollowing(@PageableDefault pageable: Pageable,
-                     @PathVariable("userId") userId: Long,
-                     @ApiIgnore user: User
+    fun getFollowing(
+        @PageableDefault pageable: Pageable,
+        @PathVariable("userId") userId: Long,
+        @ApiIgnore user: User
     ) = UserPagedResponse(userService.getFollowing(pageable, userId), user)
 
     @ApiOperation(value = "해당 유저의 팔로워 목록 조회")
     @GetMapping("/{userId}/follower")
-    fun getFollowers(@PageableDefault pageable: Pageable,
-                     @PathVariable("userId") userId: Long,
-                     @ApiIgnore user: User
+    fun getFollowers(
+        @PageableDefault pageable: Pageable,
+        @PathVariable("userId") userId: Long,
+        @ApiIgnore user: User
     ) = UserPagedResponse(userService.getFollowers(pageable, userId), user)
 
     @ApiOperation(value = "해당 유저 팔로우")
@@ -127,12 +131,12 @@ class UserController(
 
     @ApiOperation(value = "내 이름 수정")
     @PutMapping("/name")
-    fun updateUserName(@RequestBody form: UserInfoUpdateForm, @ApiIgnore user: User) =
+    fun updateUserName(@Valid @RequestBody form: UserNameUpdateForm, @ApiIgnore user: User) =
         UserDetailResponse(userService.updateUserName(form, user), user)
 
     @ApiOperation(value = "오늘의 한 마디 수정")
     @PutMapping("/message")
-    fun updateUserMessage(@RequestBody form: UserMessageUpdateForm, @ApiIgnore user: User) =
+    fun updateUserMessage(@Valid @RequestBody form: UserMessageUpdateForm, @ApiIgnore user: User) =
         UserDetailResponse(userService.updateUserMessage(form, user), user)
 
     @ApiOperation(value = "내 직종 수정")
@@ -162,7 +166,7 @@ class UserController(
     fun updateUserProfileShow(@RequestBody isShown: Boolean, @ApiIgnore user: User) =
         UserDetailResponse(userService.updateUserProfileShow(isShown, user), user)
 
-    @ApiOperation(value = "내 비밀번호 변경")
+    @ApiOperation(value = "내 비밀번호 변경", notes = "비밀번호 정규식: $PASSWORD_CREATE_POLICY")
     @PutMapping("/password")
     fun updateUserPassword(@Valid @RequestBody form: PasswordUpdateForm, @ApiIgnore user: User) =
         userService.updatePassword(form, user)

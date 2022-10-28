@@ -1,5 +1,7 @@
 package diary.capstone.domain.user
 
+import diary.capstone.config.MESSAGE_MAX_LENGTH
+import diary.capstone.config.NAME_MAX_LENGTH
 import diary.capstone.domain.feed.Feed
 import diary.capstone.domain.feed.FeedLike
 import diary.capstone.domain.feed.comment.Comment
@@ -21,9 +23,11 @@ class User(
 
     var email: String,
     var password: String,
+
+    @Column(length = NAME_MAX_LENGTH)
     var name: String,
 
-    @Column(length = 100)
+    @Column(length = MESSAGE_MAX_LENGTH)
     var message: String = "",
 
     // 최근 접속 ip, 로그인 대기 상태

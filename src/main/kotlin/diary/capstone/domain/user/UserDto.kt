@@ -1,12 +1,16 @@
 package diary.capstone.domain.user
 
+import diary.capstone.config.MESSAGE_MAX_LENGTH
+import diary.capstone.config.NAME_MAX_LENGTH
+import diary.capstone.config.PASSWORD_CREATE_POLICY
 import diary.capstone.domain.feed.feedline.FeedLine
 import diary.capstone.domain.file.ProfileImageFileResponse
 import org.hibernate.validator.constraints.Length
+import org.intellij.lang.annotations.RegExp
 import org.springframework.data.domain.Page
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
-import javax.validation.constraints.Size
+import javax.validation.constraints.Pattern
 
 data class LoginForm(
     @field:NotBlank
@@ -44,6 +48,7 @@ data class JoinForm(
     var email: String,
 
     @field:NotBlank
+    @field:Pattern(regexp = PASSWORD_CREATE_POLICY)
     var password: String,
 
     @field:NotBlank
@@ -60,6 +65,7 @@ data class PasswordUpdateForm(
     var currentPassword: String,
 
     @field:NotBlank
+    @field:Pattern(regexp = PASSWORD_CREATE_POLICY)
     var newPassword: String,
 
     @field:NotBlank
@@ -68,13 +74,14 @@ data class PasswordUpdateForm(
     fun checkPassword(): Boolean = this.newPassword == this.newPasswordCheck
 }
 
-data class UserInfoUpdateForm(
+data class UserNameUpdateForm(
     @field:NotBlank
+    @field:Length(min = 1, max = NAME_MAX_LENGTH)
     var name: String
 )
 
 data class UserMessageUpdateForm(
-    @field:Length(min = 0, max = 100)
+    @field:Length(min = 0, max = MESSAGE_MAX_LENGTH)
     var message: String = ""
 )
 

@@ -30,3 +30,12 @@ const val CACHING_MINUTES: Long = 5
 const val AUTH_CODE_CHARS = "0123456789"  // 인증 코드에 사용할 문자열들
 const val AUTH_CODE_DIGITS = 6            // 인증 코드의 자릿수
 const val AUTH_CODE_VALID_MINUTE = 5      // 인증 코드 유효 시간(분)
+
+// 유저 이름 최대 길이
+const val NAME_MAX_LENGTH = 20
+
+// 유저 오늘의 한 마디 최대 길이
+const val MESSAGE_MAX_LENGTH = 100
+
+// 비밀번호 생성 규칙(대소문자, 숫자, 특수문자 중 2가지 이상을 포함한 6~20자리)
+const val PASSWORD_CREATE_POLICY = "^(?=.*[a-zA-Z0-9])(?=.*[a-zA-Z!@#\$%^&*])(?=.*[0-9!@#\$%^&*]).{6,20}\$"
