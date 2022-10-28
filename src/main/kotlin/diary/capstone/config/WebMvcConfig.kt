@@ -5,12 +5,31 @@ import diary.capstone.domain.user.AuthException
 import diary.capstone.domain.user.NOT_LOGIN_USER
 import diary.capstone.domain.user.USER_NOT_FOUND
 import diary.capstone.domain.user.User
+import org.springframework.context.annotation.Configuration
 import org.springframework.core.MethodParameter
 import org.springframework.web.bind.support.WebDataBinderFactory
 import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.method.support.ModelAndViewContainer
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import javax.servlet.http.HttpServletRequest
+
+@Configuration
+class WebMvcConfig(private val jwtProvider: JwtProvider): WebMvcConfigurer {
+    
+    // ArgumentResolver 등록
+    override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {
+        resolvers.add(LoginUserArgumentResolver(jwtProvider))
+    }
+
+    // 정적 리소스 조회 경로 설정: 현재 미사용, 스토리지를 S3 로 이전함
+//    override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
+//        registry
+//            .addResourceHandler("/resource/**")
+//            .addResourceLocations("file:$FILE_SAVE_PATH")
+//            .setCacheControl(CacheControl.maxAge(CACHING_MINUTES, TimeUnit.MINUTES))
+//    }
+}
 
 // 요청하는 클라이언트가 로그인 한 유저 정보를 얻기 위한 ArgumentResolver
 class LoginUserArgumentResolver(private val jwtProvider: JwtProvider): HandlerMethodArgumentResolver {
