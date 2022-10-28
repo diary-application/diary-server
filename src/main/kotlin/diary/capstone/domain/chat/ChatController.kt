@@ -27,6 +27,6 @@ class ChatMessageController(private val sendingOperations: SimpMessageSendingOpe
 
     @MessageMapping("/chat")
     fun sendMessage(chatMessage: ChatMessage) {
-        sendingOperations.convertAndSend("/pub/")
+        sendingOperations.convertAndSend("/pub/chat/room/${chatMessage.message}", chatMessage)
     }
 }
