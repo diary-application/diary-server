@@ -1,6 +1,6 @@
 package diary.capstone.domain.user
 
-import diary.capstone.domain.feedline.FeedLine
+import diary.capstone.domain.feed.feedline.FeedLine
 import diary.capstone.domain.file.ProfileImageFileResponse
 import org.hibernate.validator.constraints.Length
 import org.springframework.data.domain.Page
