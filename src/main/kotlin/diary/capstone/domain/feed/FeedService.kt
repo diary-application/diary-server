@@ -161,29 +161,31 @@ class FeedService(
             .find { it.id == commentId } ?: throw CommentException(COMMENT_NOT_FOUND)
 
     // 새 루트 댓글 생성
-    fun createRootComment(feedId: Long, form: CommentRequestForm, loginUser: User) =
-        getFeed(feedId).let {
-            it.comments.add(
-                Comment(
-                    feed = it,
-                    writer = loginUser,
-                    content = form.content
-                )
+    fun createRootComment(feedId: Long, form: CommentRequestForm, loginUser: User): Comment =
+        getFeed(feedId).let { feed ->
+            val comment = Comment(
+                feed = feed,
+                writer = loginUser,
+                content = form.content
             )
+            feed.comments.add(comment)
+            comment
         }
 
     // 대댓글 생성
-    fun createChildComment(feedId: Long, parentId: Long, form: CommentRequestForm, loginUser: User) =
-        getComment(feedId, parentId).let {
-            it.children.add(
-                Comment(
-                    feed = getFeed(feedId),
+    fun createChildComment(feedId: Long, parentId: Long, form: CommentRequestForm, loginUser: User): Comment =
+        getFeed(feedId).let { feed ->
+            getComment(feedId, parentId).let { parentComment ->
+                val comment = Comment(
+                    feed = feed,
                     writer = loginUser,
                     content = form.content,
-                    parent = it,
-                    layer = it.layer + 1
+                    parent = parentComment,
+                    layer = parentComment.layer + 1
                 )
-            )
+                parentComment.children.add(comment)
+                comment
+            }
         }
 
     /**
