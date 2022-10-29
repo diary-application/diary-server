@@ -51,9 +51,10 @@ class FeedController(private val feedService: FeedService) {
 
     @ApiOperation(value = "피드 수정")
     @PutMapping("/{feedId}")
-    fun updateFeed(@PathVariable("feedId") feedId: Long,
-                   @Valid @ModelAttribute form: FeedUpdateForm,
-                   @ApiIgnore user: User
+    fun updateFeed(
+        @PathVariable("feedId") feedId: Long,
+        @Valid @ModelAttribute form: FeedUpdateForm,
+        @ApiIgnore user: User
     ) = FeedDetailResponse(feedService.updateFeed(feedId, form, user), user)
 
     @ApiOperation(value = "피드 삭제")
@@ -70,17 +71,19 @@ class CommentController(private val feedService: FeedService) {
 
     @ApiOperation(value = "루트 댓글 생성")
     @PostMapping
-    fun createRootComment(@PathVariable("feedId") feedId: Long,
-                          @Valid @RequestBody form: CommentRequestForm,
-                          @ApiIgnore user: User
+    fun createRootComment(
+        @PathVariable("feedId") feedId: Long,
+        @Valid @RequestBody form: CommentRequestForm,
+        @ApiIgnore user: User
     ) = CommentResponse(feedService.createRootComment(feedId, form, user), user)
 
     @ApiOperation(value = "대댓글 생성")
     @PostMapping("/{commentId}")
-    fun createChildComment(@PathVariable("feedId") feedId: Long,
-                           @PathVariable("commentId") commentId: Long,
-                           @Valid @RequestBody form: CommentRequestForm,
-                           @ApiIgnore user: User
+    fun createChildComment(
+        @PathVariable("feedId") feedId: Long,
+        @PathVariable("commentId") commentId: Long,
+        @Valid @RequestBody form: CommentRequestForm,
+        @ApiIgnore user: User
     ) = CommentResponse(feedService.createChildComment(feedId, commentId, form, user), user)
 
     @ApiOperation(
@@ -89,10 +92,11 @@ class CommentController(private val feedService: FeedService) {
                 "user 파라미터를 포함하지 않을 경우 다른 유저들의 루트 댓글 조회"
     )
     @GetMapping
-    fun getRootComments(@PathVariable("feedId") feedId: Long,
-                        @RequestParam(name = "user", required = false) user: String?,
-                        @PageableDefault pageable: Pageable,
-                        @ApiIgnore loginUser: User
+    fun getRootComments(
+        @PathVariable("feedId") feedId: Long,
+        @RequestParam(name = "user", required = false) user: String?,
+        @PageableDefault pageable: Pageable,
+        @ApiIgnore loginUser: User
     ) = CommentPagedResponse(
             when (user) {
                 "me" -> feedService.getMyComments(feedId, pageable, loginUser)
@@ -102,25 +106,28 @@ class CommentController(private val feedService: FeedService) {
 
     @ApiOperation(value = "해당 댓글의 대댓글 목록 조회")
     @GetMapping("/{commentId}")
-    fun getChildComments(@PathVariable("feedId") feedId: Long,
-                         @PathVariable("commentId") commentId: Long,
-                         @PageableDefault pageable: Pageable,
-                         @ApiIgnore user: User
+    fun getChildComments(
+        @PathVariable("feedId") feedId: Long,
+        @PathVariable("commentId") commentId: Long,
+        @PageableDefault pageable: Pageable,
+        @ApiIgnore user: User
     ) = CommentPagedResponse(feedService.getChildComments(feedId, commentId, pageable), user)
 
     @ApiOperation(value = "댓글 수정")
     @PutMapping("/{commentId}")
-    fun updateComment(@PathVariable("feedId") feedId: Long,
-                      @PathVariable("commentId") commentId: Long,
-                      @Valid @RequestBody form: CommentRequestForm,
-                      @ApiIgnore user: User
+    fun updateComment(
+        @PathVariable("feedId") feedId: Long,
+        @PathVariable("commentId") commentId: Long,
+        @Valid @RequestBody form: CommentRequestForm,
+        @ApiIgnore user: User
     ) = CommentResponse(feedService.updateComment(feedId, commentId, form, user), user)
 
     @ApiOperation(value = "댓글 삭제")
     @DeleteMapping("/{commentId}")
-    fun deleteComment(@PathVariable("feedId") feedId: Long,
-                      @PathVariable("commentId") commentId: Long,
-                      @ApiIgnore user: User
+    fun deleteComment(
+        @PathVariable("feedId") feedId: Long,
+        @PathVariable("commentId") commentId: Long,
+        @ApiIgnore user: User
     ) = feedService.deleteComment(feedId, commentId, user)
 }
 
