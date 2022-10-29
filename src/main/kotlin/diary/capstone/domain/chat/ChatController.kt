@@ -1,6 +1,10 @@
 package diary.capstone.domain.chat
 
+import diary.capstone.util.logger
 import org.springframework.messaging.handler.annotation.MessageMapping
+import org.springframework.messaging.handler.annotation.Payload
+import org.springframework.messaging.handler.annotation.SendTo
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor
 import org.springframework.messaging.simp.SimpMessageSendingOperations
 import org.springframework.web.bind.annotation.*
 
@@ -25,8 +29,11 @@ class ChatController(private val chatService: ChatService) {
 @RestController
 class ChatMessageController(private val sendingOperations: SimpMessageSendingOperations) {
 
-    @MessageMapping("/chat")
-    fun sendMessage(chatMessage: ChatMessage) {
-        sendingOperations.convertAndSend("/pub/chat/room/${chatMessage.message}", chatMessage)
+    @MessageMapping("/chat/0")
+    @SendTo("/sub/chat/0")
+    fun sendMessage(@Payload chatMessage: ChatMessage, accessor: SimpMessageHeaderAccessor): ChatMessage {
+        logger().info("{}: {}", chatMessage.sender, chatMessage.message)
+        sendingOperations.convertAndSend("/pub/chat/0", chatMessage)
+        return chatMessage
     }
 }
