@@ -47,7 +47,7 @@ data class ChatSessionResponse(
                 else chats.last().chatReadUser.any { it.user.id == user.id }
             },
         unreadCount = chatSession.chats.count { chat ->
-            chat.chatReadUser.none { it.user.id == user.id }
+            chat.chatReadUser.any { it.user.id == user.id }
         }
     )
 }

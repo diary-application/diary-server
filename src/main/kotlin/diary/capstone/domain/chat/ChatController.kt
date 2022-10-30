@@ -34,7 +34,7 @@ class ChatSessionController(private val chatService: ChatService) {
 
     @GetMapping("/session/{chatSessionId}")
     fun getChatLog(
-        @PageableDefault(size = 50, sort = ["chat_id"], direction = Sort.Direction.DESC) pageable: Pageable,
+        @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) pageable: Pageable,
         @PathVariable("chatSessionId") chatSessionId: Long,
         @ApiIgnore user: User
     ) = ChatLogPagedResponse(chatService.getChatLog(pageable, chatSessionId, user), user)
