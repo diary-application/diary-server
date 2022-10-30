@@ -5,7 +5,6 @@ import diary.capstone.domain.user.User
 import diary.capstone.domain.user.UserService
 import diary.capstone.util.logger
 import org.springframework.data.domain.Pageable
-import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
 import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
@@ -34,10 +33,10 @@ class ChatSessionController(private val chatService: ChatService) {
 
     @GetMapping("/session/{chatSessionId}")
     fun getChatLog(
-        @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) pageable: Pageable,
+        @PageableDefault(size = 100) pageable: Pageable,
         @PathVariable("chatSessionId") chatSessionId: Long,
         @ApiIgnore user: User
-    ) = ChatLogPagedResponse(chatService.getChatLog(pageable, chatSessionId, user), user)
+    ) = ChatPagedResponse(chatService.getChatLog(pageable, chatSessionId, user), user)
 
     @PutMapping("/session/{chatSessionId}")
     fun readChat(
