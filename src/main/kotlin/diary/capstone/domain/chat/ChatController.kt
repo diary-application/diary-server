@@ -39,12 +39,11 @@ class ChatSessionController(private val chatService: ChatService) {
         @ApiIgnore user: User
     ) = ChatLogPagedResponse(chatService.getChatLog(pageable, chatSessionId, user), user)
 
-    @PostMapping("/session/{chatSessionId}/chat/{chatId}")
+    @PutMapping("/session/{chatSessionId}")
     fun readChat(
         @PathVariable("chatSessionId") chatSessionId: Long,
-        @PathVariable("chatId") chatId: Long,
         @ApiIgnore user: User
-    ) = chatService.readChat(chatSessionId, chatId, user)
+    ) = chatService.readChat(chatSessionId, user)
 
     @DeleteMapping("/session/{chatSessionId}")
     fun deleteChatSession(@PathVariable("chatSessionId") chatSessionId: Long, @ApiIgnore user: User) =
