@@ -28,15 +28,16 @@ class ChatService(
             .setUsers(listOf(targetUser, loginUser))
     }
 
-    fun createChat(chatSessionId: Long, chatMessage: ChatMessage) =
+    fun createChat(chatSessionId: Long, chatRequest: ChatRequest) =
         getChatSession(chatSessionId).let { chatSession ->
-            chatSession.chats.add(
-                Chat(
-                    sender = userService.getUser(chatMessage.sender),
-                    message = chatMessage.message,
-                    chatSession = chatSession
-                )
-            )
+            Chat(
+                sender = userService.getUser(chatRequest.sender),
+                message = chatRequest.message,
+                chatSession = chatSession
+            ).let {
+                chatSession.chats.add(it)
+                it
+            }
         }
 
     @Transactional(readOnly = true)

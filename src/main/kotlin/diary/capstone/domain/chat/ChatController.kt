@@ -2,7 +2,7 @@ package diary.capstone.domain.chat
 
 import diary.capstone.auth.Auth
 import diary.capstone.domain.user.User
-import diary.capstone.util.logger
+import diary.capstone.domain.user.UserService
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
@@ -42,19 +42,22 @@ class ChatSessionController(private val chatService: ChatService) {
 @RestController
 class ChatMessageController(
     private val sendingOperations: SimpMessageSendingOperations,
-    private val chatService: ChatService
+    private val chatService: ChatService,
+    private val userService: UserService
 ) {
 
     @MessageMapping("/chat/{chatSessionId}")
     @SendTo("/sub/chat/{chatSessionId}")
     fun sendMessage(
         @DestinationVariable("chatSessionId") chatSessionId: Long,
-        @Payload chatMessage: ChatMessage,
+        @Payload chatRequest: ChatRequest,
         accessor: SimpMessageHeaderAccessor
-    ): ChatMessage {
-        logger().info("{}: {}", chatMessage.sender, chatMessage.message)
-        chatService.createChat(chatSessionId, chatMessage)
-        sendingOperations.convertAndSend("/pub/chat/${chatSessionId}", chatMessage)
-        return chatMessage
+    ): ChatResponse {
+        val chat = ChatResponse(
+            chatService.createChat(chatSessionId, chatRequest),
+            userService.getUser(chatRequest.sender)
+        )
+        sendingOperations.convertAndSend("/pub/chat/${chatSessionId}", chat)
+        return chat
     }
 }
