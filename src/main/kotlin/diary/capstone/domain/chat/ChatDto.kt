@@ -5,10 +5,22 @@ import diary.capstone.domain.user.UserSimpleResponse
 import org.springframework.data.domain.Page
 
 // Stomp payload 로 전송되는 채팅 메시지 스펙
-data class ChatMessage(
+data class ChatRequest(
     var sender: Long,
     var message: String
 )
+
+data class ChatResponse(
+    var sender: UserSimpleResponse,
+    var message: String,
+    var createTime: String,
+) {
+    constructor(chat: Chat, user: User): this(
+        sender = UserSimpleResponse(chat.sender, user),
+        message = chat.message,
+        createTime = chat.createTime
+    )
+}
 
 data class ChatSessionCreateForm(var targetUserId: Long)
 
@@ -28,14 +40,14 @@ data class ChatLogPagedResponse(
     var currentPage: Int,
     var totalPages: Int,
     var totalElements: Long,
-    var chats: List<ChatMessage>
+    var chats: List<ChatRequest>
 ) {
     constructor(chats: Page<Chat>): this(
         currentPage = chats.number + 1,
         totalPages = chats.totalPages,
         totalElements = chats.totalElements,
         chats = chats.content
-            .map { ChatMessage(it.sender.id!!, it.message) }
+            .map { ChatRequest(it.sender.id!!, it.message) }
             .toList()
     )
 }
