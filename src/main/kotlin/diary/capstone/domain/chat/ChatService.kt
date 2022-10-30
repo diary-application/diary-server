@@ -70,7 +70,7 @@ class ChatService(
         )
 
     // 해당 채팅 세션의 안읽은 모든 채팅 읽기
-    fun readChat(chatSessionId: Long, chatId: Long, loginUser: User) =
+    fun readChat(chatSessionId: Long, loginUser: User) =
         getChatSession(chatSessionId).let { chatSession ->
             chatSession.chats
                 .filter { chat -> chat.chatReadUser.none { it.user.id == loginUser.id } }
