@@ -54,7 +54,8 @@ class ChatService(
     // 해당 채팅 세션 조회
     @Transactional(readOnly = true)
     fun getChatSession(chatSessionId: Long): ChatSession =
-        chatSessionRepository.findById(chatSessionId).orElseThrow { throw ChatException(CHAT_SESSION_NOT_FOUND) }
+        chatSessionRepository.findById(chatSessionId)
+            .orElseThrow { throw ChatException(CHAT_SESSION_NOT_FOUND) }
 
     // 해당 유저의 모든 채팅 세션 조회
     @Transactional(readOnly = true)
