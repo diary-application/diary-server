@@ -1,39 +1,60 @@
 package diary.capstone.domain.chat
 
+import diary.capstone.auth.Auth
+import diary.capstone.domain.user.User
 import diary.capstone.util.logger
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
+import org.springframework.data.web.PageableDefault
+import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.handler.annotation.Payload
 import org.springframework.messaging.handler.annotation.SendTo
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor
 import org.springframework.messaging.simp.SimpMessageSendingOperations
 import org.springframework.web.bind.annotation.*
+import springfox.documentation.annotations.ApiIgnore
 
+@Auth
 @RestController
 @RequestMapping("/chat")
-class ChatController(private val chatService: ChatService) {
+class ChatSessionController(private val chatService: ChatService) {
 
-    @PostMapping("/room")
-    fun createRoom(@RequestBody roomName: String): List<ChatRoom> =
-        chatService.createRoom(roomName).let { chatService.getAllRooms() }
+    @PostMapping("/session")
+    fun createChatSession(
+        @RequestBody chatSessionCreateForm: ChatSessionCreateForm,
+        @ApiIgnore user: User
+    ) = ChatSessionResponse(chatService.createChatSession(chatSessionCreateForm.targetUserId, user), user)
 
-    @GetMapping("/rooms")
-    fun getAllRooms(): List<ChatRoom> =
-        chatService.getAllRooms()
+    @GetMapping("/session")
+    fun getAllChatSession(@ApiIgnore user: User) =
+        chatService.getAllChatSession(user).map { ChatSessionResponse(it, user) }
 
-    @GetMapping("/room/{roomId}")
-    fun getRoom(@PathVariable("roomId") id: Long): ChatRoom =
-        chatService.getRoom(id)
+    @GetMapping("/session/{chatSessionId}")
+    fun getChatLog(
+        @PageableDefault(size = 50, sort = ["chat_id"], direction = Sort.Direction.DESC) pageable: Pageable,
+        @PathVariable("chatSessionId") chatSessionId: Long,
+        @ApiIgnore user: User
+    ) = chatService.getChatLog(pageable, chatSessionId, user)
 }
 
 // 채팅 메시지 전송 핸들러
 @RestController
-class ChatMessageController(private val sendingOperations: SimpMessageSendingOperations) {
+class ChatMessageController(
+    private val sendingOperations: SimpMessageSendingOperations,
+    private val chatService: ChatService
+) {
 
-    @MessageMapping("/chat/0")
-    @SendTo("/sub/chat/0")
-    fun sendMessage(@Payload chatMessage: ChatMessage, accessor: SimpMessageHeaderAccessor): ChatMessage {
+    @MessageMapping("/chat/{chatSessionId}")
+    @SendTo("/sub/chat/{chatSessionId}")
+    fun sendMessage(
+        @DestinationVariable("chatSessionId") chatSessionId: Long,
+        @Payload chatMessage: ChatMessage,
+        accessor: SimpMessageHeaderAccessor
+    ): ChatMessage {
         logger().info("{}: {}", chatMessage.sender, chatMessage.message)
-        sendingOperations.convertAndSend("/pub/chat/0", chatMessage)
+        chatService.createChat(chatSessionId, chatMessage)
+        sendingOperations.convertAndSend("/pub/chat/${chatSessionId}", chatMessage)
         return chatMessage
     }
 }
