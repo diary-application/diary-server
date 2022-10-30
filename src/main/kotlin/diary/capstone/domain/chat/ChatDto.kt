@@ -27,7 +27,7 @@ data class ChatSessionCreateForm(var targetUserId: Long)
 data class ChatSessionResponse(
     var id: Long,
     var users: List<UserSimpleResponse>,
-    var lastChat: ChatResponse,
+    var lastChat: ChatResponse?,
     var hasReadLastChat: Boolean
 ) {
     constructor(chatSession: ChatSession, user: User): this(
@@ -35,9 +35,16 @@ data class ChatSessionResponse(
         users = chatSession.sessionUsers
             .filter { it.user.id != user.id }
             .map { UserSimpleResponse(it.user, user) },
-        lastChat = ChatResponse(chatSession.chats.last(), user),
-        hasReadLastChat = chatSession.chats.last().chatReadUser
-            .any { it.user.id == user.id }
+        lastChat = chatSession.chats
+            .let { chats ->
+                if (chats.isEmpty()) null
+                else ChatResponse(chats.last(), user)
+            },
+        hasReadLastChat = chatSession.chats
+            .let { chats ->
+                if (chatSession.chats.isEmpty()) true
+                else chats.last().chatReadUser.any { it.user.id == user.id }
+            }
     )
 }
 
