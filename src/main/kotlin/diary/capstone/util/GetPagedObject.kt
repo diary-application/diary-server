@@ -1,5 +1,6 @@
 package diary.capstone.util
 
+import diary.capstone.domain.chat.Chat
 import diary.capstone.domain.feed.Feed
 import diary.capstone.domain.feed.comment.Comment
 import diary.capstone.domain.user.User
@@ -33,6 +34,13 @@ fun getPagedFeed(pageable: Pageable, feeds: List<Feed>): Page<Feed> {
     val start = pageable.offset.toInt()
     val end = min((start + pageable.pageSize), total)
     return PageImpl(feeds.subList(start, end), pageable, total.toLong())
+}
+
+fun getPagedChat(pageable: Pageable, chats: List<Chat>): Page<Chat> {
+    val total = chats.size
+    val start = pageable.offset.toInt()
+    val end = min((start + pageable.pageSize), total)
+    return PageImpl(chats.subList(start, end), pageable, total.toLong())
 }
 
 fun <T> getPagedObject(pageable: Pageable, entityList: List<T>): Page<T> {
