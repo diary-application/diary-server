@@ -27,7 +27,7 @@ data class ChatSessionCreateForm(var targetUserId: Long)
 data class ChatSessionResponse(
     var id: Long,
     var users: List<UserSimpleResponse>,
-    var lastChat: ChatResponse?,
+    var lastChat: String?,
     var hasReadLastChat: Boolean,
     var unreadCount: Int,
 ) {
@@ -39,16 +39,15 @@ data class ChatSessionResponse(
         lastChat = chatSession.chats
             .let { chats ->
                 if (chats.isEmpty()) null
-                else ChatResponse(chats.last(), user)
+                else chats.last().message
             },
         hasReadLastChat = chatSession.chats
             .let { chats ->
                 if (chatSession.chats.isEmpty()) true
                 else chats.last().chatReadUser.any { it.user.id == user.id }
             },
-        unreadCount = chatSession.chats.count { chat ->
-            chat.chatReadUser.any { it.user.id == user.id }
-        }
+        unreadCount = chatSession.chats
+            .filter { chat -> chat.chatReadUser.none { it.user.id == user.id } }.size
     )
 }
 
