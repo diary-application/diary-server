@@ -11,11 +11,13 @@ data class ChatRequest(
 )
 
 data class ChatResponse(
+    var id: Long,
     var sender: UserSimpleResponse,
     var message: String,
     var createTime: String,
 ) {
     constructor(chat: Chat, user: User): this(
+        id = chat.id!!,
         sender = UserSimpleResponse(chat.sender, user),
         message = chat.message,
         createTime = chat.createTime
@@ -51,7 +53,7 @@ data class ChatSessionResponse(
     )
 }
 
-data class ChatLogPagedResponse(
+data class ChatPagedResponse(
     var currentPage: Int,
     var totalPages: Int,
     var totalElements: Long,
@@ -63,6 +65,5 @@ data class ChatLogPagedResponse(
         totalElements = chats.totalElements,
         chats = chats.content
             .map { ChatResponse(it, user) }
-            .toList()
     )
 }
