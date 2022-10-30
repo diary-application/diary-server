@@ -3,10 +3,13 @@ package diary.capstone.domain.chat
 import diary.capstone.domain.user.User
 import diary.capstone.domain.user.UserService
 import diary.capstone.util.getPagedObject
+import diary.capstone.util.logger
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Service
 @Transactional
@@ -36,6 +39,7 @@ class ChatService(
                 chatSession = chatSession
             ).let {
                 chatSession.chats.add(it)
+                it.createTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
                 it
             }
         }

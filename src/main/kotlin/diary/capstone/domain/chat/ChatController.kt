@@ -3,6 +3,7 @@ package diary.capstone.domain.chat
 import diary.capstone.auth.Auth
 import diary.capstone.domain.user.User
 import diary.capstone.domain.user.UserService
+import diary.capstone.util.logger
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
@@ -12,6 +13,7 @@ import org.springframework.messaging.handler.annotation.Payload
 import org.springframework.messaging.handler.annotation.SendTo
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor
 import org.springframework.messaging.simp.SimpMessageSendingOperations
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 import springfox.documentation.annotations.ApiIgnore
 
@@ -35,7 +37,7 @@ class ChatSessionController(private val chatService: ChatService) {
         @PageableDefault(size = 50, sort = ["chat_id"], direction = Sort.Direction.DESC) pageable: Pageable,
         @PathVariable("chatSessionId") chatSessionId: Long,
         @ApiIgnore user: User
-    ) = ChatLogPagedResponse(chatService.getChatLog(pageable, chatSessionId, user))
+    ) = ChatLogPagedResponse(chatService.getChatLog(pageable, chatSessionId, user), user)
 }
 
 // 채팅 메시지 전송 핸들러
@@ -46,6 +48,7 @@ class ChatMessageController(
     private val userService: UserService
 ) {
 
+    @Transactional
     @MessageMapping("/chat/{chatSessionId}")
     @SendTo("/sub/chat/{chatSessionId}")
     fun sendMessage(
@@ -53,6 +56,7 @@ class ChatMessageController(
         @Payload chatRequest: ChatRequest,
         accessor: SimpMessageHeaderAccessor
     ): ChatResponse {
+        logger().info("{}: {}", chatRequest.sender, chatRequest.message)
         val chat = ChatResponse(
             chatService.createChat(chatSessionId, chatRequest),
             userService.getUser(chatRequest.sender)

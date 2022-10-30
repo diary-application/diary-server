@@ -40,14 +40,14 @@ data class ChatLogPagedResponse(
     var currentPage: Int,
     var totalPages: Int,
     var totalElements: Long,
-    var chats: List<ChatRequest>
+    var chats: List<ChatResponse>
 ) {
-    constructor(chats: Page<Chat>): this(
+    constructor(chats: Page<Chat>, user: User): this(
         currentPage = chats.number + 1,
         totalPages = chats.totalPages,
         totalElements = chats.totalElements,
         chats = chats.content
-            .map { ChatRequest(it.sender.id!!, it.message) }
+            .map { ChatResponse(it, user) }
             .toList()
     )
 }
