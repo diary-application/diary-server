@@ -18,6 +18,12 @@ class ChatService(
     private val userService: UserService
 ) {
 
+    /**
+     * 채팅 세션 생성
+     * - 본인과 채팅할 유저의 id를 요청
+     * - 본인과 채팅할 유저의 채팅 세션이 이미 있다면 해당 채팅 세션 반환
+     * - 없을 경우 새 채팅 세션을 만들어 반환
+     */
     fun createChatSession(targetUserId: Long, loginUser: User): ChatSession {
         val targetUser = userService.getUser(targetUserId)
         val targetChatSessions = targetUser.chatSession.map { it.chatSession.id }
@@ -31,33 +37,55 @@ class ChatService(
             .setUsers(listOf(targetUser, loginUser))
     }
 
+    // 해당 채팅 세션에 채팅 저장
     fun createChat(chatSessionId: Long, chatRequest: ChatRequest) =
         getChatSession(chatSessionId).let { chatSession ->
             Chat(
                 sender = userService.getUser(chatRequest.sender),
                 message = chatRequest.message,
-                chatSession = chatSession
+                chatSession = chatSession,
+                createTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
             ).let {
                 chatSession.chats.add(it)
-                it.createTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
                 it
             }
         }
 
+    // 해당 채팅 세션 조회
     @Transactional(readOnly = true)
     fun getChatSession(chatSessionId: Long): ChatSession =
         chatSessionRepository.findById(chatSessionId).orElseThrow { throw ChatException(CHAT_SESSION_NOT_FOUND) }
 
+    // 해당 유저의 모든 채팅 세션 조회
     @Transactional(readOnly = true)
     fun getAllChatSession(loginUser: User): List<ChatSession> =
         loginUser.chatSession.map { it.chatSession }
 
+    // 해당 채팅 세션의 채팅 목록 조회
     @Transactional(readOnly = true)
     fun getChatLog(pageable: Pageable, chatSessionId: Long, loginUser: User): Page<Chat> =
         getPagedObject(pageable,
             getChatSession(chatSessionId).chats
         )
 
-    fun deleteChatSession(chatSessionId: Long) =
-        chatSessionRepository.deleteById(chatSessionId)
+    // 채팅 읽기
+    fun readChat(chatSessionId: Long, chatId: Long, loginUser: User): Chat =
+        getChatSession(chatSessionId).let { chatSession ->
+            chatSession.chats
+                .find { it.id == chatId }
+                ?.let { chat ->
+                    if (chat.sender.id != loginUser.id)
+                        chat.chatReadUser.add(ChatReadUser(chat = chat, user = loginUser))
+                    return chat
+                }
+                .run { throw ChatException(CHAT_NOT_FOUND) }
+        }
+
+    // 채팅 세션 삭제(채팅 세션에 포함된 유저만 삭제 가능)
+    fun deleteChatSession(chatSessionId: Long, loginUser: User) =
+        getChatSession(chatSessionId).let { chatSession ->
+            if (chatSession.sessionUsers.any { it.user.id == loginUser.id })
+                chatSessionRepository.delete(chatSession)
+            else throw ChatException(CHAT_SESSION_ACCESS_DENIED)
+        }
 }

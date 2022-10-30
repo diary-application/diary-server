@@ -59,4 +59,24 @@ class Chat(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_session_id")
     var chatSession: ChatSession,
-): BaseTimeEntity()
+
+    @OneToMany(mappedBy = "chat", cascade = [CascadeType.ALL], orphanRemoval = true)
+    var chatReadUser: MutableList<ChatReadUser> = mutableListOf(),
+
+    var createTime: String
+)
+
+@Entity
+class ChatReadUser(
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "chat_read_user_id")
+    var id: Long? = null,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "chat_id")
+    var chat: Chat,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    var user: User,
+)

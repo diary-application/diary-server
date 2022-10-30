@@ -3,6 +3,7 @@ package diary.capstone.domain.user
 import diary.capstone.config.MESSAGE_MAX_LENGTH
 import diary.capstone.config.NAME_MAX_LENGTH
 import diary.capstone.domain.chat.Chat
+import diary.capstone.domain.chat.ChatReadUser
 import diary.capstone.domain.chat.ChatSessionUser
 import diary.capstone.domain.feed.Feed
 import diary.capstone.domain.feed.FeedLike
@@ -79,6 +80,9 @@ class User(
 
     @OneToMany(mappedBy = "sender", cascade = [CascadeType.ALL], orphanRemoval = true)
     var chats: MutableList<Chat> = mutableListOf(),
+
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
+    var readChats: MutableList<ChatReadUser> = mutableListOf(),
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
     var schedules: MutableList<Schedule> = mutableListOf()

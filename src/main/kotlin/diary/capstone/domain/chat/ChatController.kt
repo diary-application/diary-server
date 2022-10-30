@@ -38,6 +38,17 @@ class ChatSessionController(private val chatService: ChatService) {
         @PathVariable("chatSessionId") chatSessionId: Long,
         @ApiIgnore user: User
     ) = ChatLogPagedResponse(chatService.getChatLog(pageable, chatSessionId, user), user)
+
+    @PostMapping("/session/{chatSessionId}/chat/{chatId}")
+    fun readChat(
+        @PathVariable("chatSessionId") chatSessionId: Long,
+        @PathVariable("chatId") chatId: Long,
+        @ApiIgnore user: User
+    ) = chatService.readChat(chatSessionId, chatId, user)
+
+    @DeleteMapping("/session/{chatSessionId}")
+    fun deleteChatSession(@PathVariable("chatSessionId") chatSessionId: Long, @ApiIgnore user: User) =
+        chatService.deleteChatSession(chatSessionId, user)
 }
 
 // 채팅 메시지 전송 핸들러
@@ -48,6 +59,13 @@ class ChatMessageController(
     private val userService: UserService
 ) {
 
+    /**
+     * 채팅 메시지 전송을 위한 핸들러 메소드
+     * - topic: /chat/{chatSessionId}
+     * - MessageMapping: 해당 topic 으로 메시지를 전송, 클라이언트는 요청 시 /pub 을 prefix 로 요청한다
+     * - SendTo: 퍼블리싱 된 메시지를 해당 topic 을 구독한 사용자들에게 전송한다.
+     * - topic 구독: 클라이언트는 /sub 을 prefix 로 요청하여 해당 topic 을 구독한다.
+     */
     @Transactional
     @MessageMapping("/chat/{chatSessionId}")
     @SendTo("/sub/chat/{chatSessionId}")
