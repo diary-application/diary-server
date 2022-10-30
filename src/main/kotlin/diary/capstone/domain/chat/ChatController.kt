@@ -75,10 +75,8 @@ class ChatMessageController(
         accessor: SimpMessageHeaderAccessor
     ): ChatResponse {
         logger().info("{}: {}", chatRequest.sender, chatRequest.message)
-        val chat = ChatResponse(
-            chatService.createChat(chatSessionId, chatRequest),
-            userService.getUser(chatRequest.sender)
-        )
+        val sender = userService.getUser(chatRequest.sender)
+        val chat = ChatResponse(chatService.createChat(chatSessionId, chatRequest, sender), sender)
         sendingOperations.convertAndSend("/pub/chat/${chatSessionId}", chat)
         return chat
     }

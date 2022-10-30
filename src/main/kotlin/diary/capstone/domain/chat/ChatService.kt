@@ -3,7 +3,6 @@ package diary.capstone.domain.chat
 import diary.capstone.domain.user.User
 import diary.capstone.domain.user.UserService
 import diary.capstone.util.getPagedObject
-import diary.capstone.util.logger
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -38,7 +37,7 @@ class ChatService(
     }
 
     // 해당 채팅 세션에 채팅 저장
-    fun createChat(chatSessionId: Long, chatRequest: ChatRequest) =
+    fun createChat(chatSessionId: Long, chatRequest: ChatRequest, sender: User) =
         getChatSession(chatSessionId).let { chatSession ->
             Chat(
                 sender = userService.getUser(chatRequest.sender),
@@ -47,6 +46,7 @@ class ChatService(
                 createTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
             ).let {
                 chatSession.chats.add(it)
+                it.chatReadUser.add(ChatReadUser(chat = it, user = sender))
                 it
             }
         }
@@ -69,17 +69,12 @@ class ChatService(
             getChatSession(chatSessionId).chats
         )
 
-    // 채팅 읽기
-    fun readChat(chatSessionId: Long, chatId: Long, loginUser: User): Chat =
+    // 해당 채팅 세션의 안읽은 모든 채팅 읽기
+    fun readChat(chatSessionId: Long, chatId: Long, loginUser: User) =
         getChatSession(chatSessionId).let { chatSession ->
             chatSession.chats
-                .find { it.id == chatId }
-                ?.let { chat ->
-                    if (chat.sender.id != loginUser.id)
-                        chat.chatReadUser.add(ChatReadUser(chat = chat, user = loginUser))
-                    return chat
-                }
-                .run { throw ChatException(CHAT_NOT_FOUND) }
+                .filter { chat -> chat.chatReadUser.none { it.user.id == loginUser.id } }
+                .forEach { it.chatReadUser.add(ChatReadUser(chat = it, user = loginUser)) }
         }
 
     // 채팅 세션 삭제(채팅 세션에 포함된 유저만 삭제 가능)
