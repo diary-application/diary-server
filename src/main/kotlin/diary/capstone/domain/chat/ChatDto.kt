@@ -31,7 +31,6 @@ data class ChatSessionResponse(
     var id: Long,
     var users: List<UserSimpleResponse>,
     var lastChat: String?,
-    var hasReadLastChat: Boolean,
     var unreadCount: Int,
 ) {
     constructor(chatSession: ChatSession, user: User): this(
@@ -44,13 +43,7 @@ data class ChatSessionResponse(
                 if (chats.isEmpty()) null
                 else chats.last().message
             },
-        hasReadLastChat = chatSession.chats
-            .let { chats ->
-                if (chatSession.chats.isEmpty()) true
-                else chats.last().chatReadUser.any { it.user.id == user.id }
-            },
-        unreadCount = chatSession.chats
-            .filter { chat -> chat.chatReadUser.none { it.user.id == user.id } }.size
+        unreadCount = chatSession.getUnreadChats(user).size
     )
 }
 
