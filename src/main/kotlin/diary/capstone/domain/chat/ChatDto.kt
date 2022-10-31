@@ -6,18 +6,19 @@ import org.springframework.data.domain.Page
 
 // Stomp payload 로 전송되는 채팅 메시지 스펙
 data class ChatRequest(
+    var sessionId: Long,
     var sender: Long,
     var message: String
 )
 
 data class ChatResponse(
-    var id: Long,
+    var sessionId: Long,
     var sender: UserSimpleResponse,
     var message: String,
     var createTime: String,
 ) {
     constructor(chat: Chat, user: User): this(
-        id = chat.id!!,
+        sessionId = chat.chatSession.id!!,
         sender = UserSimpleResponse(chat.sender, user),
         message = chat.message,
         createTime = chat.createTime
