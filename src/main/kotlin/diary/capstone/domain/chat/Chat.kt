@@ -1,7 +1,6 @@
 package diary.capstone.domain.chat
 
 import diary.capstone.domain.user.User
-import diary.capstone.util.BaseTimeEntity
 import javax.persistence.*
 
 @Entity
@@ -20,12 +19,13 @@ class ChatSession(
 ) {
     fun setUsers(users: List<User>): ChatSession {
         users.forEach {
-            this.sessionUsers.add(
-                ChatSessionUser(user = it, chatSession = this)
-            )
+            this.sessionUsers.add(ChatSessionUser(user = it, chatSession = this))
         }
         return this
     }
+
+    fun getUnreadChats(user: User): List<Chat> =
+        this.chats.filter { !it.getReadUsers().contains(user.id) }
 }
 
 // 유저의 채팅 세션 구독 정보
@@ -60,23 +60,18 @@ class Chat(
     @JoinColumn(name = "chat_session_id")
     var chatSession: ChatSession,
 
-    @OneToMany(mappedBy = "chat", cascade = [CascadeType.ALL], orphanRemoval = true)
-    var chatReadUser: MutableList<ChatReadUser> = mutableListOf(),
+    var readUsers: String = "",
 
     var createTime: String
-)
+) {
 
-@Entity
-class ChatReadUser(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "chat_read_user_id")
-    var id: Long? = null,
+    fun getReadUsers(): List<Long> {
+        return if (this.readUsers == "") listOf()
+        else this.readUsers.split(",").map { it.toLong() }
+    }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chat_id")
-    var chat: Chat,
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    var user: User,
-)
+    fun addReadUser(userId: Long) {
+        if (this.readUsers == "") this.readUsers = userId.toString()
+        else this.readUsers += ",${userId}"
+    }
+}

@@ -46,7 +46,7 @@ class ChatService(
                 createTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
             ).let {
                 chatSession.chats.add(it)
-                it.chatReadUser.add(ChatReadUser(chat = it, user = sender))
+                it.addReadUser(sender.id!!)
                 it
             }
         }
@@ -62,19 +62,13 @@ class ChatService(
     fun getAllChatSession(loginUser: User): List<ChatSession> =
         loginUser.chatSession.map { it.chatSession }
 
-    // 해당 채팅 세션의 채팅 목록 조회
-    @Transactional(readOnly = true)
+    // 해당 채팅 세션의 채팅 목록 조회 + 안읽은 채팅 모두 읽기
     fun getChatLog(pageable: Pageable, chatSessionId: Long, loginUser: User): Page<Chat> =
-        getPagedObject(pageable,
-            getChatSession(chatSessionId).chats
-        )
-
-    // 해당 채팅 세션의 안읽은 모든 채팅 읽기
-    fun readChat(chatSessionId: Long, loginUser: User) =
         getChatSession(chatSessionId).let { chatSession ->
             chatSession.chats
-                .filter { chat -> chat.chatReadUser.none { it.user.id == loginUser.id } }
-                .forEach { it.chatReadUser.add(ChatReadUser(chat = it, user = loginUser)) }
+                .filter { !it.getReadUsers().contains(loginUser.id) }
+                .forEach { it.addReadUser(loginUser.id!!) }
+            getPagedObject(pageable, chatSession.chats)
         }
 
     // 채팅 세션 삭제(채팅 세션에 포함된 유저만 삭제 가능)

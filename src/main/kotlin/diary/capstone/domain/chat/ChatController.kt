@@ -32,17 +32,15 @@ class ChatSessionController(private val chatService: ChatService) {
         chatService.getAllChatSession(user).map { ChatSessionResponse(it, user) }
 
     @GetMapping("/session/{chatSessionId}")
+    fun getChatSession(@PathVariable("chatSessionId") chatSessionId: Long, @ApiIgnore user: User) =
+        ChatSessionResponse(chatService.getChatSession(chatSessionId), user)
+
+    @GetMapping("/session/{chatSessionId}/chat")
     fun getChatLog(
         @PageableDefault(size = 100) pageable: Pageable,
         @PathVariable("chatSessionId") chatSessionId: Long,
         @ApiIgnore user: User
     ) = ChatPagedResponse(chatService.getChatLog(pageable, chatSessionId, user), user)
-
-    @PutMapping("/session/{chatSessionId}")
-    fun readChat(
-        @PathVariable("chatSessionId") chatSessionId: Long,
-        @ApiIgnore user: User
-    ) = chatService.readChat(chatSessionId, user)
 
     @DeleteMapping("/session/{chatSessionId}")
     fun deleteChatSession(@PathVariable("chatSessionId") chatSessionId: Long, @ApiIgnore user: User) =
@@ -72,7 +70,7 @@ class ChatMessageController(
         @Payload chatRequest: ChatRequest,
         accessor: SimpMessageHeaderAccessor
     ): ChatResponse {
-        logger().info("{}: {}", chatRequest.sender, chatRequest.message)
+        logger().info(chatRequest.toString())
         val sender = userService.getUser(chatRequest.sender)
         val chat = ChatResponse(chatService.createChat(chatSessionId, chatRequest, sender), sender)
         sendingOperations.convertAndSend("/pub/chat/${chatSessionId}", chat)
