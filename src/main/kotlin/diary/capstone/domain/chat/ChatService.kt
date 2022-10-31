@@ -66,7 +66,7 @@ class ChatService(
     @Transactional(readOnly = true)
     fun getChatLog(pageable: Pageable, chatSessionId: Long, loginUser: User): Page<Chat> =
         getPagedObject(pageable,
-            getChatSession(chatSessionId).chats
+            getChatSession(chatSessionId).chats.sortedByDescending { it.id }
         )
 
     // 해당 채팅 세션의 안읽은 모든 채팅 읽기
