@@ -5,6 +5,7 @@ import diary.capstone.domain.user.User
 import diary.capstone.domain.user.UserService
 import diary.capstone.util.logger
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
 import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
