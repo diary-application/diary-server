@@ -5,9 +5,6 @@ const val FEED_NOT_FOUND = "해당 글을 찾을 수 없습니다."
 const val FEED_ACCESS_DENIED = "해당 글에 대한 접근 권한이 없습니다."
 const val INVALID_FEED_FORM = "클라이언트 : 입력 폼이 잘못되었습니다."
 
-// 피드 라인
-const val FEED_LINE_NOT_FOUND = "해당 피드 라인을 찾을 수 없습니다."
-
 // 좋아요
 const val ALREADY_LIKED_FEED = "이미 좋아요를 누른 피드입니다."
 const val ALREADY_LIKED_COMMENT = "이미 좋아요를 누른 댓글입니다."

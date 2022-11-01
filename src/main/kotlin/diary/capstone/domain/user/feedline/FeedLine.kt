@@ -1,4 +1,4 @@
-package diary.capstone.domain.feed.feedline
+package diary.capstone.domain.user.feedline
 
 import diary.capstone.domain.user.User
 import javax.persistence.*
@@ -21,8 +21,11 @@ class FeedLine (
     // 피드라인 제목
     var title: String = "",
 
-    // 정렬 기준 asc/desc(날짜순, 좋아요순)
+    // 정렬 기준 (날짜순, 좋아요순)
     var sortBy: String = "",
+
+    // 정렬 방향 (asc, desc)
+    var direction: String = "",
 
     // 선택한 카테고리 목록(,로 구분)
     var categories: String = ""
