@@ -12,16 +12,20 @@ data class ChatRequest(
 )
 
 data class ChatResponse(
+    var id: Long,
     var sessionId: Long,
     var sender: UserSimpleResponse,
     var message: String,
     var createTime: String,
+    var readUsers: List<Long>
 ) {
     constructor(chat: Chat, user: User): this(
+        id = chat.id ?: 0,
         sessionId = chat.chatSession.id!!,
         sender = UserSimpleResponse(chat.sender, user),
         message = chat.message,
-        createTime = chat.createTime
+        createTime = chat.createTime,
+        readUsers = chat.getReadUsers()
     )
 }
 
