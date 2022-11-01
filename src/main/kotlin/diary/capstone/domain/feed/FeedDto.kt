@@ -95,15 +95,12 @@ data class FeedDetailResponse(
 data class FeedPagedResponse(
     var currentPage: Int,
     var totalPages: Int,
-    var totalElements: Long,
     var feeds: List<FeedSimpleResponse>
 ) {
     constructor(feeds: Page<Feed>, user: User): this(
         currentPage = feeds.number + 1,
         totalPages = feeds.totalPages,
-        totalElements = feeds.totalElements,
         feeds = feeds.content
             .map { FeedSimpleResponse(it, user) }
-            .toList()
     )
 }

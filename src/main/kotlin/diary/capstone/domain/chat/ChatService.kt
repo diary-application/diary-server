@@ -71,14 +71,14 @@ class ChatService(
             chatSession.chats
                 .filter { !it.getReadUsers().contains(loginUser.id) }
                 .forEach { it.addReadUser(loginUser.id!!) }
-            getPagedObject(pageable, chatSession.chats)
+            getPagedObject(pageable, chatSession.chats.sortedByDescending { it.id })
         }
 
     // 채팅 하나 읽기
     fun readChat(chatSessionId: Long, chatId: Long, loginUser: User) =
         getChatSession(chatSessionId).chats
             .find { it.id == chatId }
-            ?.let { it.addReadUser(loginUser.id!!) }
+            ?.let { if (!it.getReadUsers().contains(loginUser.id)) it.addReadUser(loginUser.id!!) }
             ?:run { throw ChatException(CHAT_NOT_FOUND) }
 
     // 채팅 세션 삭제(채팅 세션에 포함된 유저만 삭제 가능)
