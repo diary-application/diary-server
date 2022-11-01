@@ -14,6 +14,7 @@ import java.time.format.DateTimeFormatter
 @Transactional
 class ChatService(
     private val chatSessionRepository: ChatSessionRepository,
+    private val chatRepository: ChatRepository,
     private val userService: UserService
 ) {
 
@@ -39,11 +40,13 @@ class ChatService(
     // 해당 채팅 세션에 채팅 저장
     fun createChat(chatSessionId: Long, chatRequest: ChatRequest, sender: User) =
         getChatSession(chatSessionId).let { chatSession ->
-            Chat(
-                sender = userService.getUser(chatRequest.sender),
-                message = chatRequest.message,
-                chatSession = chatSession,
-                createTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+            chatRepository.save(
+                Chat(
+                    sender = userService.getUser(chatRequest.sender),
+                    message = chatRequest.message,
+                    chatSession = chatSession,
+                    createTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+                )
             ).let {
                 chatSession.chats.add(it)
                 it.addReadUser(sender.id!!)
@@ -70,6 +73,13 @@ class ChatService(
                 .forEach { it.addReadUser(loginUser.id!!) }
             getPagedObject(pageable, chatSession.chats)
         }
+
+    // 채팅 하나 읽기
+    fun readChat(chatSessionId: Long, chatId: Long, loginUser: User) =
+        getChatSession(chatSessionId).chats
+            .find { it.id == chatId }
+            ?.let { it.addReadUser(loginUser.id!!) }
+            ?:run { throw ChatException(CHAT_NOT_FOUND) }
 
     // 채팅 세션 삭제(채팅 세션에 포함된 유저만 삭제 가능)
     fun deleteChatSession(chatSessionId: Long, loginUser: User) =
