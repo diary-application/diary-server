@@ -11,7 +11,7 @@ import diary.capstone.domain.occupation.OCCUPATION_NOT_FOUND
 import diary.capstone.domain.occupation.OccupationException
 import diary.capstone.domain.occupation.OccupationService
 import diary.capstone.util.getIp
-import diary.capstone.util.getPagedUsers
+import diary.capstone.util.getPagedObject
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -124,7 +124,7 @@ class UserService(
     // 내가 팔로우 중인 유저 목록
     @Transactional(readOnly = true)
     fun getFollowing(pageable: Pageable, userId: Long): Page<User> =
-        getPagedUsers(pageable,
+        getPagedObject(pageable,
             getUser(userId).following
                 .map { it.target }
                 .sortedBy { it.name }
@@ -133,7 +133,7 @@ class UserService(
     // 나를 팔로우 중인 유저 목록
     @Transactional(readOnly = true)
     fun getFollowers(pageable: Pageable, userId: Long): Page<User> =
-        getPagedUsers(pageable,
+        getPagedObject(pageable,
             getUser(userId).follower
                 .map { it.user }
                 .sortedBy { it.name }

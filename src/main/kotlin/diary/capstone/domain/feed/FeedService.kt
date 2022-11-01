@@ -53,13 +53,13 @@ class FeedService(
         userId?.let { userId ->
             // 로그인 유저가 해당 유저일 경우 모든 피드 조회
             if (loginUser.id == userId)
-                return getPagedFeed(pageable,
+                return getPagedObject(pageable,
                     loginUser.feeds.sortedByDescending { it.id }
                 )
 
             val user = userService.getUser(userId)
 
-            return getPagedFeed(pageable,
+            return getPagedObject(pageable,
                 user.feeds
                     .filterNotShowFollowersFeed(
                         // 피드 작성자를 팔로우 했다면 팔로워 공개 피드를 보여줌
@@ -82,7 +82,7 @@ class FeedService(
     // 피드 내용 또는 파일 설명으로 피드 조회
     @Transactional(readOnly = true)
     fun searchFeedsByUserAndKeyword(pageable: Pageable, userId: Long, keyword: String): Page<Feed> =
-        getPagedFeed(pageable,
+        getPagedObject(pageable,
             userService.getUser(userId).feeds
                 .filter { feed ->
                     feed.content.contains(keyword) ||
@@ -198,7 +198,7 @@ class FeedService(
     // 모든 루트 댓글 조회 (부모 댓글 x, 로그인한 유저가 쓴 댓글 제외)
     @Transactional(readOnly = true)
     fun getRootComments(feedId: Long, pageable: Pageable, loginUser: User): Page<Comment> =
-        getPagedComments(pageable,
+        getPagedObject(pageable,
             getFeed(feedId).comments
                 .filterRootComments()
                 .filterNotSpecificUserComments(loginUser.id!!)
@@ -208,7 +208,7 @@ class FeedService(
     // 해당 피드의 내가 쓴 루트 댓글만 조회 (부모 댓글 x, 로그인한 유저가 쓴 댓글만)
     @Transactional(readOnly = true)
     fun getMyComments(feedId: Long, pageable: Pageable, loginUser: User): Page<Comment> =
-        getPagedComments(pageable,
+        getPagedObject(pageable,
             getFeed(feedId).comments
                 .filterRootComments()
                 .filterSpecificUserComments(loginUser.id!!)
@@ -218,7 +218,7 @@ class FeedService(
     // 해당 댓글의 대댓글들 조회 (해당 댓글의 자식 댓글들만)
     @Transactional(readOnly = true)
     fun getChildComments(feedId: Long, commentId: Long, pageable: Pageable): Page<Comment> =
-        getPagedComments(pageable,
+        getPagedObject(pageable,
             getFeed(feedId).comments
                 .filterChildComments(commentId)
                 .sortedBy { it.id }

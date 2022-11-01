@@ -143,13 +143,11 @@ data class UserDetailResponse(
 data class UserPagedResponse(
     var currentPage: Int,
     var totalPages: Int,
-    var totalElements: Long,
     var users: List<UserSimpleResponse>
 ) {
     constructor(users: Page<User>, me: User): this(
         currentPage = users.number + 1,
         totalPages = users.totalPages,
-        totalElements = users.totalElements,
         users = users.content
             .map { UserSimpleResponse(it, me) }
             .toList()

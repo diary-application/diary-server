@@ -54,14 +54,13 @@ data class ChatSessionResponse(
 data class ChatPagedResponse(
     var currentPage: Int,
     var totalPages: Int,
-    var totalElements: Long,
     var chats: List<ChatResponse>
 ) {
     constructor(chats: Page<Chat>, user: User): this(
         currentPage = chats.number + 1,
         totalPages = chats.totalPages,
-        totalElements = chats.totalElements,
         chats = chats.content
+            .reversed()
             .map { ChatResponse(it, user) }
     )
 }

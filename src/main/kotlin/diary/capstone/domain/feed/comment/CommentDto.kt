@@ -42,15 +42,12 @@ data class CommentResponse(
 data class CommentPagedResponse(
     var currentPage: Int,
     var totalPages: Int,
-    var totalElements: Long,
     var comments: List<CommentResponse>
 ) {
     constructor(comments: Page<Comment>, user: User): this(
         currentPage = comments.number + 1,
         totalPages = comments.totalPages,
-        totalElements = comments.totalElements,
         comments = comments.content
             .map { CommentResponse(it, user) }
-            .toList()
     )
 }
