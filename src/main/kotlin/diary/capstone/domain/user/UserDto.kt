@@ -3,7 +3,7 @@ package diary.capstone.domain.user
 import diary.capstone.config.MESSAGE_MAX_LENGTH
 import diary.capstone.config.NAME_MAX_LENGTH
 import diary.capstone.config.PASSWORD_CREATE_POLICY
-import diary.capstone.domain.feed.feedline.FeedLine
+import diary.capstone.domain.user.feedline.FeedLine
 import diary.capstone.domain.file.ProfileImageFileResponse
 import org.hibernate.validator.constraints.Length
 import org.intellij.lang.annotations.RegExp
@@ -65,7 +65,7 @@ data class PasswordUpdateForm(
     var currentPassword: String,
 
     @field:NotBlank
-    @field:Pattern(regexp = PASSWORD_CREATE_POLICY)
+    @field:Pattern(regexp = PASSWORD_CREATE_POLICY, message = "비밀번호가 형식에 맞지 않습니다.")
     var newPassword: String,
 
     @field:NotBlank
@@ -103,13 +103,6 @@ data class UserSimpleResponse(
         image = user.profileImage?.let { ProfileImageFileResponse(it) },
         isFollowed = me.following
             .any { it.target.id == user.id }
-    )
-}
-
-data class FeedLineResponse(var id: Long, var title: String) {
-    constructor(feedLine: FeedLine): this(
-        id = feedLine.id!!,
-        title = feedLine.title
     )
 }
 

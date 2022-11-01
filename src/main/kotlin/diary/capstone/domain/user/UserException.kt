@@ -19,6 +19,9 @@ const val USER_NOT_FOUND = "해당 유저를 찾을 수 없습니다."
 const val ALREADY_FOLLOWED = "해당 유저를 이미 팔로잉 중입니다."
 const val FOLLOW_TARGET_INVALID = "팔로우 할 수 없는 유저입니다."
 
+// 피드 라인
+const val FEED_LINE_NOT_FOUND = "해당 피드 라인을 찾을 수 없습니다."
+
 // 비밀번호 변경
 const val CURRENT_PASSWORD_MISMATCH = "현재 비밀번호가 일치하지 않습니다."
 const val NEW_PASSWORD_MISMATCH = "새 비밀번호가 일치하지 않습니다."

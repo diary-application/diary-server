@@ -85,10 +85,6 @@ class UserController(
         UserPagedResponse(userService.searchUser(pageable, it), user)
     } ?: UserDetailResponse(user, user)
 
-    @ApiOperation(value = "내 피드라인 목록 조회")
-    @GetMapping("/feedlines")
-    fun getMyFeedLines(@ApiIgnore user: User) = user.feedLines.map { FeedLineResponse(it) }
-
     @ApiOperation(value = "특정 유저의 피드 조회")
     @GetMapping("/{userId}/feed")
     fun searchUserFeed(

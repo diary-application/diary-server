@@ -19,6 +19,9 @@ const val TOKEN_VALID_TIME = 180 * 1000 * 60 // 180분
 // 관심 분야 최대 개수
 const val INTERESTS_LIMIT = 3
 
+// 피드라인 선택 가능 카테고리 최대 개수
+const val FEEDLINE_CATEGORY_LIMIT = 5
+
 // 페이지당 표시 할 데이터 개수
 const val FEED_PAGE_SIZE = 10
 const val COMMENT_PAGE_SIZE = 10

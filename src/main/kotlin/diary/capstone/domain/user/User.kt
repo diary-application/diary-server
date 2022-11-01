@@ -8,7 +8,7 @@ import diary.capstone.domain.feed.Feed
 import diary.capstone.domain.feed.FeedLike
 import diary.capstone.domain.feed.comment.Comment
 import diary.capstone.domain.feed.comment.CommentLike
-import diary.capstone.domain.feed.feedline.FeedLine
+import diary.capstone.domain.user.feedline.FeedLine
 import diary.capstone.domain.file.File
 import diary.capstone.domain.occupation.Occupation
 import diary.capstone.domain.schedule.Schedule
