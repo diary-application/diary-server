@@ -1,6 +1,7 @@
 package diary.capstone.domain.chat
 
 import diary.capstone.domain.user.User
+import diary.capstone.util.BaseTimeEntity
 import javax.persistence.*
 
 @Entity
@@ -62,8 +63,7 @@ class Chat(
 
     var readUsers: String = "",
 
-    var createTime: String
-) {
+): BaseTimeEntity() {
 
     fun getReadUsers(): List<Long> {
         return if (this.readUsers == "") listOf()
