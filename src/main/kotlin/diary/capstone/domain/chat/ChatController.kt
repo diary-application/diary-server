@@ -19,7 +19,10 @@ import springfox.documentation.annotations.ApiIgnore
 @Auth
 @RestController
 @RequestMapping("/chat")
-class ChatSessionController(private val chatService: ChatService) {
+class ChatSessionController(
+    private val chatService: ChatService,
+    private val sendingOperations: SimpMessageSendingOperations
+) {
 
     @PostMapping("/session")
     fun createChatSession(
@@ -42,13 +45,6 @@ class ChatSessionController(private val chatService: ChatService) {
         @ApiIgnore user: User
     ) = ChatPagedResponse(chatService.getChatLog(pageable, chatSessionId, user), user)
 
-    @GetMapping("/session/{chatSessionId}/chat/{chatId}")
-    fun readChat(
-        @PathVariable("chatSessionId") chatSessionId: Long,
-        @PathVariable("chatId") chatId: Long,
-        @ApiIgnore user: User
-    ) = chatService.readChat(chatSessionId, chatId, user)
-
     @DeleteMapping("/session/{chatSessionId}")
     fun deleteChatSession(@PathVariable("chatSessionId") chatSessionId: Long, @ApiIgnore user: User) =
         chatService.deleteChatSession(chatSessionId, user)
@@ -70,17 +66,17 @@ class ChatMessageController(
      * - topic 구독: 클라이언트는 /sub 을 prefix 로 요청하여 해당 topic 을 구독한다.
      */
     @Transactional
-    @MessageMapping("/chat/{chatSessionId}")
-    @SendTo("/sub/chat/{chatSessionId}")
+    @MessageMapping("/chat/{receiverId}")
+    @SendTo("/sub/chat/{receiverId}")
     fun sendMessage(
-        @DestinationVariable("chatSessionId") chatSessionId: Long,
+        @DestinationVariable("receiverId") receiverId: Long,
         @Payload chatRequest: ChatRequest,
         accessor: SimpMessageHeaderAccessor
-    ): ChatResponse {
+    ) {
         logger().info(chatRequest.toString())
         val sender = userService.getUser(chatRequest.sender)
-        val chat = ChatResponse(chatService.createChat(chatSessionId, chatRequest, sender), sender)
-        sendingOperations.convertAndSend("/pub/chat/${chatSessionId}", chat)
-        return chat
+        val chat = ChatResponse(chatService.createChat(chatRequest), sender)
+        sendingOperations.convertAndSend("/sub/chat/$receiverId", chat)
+        sendingOperations.convertAndSend("/sub/chat/${sender.id}", chat)
     }
 }
