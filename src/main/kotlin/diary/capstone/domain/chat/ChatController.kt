@@ -75,8 +75,18 @@ class ChatMessageController(
     ) {
         logger().info(chatRequest.toString())
         val sender = userService.getUser(chatRequest.sender)
-        val chat = ChatResponse(chatService.createChat(chatRequest), sender)
-        sendingOperations.convertAndSend("/sub/chat/$receiverId", chat)
-        sendingOperations.convertAndSend("/sub/chat/${sender.id}", chat)
+        if (chatRequest.message.isNotEmpty()) {
+            ChatResponse(chatService.createChat(chatRequest), sender).let { chat ->
+                sendingOperations.convertAndSend("/sub/chat/$receiverId", chat)
+                sendingOperations.convertAndSend("/sub/chat/${sender.id}", chat)
+            }
+        } else {
+            chatService.getChatSession(chatRequest.sessionId).let { chatSession ->
+                chatSession.sessionUsers.forEach {
+                    if (it.user.id != sender.id)
+                        sendingOperations.convertAndSend("/sub/chat/${it.user.id}", chatRequest)
+                }
+            }
+        }
     }
 }
