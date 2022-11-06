@@ -1,5 +1,9 @@
 package diary.capstone.domain.file
 
+import org.springframework.web.multipart.MultipartFile
+
+data class FileRequest(var file: MultipartFile)
+
 data class FileResponse(
     var id: Long,
     var originalName: String,

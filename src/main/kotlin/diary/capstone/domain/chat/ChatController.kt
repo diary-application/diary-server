@@ -19,7 +19,7 @@ import springfox.documentation.annotations.ApiIgnore
 @Auth
 @RestController
 @RequestMapping("/chat")
-class ChatSessionController(
+class ChatController(
     private val chatService: ChatService,
     private val sendingOperations: SimpMessageSendingOperations
 ) {
@@ -61,9 +61,9 @@ class ChatMessageController(
     /**
      * 채팅 메시지 전송을 위한 핸들러 메소드
      * - topic: /chat/{chatSessionId}
-     * - MessageMapping: 해당 topic 으로 메시지를 전송, 클라이언트는 요청 시 /pub 을 prefix 로 요청한다
-     * - SendTo: 퍼블리싱 된 메시지를 해당 topic 을 구독한 사용자들에게 전송한다.
-     * - topic 구독: 클라이언트는 /sub 을 prefix 로 요청하여 해당 topic 을 구독한다.
+     * - MessageMapping: 해당 topic 으로 메시지를 전송, 클라이언트는 요청 시 /pub 을 prefix 로 요청
+     * - SendTo: 퍼블리싱 된 메시지를 해당 topic 을 구독한 사용자들에게 전송
+     * - topic 구독: 클라이언트는 /sub 을 prefix 로 요청하여 해당 topic 을 구독
      */
     @Transactional
     @MessageMapping("/chat/{receiverId}")

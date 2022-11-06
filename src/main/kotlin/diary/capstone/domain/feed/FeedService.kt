@@ -28,7 +28,7 @@ class FeedService(
             feed.files.forEach { fileService.deleteFile(it) }
             // 이미지 파일들과 설명들을 합쳐서 하나의 리스트로 묶고 순회
             images.zip(descriptions) { file, desc ->
-                feed.files.add(fileService.saveFile(file, desc).setFeed(feed))
+                feed.files.add(fileService.uploadFile(file, desc).setFeed(feed))
             }
         } else throw FeedException("$INVALID_FEED_FORM 파일: ${images.size} / 설명: ${descriptions.size}")
     }
@@ -132,17 +132,29 @@ class FeedService(
             feed.saves.remove(feed.saves.find { it.user.id == loginUser.id })
         }
 
-    // 피드 수정(원래 있던 파일 중 삭제된 파일은 삭제, 추가로 업로드된 파일은 추가)
+    // 피드 수정
     fun updateFeed(feedId: Long, form: FeedUpdateForm, loginUser: User): Feed =
         getFeed(feedId).let { feed ->
             feedPermissionCheck(feed, loginUser)
+            if (form.images.size != form.descriptions.size)
+                throw FeedException("$INVALID_FEED_FORM 파일: ${form.images.size} / 설명: ${form.descriptions.size}")
+
             feed.update(form.content, form.showScope)
-            form.deletedImages.forEach { source ->
-                feed.files
-                    .find { it.source == source }
-                    .let { fileService.deleteFile(it!!) }
+
+            // 업데이트된 파일 중 존재하지 않는 기존 파일 삭제
+            feed.files.forEach {
+                if (!form.images.contains(it.id)) fileService.deleteFile(it)
             }
-            setAndSaveFiles(feed, form.images, form.descriptions)
+
+            // 기존 피드 파일 비우기
+            feed.files.clear()
+
+            // 받은 파일 순서대로 피드 파일에 추가
+            form.images.zip(form.descriptions) { imageId, desc ->
+                var image = fileService.getFile(imageId).updateDesc(desc)
+                feed.files.add(image.setFeed(feed))
+            }
+
             feed
         }
 

@@ -32,8 +32,14 @@ class File (
     }
 
     // 파일이 등록된 피드 설정
-    fun setFeed(feed: Feed): File {
+    fun setFeed(feed: Feed?): File {
         this.feedFile = feed
+        return this
+    }
+
+    // 파일 설명 수정
+    fun updateDesc(description: String): File {
+        this.description = description
         return this
     }
 }
