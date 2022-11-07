@@ -14,23 +14,28 @@ data class FeedCreateForm(
     var images: List<MultipartFile> = listOf(),
     var descriptions: List<String> = listOf(),
 
-    @field:Pattern(regexp = "^(all|followers|me)$", message = "all, followers, me 로만 입력 가능합니다.")
+    @field:Pattern(
+        regexp = "^($SHOW_ALL|$SHOW_FOLLOWERS|$SHOW_ME)$",
+        message = "$SHOW_ALL, $SHOW_FOLLOWERS, $SHOW_ME 로만 입력 가능합니다."
+    )
     var showScope: String
 )
 
 data class FeedUpdateForm(
     var content: String,
 
-    // 기존에 있던 파일 중 수정하며 삭제될 파일의 소스 리스트
-    var deletedImages: List<String> = listOf(),
-    var images: List<MultipartFile> = listOf(),
+    // 업로드 된 파일 ID 리스트
+    var images: List<Long> = listOf(),
     var descriptions: List<String> = listOf(),
 
-    @field:Pattern(regexp = "^(all|followers|me)$", message = "all, followers, me 로만 입력 가능합니다.")
+    @field:Pattern(
+        regexp = "^($SHOW_ALL|$SHOW_FOLLOWERS|$SHOW_ME)$",
+        message = "$SHOW_ALL, $SHOW_FOLLOWERS, $SHOW_ME 로만 입력 가능합니다."
+    )
     var showScope: String
 )
 
-data class FeedSimpleResponse(
+data class FeedResponse(
     var id: Long,
     var writer: UserSimpleResponse,
     var content: String,
@@ -59,48 +64,15 @@ data class FeedSimpleResponse(
     )
 }
 
-// 피드 상세 보기, 댓글 데이터는 해당 API를 통해 따로 요청
-data class FeedDetailResponse(
-    var id: Long,
-    var writer: UserSimpleResponse,
-    var content: String,
-    var files: List<FileResponse>,
-    var commentCount: Int,
-//    var comments: List<CommentResponse>,
-    var likeCount: Int,
-    var isLiked: Boolean,
-    var isFollowed: Boolean,
-    var showScope: String,
-    var createTime: String
-) {
-    constructor(feed: Feed, user: User): this(
-        id = feed.id!!,
-        writer = UserSimpleResponse(feed.writer, user),
-        content = feed.content,
-        files = feed.files.map { FileResponse(it) },
-        commentCount = feed.comments.size,
-//        comments = feed.comments
-//            .filter { it.parent == null }
-//            .map { CommentResponse(it) },
-        likeCount = feed.likes.size,
-        isLiked = feed.likes
-            .any { it.user.id == user.id },
-        isFollowed = user.following
-            .any { it.target.id == feed.writer.id },
-        showScope = feed.showScope,
-        createTime = feed.createTime,
-    )
-}
-
 data class FeedPagedResponse(
     var currentPage: Int,
     var totalPages: Int,
-    var feeds: List<FeedSimpleResponse>
+    var feeds: List<FeedResponse>
 ) {
     constructor(feeds: Page<Feed>, user: User): this(
         currentPage = feeds.number + 1,
         totalPages = feeds.totalPages,
         feeds = feeds.content
-            .map { FeedSimpleResponse(it, user) }
+            .map { FeedResponse(it, user) }
     )
 }

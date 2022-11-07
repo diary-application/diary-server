@@ -7,13 +7,16 @@ import diary.capstone.domain.feed.comment.CommentRequestForm
 import diary.capstone.domain.feed.comment.CommentResponse
 import diary.capstone.domain.user.User
 import diary.capstone.domain.user.UserSimpleResponse
+import diary.capstone.util.logger
 import io.swagger.annotations.ApiOperation
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import springfox.documentation.annotations.ApiIgnore
 import javax.validation.Valid
+import kotlin.io.path.Path
 
 @ApiOperation("피드 관련 API")
 @Auth
@@ -28,7 +31,7 @@ class FeedController(private val feedService: FeedService) {
     )
     @PostMapping
     fun createFeed(@Valid @ModelAttribute form: FeedCreateForm, @ApiIgnore user: User) =
-        FeedSimpleResponse(feedService.createFeed(form, user), user)
+        FeedResponse(feedService.createFeed(form, user), user)
 
     @ApiOperation(
         value = "피드 목록 조회",
@@ -47,15 +50,15 @@ class FeedController(private val feedService: FeedService) {
     @ApiOperation(value = "피드 상세 조회")
     @GetMapping("/{feedId}")
     fun getFeed(@PathVariable("feedId") feedId: Long, @ApiIgnore user: User) =
-        FeedDetailResponse(feedService.getFeed(feedId), user)
+        FeedResponse(feedService.getFeed(feedId), user)
 
     @ApiOperation(value = "피드 수정")
     @PutMapping("/{feedId}")
     fun updateFeed(
         @PathVariable("feedId") feedId: Long,
-        @Valid @ModelAttribute form: FeedUpdateForm,
+        @Valid @RequestBody form: FeedUpdateForm,
         @ApiIgnore user: User
-    ) = FeedDetailResponse(feedService.updateFeed(feedId, form, user), user)
+    ) = FeedResponse(feedService.updateFeed(feedId, form, user), user)
 
     @ApiOperation(value = "피드 삭제")
     @DeleteMapping("/{feedId}")
@@ -148,12 +151,12 @@ class FeedLikeController(private val feedService: FeedService) {
     @ApiOperation(value = "해당 피드 좋아요 등록")
     @PostMapping
     fun likeFeed(@PathVariable("feedId") feedId: Long, @ApiIgnore user: User) =
-        FeedDetailResponse(feedService.likeFeed(feedId, user), user)
+        FeedResponse(feedService.likeFeed(feedId, user), user)
 
     @ApiOperation(value = "해당 피드 좋아요 취소")
     @DeleteMapping
     fun cancelLikeFeed(@PathVariable("feedId") feedId: Long, @ApiIgnore user: User) =
-        FeedDetailResponse(feedService.cancelLikeFeed(feedId, user), user)
+        FeedResponse(feedService.cancelLikeFeed(feedId, user), user)
 }
 
 @ApiOperation("댓글 좋아요 관런 API")

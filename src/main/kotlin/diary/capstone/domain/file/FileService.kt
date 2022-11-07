@@ -43,8 +43,8 @@ class FileService(private val fileRepository: FileRepository) {
             .build()
     }
 
-    // 서버에 파일 업로드 & DB에 파일 저장
-    fun saveFile(file: MultipartFile, description: String = ""): File {
+    // 서버에 이미지 파일 업로드 & DB에 파일 저장
+    fun uploadFile(file: MultipartFile, description: String = ""): File {
         try {
             val objectMetadata = ObjectMetadata()
             objectMetadata.contentType = file.contentType
@@ -72,6 +72,9 @@ class FileService(private val fileRepository: FileRepository) {
             throw FileException(e.message ?: "Amazon S3 객체 업로드 오류")
         }
     }
+
+    fun getFile(fileId: Long): File =
+        fileRepository.findById(fileId).orElseThrow { throw FileException("$FILE_NOT_FOUND : $fileId") }
 
     fun deleteFile(file: File) {
         s3Client.deleteObject(
