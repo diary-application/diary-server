@@ -10,6 +10,6 @@ import org.springframework.web.bind.annotation.RestController
 class FileController(private val fileService: FileService) {
 
     @PostMapping("/upload")
-    fun uploadFile(@ModelAttribute form: FileRequest): FileResponse =
+    fun uploadFile(@ModelAttribute form: FileRequest): List<FileResponse> =
         form.files.map { FileResponse(fileService.uploadFile(it)) }
 }
