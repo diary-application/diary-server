@@ -11,5 +11,5 @@ class FileController(private val fileService: FileService) {
 
     @PostMapping("/upload")
     fun uploadFile(@ModelAttribute form: FileRequest): FileResponse =
-        FileResponse(fileService.uploadFile(form.file))
+        form.files.map { FileResponse(fileService.uploadFile(it)) }
 }
