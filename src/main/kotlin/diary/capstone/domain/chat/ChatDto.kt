@@ -29,6 +29,8 @@ data class ChatResponse(
     )
 }
 
+data class UnreadChatCountResponse(var count: Int)
+
 data class ChatSessionCreateForm(var targetUserId: Long)
 
 data class ChatSessionResponse(
