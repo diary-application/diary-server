@@ -5,12 +5,14 @@ import diary.capstone.config.AUTH_CODE_VALID_MINUTE
 import diary.capstone.util.logger
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessageHelper
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 
 @Service
 class MailService(private val javaMailSender: JavaMailSender) {
 
     // 다른 IP로 로그인 시 인증을 위해 발송
+    @Async
     fun sendLoginAuthMail(code: String, email: String) {
         try {
             val mail = javaMailSender.createMimeMessage()
@@ -41,6 +43,7 @@ class MailService(private val javaMailSender: JavaMailSender) {
     }
 
     // 회원 가입 시 이메일 인증을 위해 발송
+    @Async
     fun sendEmailAuthMail(code: String, email: String) {
         try {
             val mail = javaMailSender.createMimeMessage()
