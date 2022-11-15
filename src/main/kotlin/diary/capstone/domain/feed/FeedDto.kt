@@ -51,7 +51,9 @@ data class FeedResponse(
         id = feed.id!!,
         writer = UserSimpleResponse(feed.writer, user),
         content = feed.content,
-        files = feed.files.map { FileResponse(it) },
+        files = feed.files
+            .sortedBy { it.sequence }
+            .map { FileResponse(it) },
         commentCount = feed.comments.size,
         likeCount = feed.likes
             .count { it.feed.id == feed.id },

@@ -19,10 +19,7 @@ import springfox.documentation.annotations.ApiIgnore
 @Auth
 @RestController
 @RequestMapping("/chat")
-class ChatController(
-    private val chatService: ChatService,
-    private val sendingOperations: SimpMessageSendingOperations
-) {
+class ChatController(private val chatService: ChatService) {
 
     @PostMapping("/session")
     fun createChatSession(
@@ -44,6 +41,10 @@ class ChatController(
         @PathVariable("chatSessionId") chatSessionId: Long,
         @ApiIgnore user: User
     ) = ChatPagedResponse(chatService.getChatLog(pageable, chatSessionId, user), user)
+
+    @GetMapping("/session/unread-count")
+    fun getUnreadChatCount(@ApiIgnore user: User): UnreadChatCountResponse =
+        UnreadChatCountResponse(chatService.getUnreadCount(user))
 
     @DeleteMapping("/session/{chatSessionId}")
     fun deleteChatSession(@PathVariable("chatSessionId") chatSessionId: Long, @ApiIgnore user: User) =

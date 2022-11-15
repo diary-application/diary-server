@@ -4,6 +4,9 @@ import diary.capstone.domain.feed.comment.Comment
 import diary.capstone.domain.feed.comment.CommentLike
 import diary.capstone.domain.feed.comment.CommentRequestForm
 import diary.capstone.domain.file.FileService
+import diary.capstone.domain.notice.NoticeRequest
+import diary.capstone.domain.notice.NoticeResponse
+import diary.capstone.domain.notice.NoticeService
 import diary.capstone.domain.user.SavedFeed
 import diary.capstone.domain.user.User
 import diary.capstone.domain.user.UserService
@@ -19,7 +22,8 @@ import org.springframework.web.multipart.MultipartFile
 class FeedService(
     private val feedRepository: FeedRepository,
     private val userService: UserService,
-    private val fileService: FileService
+    private val fileService: FileService,
+    private val noticeService: NoticeService
 ) {
 
     // 피드의 사진을 저장
@@ -27,8 +31,9 @@ class FeedService(
         if (images.size == descriptions.size) {
             feed.files.forEach { fileService.deleteFile(it) }
             // 이미지 파일들과 설명들을 합쳐서 하나의 리스트로 묶고 순회
+            var seq = 1
             images.zip(descriptions) { file, desc ->
-                feed.files.add(fileService.uploadFile(file, desc).setFeed(feed))
+                feed.files.add(fileService.uploadFile(file, desc).setFeed(feed).setSequence(seq++))
             }
         } else throw FeedException("$INVALID_FEED_FORM 파일: ${images.size} / 설명: ${descriptions.size}")
     }
@@ -43,6 +48,17 @@ class FeedService(
             )
         ).let {
             setAndSaveFiles(it, form.images, form.descriptions)
+            
+            // 작성자의 팔로워들에게 알림 전송
+            noticeService.sendNotices(
+                loginUser.follower.map { follow ->
+                    NoticeRequest(
+                        receiver = follow.user.id!!,
+                        type = "FEED/${it.id}",
+                        content = "${loginUser.name}님이 새로운 피드를 등록했습니다."
+                    )
+                }
+            )
             it
         }
 
@@ -150,8 +166,9 @@ class FeedService(
             feed.files.clear()
 
             // 받은 파일 순서대로 피드 파일에 추가
+            var seq = 1
             form.images.zip(form.descriptions) { imageId, desc ->
-                var image = fileService.getFile(imageId).updateDesc(desc)
+                var image = fileService.getFile(imageId).updateDesc(desc).setSequence(seq)
                 feed.files.add(image.setFeed(feed))
             }
 
@@ -184,6 +201,16 @@ class FeedService(
                 content = form.content
             )
             feed.comments.add(comment)
+
+            // 피드 작성자에게 알림 전송
+            noticeService.sendNotice(
+                NoticeRequest(
+                    receiver = feed.writer.id!!,
+                    type = "FEED/${feed.id}",
+                    content = "${loginUser.name}님이 내 피드에 댓글을 작성했습니다."
+                )
+            )
+
             comment
         }
 
@@ -199,6 +226,23 @@ class FeedService(
                     layer = parentComment.layer + 1
                 )
                 parentComment.children.add(comment)
+                
+                // 피드 작성자와 작성한 대댓글의 바로 상위 부모 댓글 작성자에게 알림 전송
+                noticeService.sendNotice(
+                    NoticeRequest(
+                        receiver = feed.writer.id!!,
+                        type = "FEED/${feed.id}",
+                        content = "${loginUser.name}님이 내 피드에 답글을 작성했습니다."
+                    )
+                )
+                noticeService.sendNotice(
+                    NoticeRequest(
+                        receiver = comment.parent!!.writer.id!!,
+                        type = "FEED/${feed.id}",
+                        content = "${loginUser.name}님이 내 댓글에 답글을 작성했습니다."
+                    )
+                )
+                
                 comment
             }
         }

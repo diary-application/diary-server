@@ -74,6 +74,11 @@ class ChatService(
             getPagedObject(pageable, chatSession.chats.sortedByDescending { it.id })
         }
 
+    // 해당 유저의 안읽은 채팅 개수
+    fun getUnreadCount(loginUser: User): Int =
+        getAllChatSession(loginUser)
+            .sumOf { it.getUnreadChats(loginUser).size }
+
     // 채팅 세션 삭제(채팅 세션에 포함된 유저만 삭제 가능)
     fun deleteChatSession(chatSessionId: Long, loginUser: User) =
         getChatSession(chatSessionId).let { chatSession ->
