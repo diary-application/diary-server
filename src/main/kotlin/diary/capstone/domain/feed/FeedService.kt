@@ -55,7 +55,7 @@ class FeedService(
                     NoticeRequest(
                         receiver = follow.user.id!!,
                         type = "FEED/${it.id}",
-                        content = "${loginUser.name}님이 새로운 피드를 등록했습니다."
+                        content = "${loginUser.name}|님이 새로운 피드를 등록했습니다."
                     )
                 }
             )
@@ -122,6 +122,17 @@ class FeedService(
             if (feed.likes.none { it.user.id == loginUser.id })
                 feed.likes.add(FeedLike(feed = feed, user = loginUser))
             else throw FeedLikeException(ALREADY_LIKED_FEED)
+
+            if (feed.writer.id != loginUser.id) {
+                noticeService.sendNotice(
+                    NoticeRequest(
+                        receiver = feed.writer.id!!,
+                        type = "FEED/${feed.id}",
+                        content = "${loginUser.name}|님이 내 피드에 좋아요를 눌렀습니다."
+                    )
+                )
+            }
+
             feed
         }
 
@@ -202,14 +213,16 @@ class FeedService(
             )
             feed.comments.add(comment)
 
-            // 피드 작성자에게 알림 전송
-            noticeService.sendNotice(
-                NoticeRequest(
-                    receiver = feed.writer.id!!,
-                    type = "FEED/${feed.id}",
-                    content = "${loginUser.name}님이 내 피드에 댓글을 작성했습니다."
+            // 피드 작성자에게 알림 전송(본인이 작성한 피드가 아닐 때)
+            if (loginUser.id != feed.writer.id) {
+                noticeService.sendNotice(
+                    NoticeRequest(
+                        receiver = feed.writer.id!!,
+                        type = "FEED/${feed.id}",
+                        content = "${loginUser.name}|님이 내 피드에 댓글을 작성했습니다."
+                    )
                 )
-            )
+            }
 
             comment
         }
@@ -228,20 +241,24 @@ class FeedService(
                 parentComment.children.add(comment)
                 
                 // 피드 작성자와 작성한 대댓글의 바로 상위 부모 댓글 작성자에게 알림 전송
-                noticeService.sendNotice(
-                    NoticeRequest(
-                        receiver = feed.writer.id!!,
-                        type = "FEED/${feed.id}",
-                        content = "${loginUser.name}님이 내 피드에 답글을 작성했습니다."
+                if (feed.writer.id != loginUser.id) {
+                    noticeService.sendNotice(
+                        NoticeRequest(
+                            receiver = feed.writer.id!!,
+                            type = "FEED/${feed.id}",
+                            content = "${loginUser.name}|님이 내 피드에 답글을 작성했습니다."
+                        )
                     )
-                )
-                noticeService.sendNotice(
-                    NoticeRequest(
-                        receiver = comment.parent!!.writer.id!!,
-                        type = "FEED/${feed.id}",
-                        content = "${loginUser.name}님이 내 댓글에 답글을 작성했습니다."
+                }
+                if (comment.parent!!.writer.id != loginUser.id) {
+                    noticeService.sendNotice(
+                        NoticeRequest(
+                            receiver = comment.parent!!.writer.id!!,
+                            type = "FEED/${feed.id}",
+                            content = "${loginUser.name}|님이 내 댓글에 답글을 작성했습니다."
+                        )
                     )
-                )
+                }
                 
                 comment
             }
@@ -303,7 +320,7 @@ class FeedService(
             comment.likes.map { it.user }
         }
 
-    // 피드 좋아요 등록
+    // 댓글 좋아요 등록
     fun likeComment(feedId: Long, commentId: Long, loginUser: User): Comment =
         getComment(feedId, commentId).let { comment ->
             if (comment.likes.none { it.user.id == loginUser.id })
@@ -312,7 +329,7 @@ class FeedService(
             comment
         }
 
-    // 피드 좋아요 취소
+    // 댓글 좋아요 취소
     fun cancelLikeComment(feedId: Long, commentId: Long, loginUser: User): Comment =
         getComment(feedId, commentId).let { comment ->
             comment.likes.remove(
