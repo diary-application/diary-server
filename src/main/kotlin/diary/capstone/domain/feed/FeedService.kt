@@ -168,7 +168,7 @@ class FeedService(
             // 받은 파일 순서대로 피드 파일에 추가
             var seq = 1
             form.images.zip(form.descriptions) { imageId, desc ->
-                var image = fileService.getFile(imageId).updateDesc(desc).setSequence(seq)
+                var image = fileService.getFile(imageId).updateDesc(desc).setSequence(seq++)
                 feed.files.add(image.setFeed(feed))
             }
 
