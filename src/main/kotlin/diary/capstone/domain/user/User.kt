@@ -10,6 +10,7 @@ import diary.capstone.domain.feed.comment.Comment
 import diary.capstone.domain.feed.comment.CommentLike
 import diary.capstone.domain.user.feedline.FeedLine
 import diary.capstone.domain.file.File
+import diary.capstone.domain.notice.Notice
 import diary.capstone.domain.occupation.Occupation
 import diary.capstone.domain.schedule.Schedule
 import diary.capstone.util.BaseTimeEntity
@@ -80,6 +81,9 @@ class User(
     @OneToMany(mappedBy = "sender", cascade = [CascadeType.ALL], orphanRemoval = true)
     var chats: MutableList<Chat> = mutableListOf(),
 
+    @OneToMany(mappedBy = "receiver", cascade = [CascadeType.ALL], orphanRemoval = true)
+    var notices: MutableList<Notice> = mutableListOf(),
+
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
     var schedules: MutableList<Schedule> = mutableListOf()
 
@@ -117,6 +121,10 @@ class User(
      */
     fun getInterests(): List<String> {
         return if (this.interests == "") listOf() else this.interests.split(",")
+    }
+
+    fun addNotice(notice: Notice) {
+        this.notices.add(notice)
     }
 
     fun addSchedule(schedule: Schedule) {

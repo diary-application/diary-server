@@ -23,7 +23,9 @@ class File (
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_id")
-    var feedFile: Feed? = null
+    var feedFile: Feed? = null,
+
+    var sequence: Int = 1
 ) {
     // 파일이 등록된 유저 설정
     fun setUser(user: User?): File {
@@ -40,6 +42,11 @@ class File (
     // 파일 설명 수정
     fun updateDesc(description: String): File {
         this.description = description
+        return this
+    }
+
+    fun setSequence(seq: Int): File {
+        this.sequence = seq
         return this
     }
 }
