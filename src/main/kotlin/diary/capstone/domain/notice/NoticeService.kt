@@ -40,9 +40,12 @@ class NoticeService(
     fun sendNotices(notices: List<NoticeRequest>) =
         notices.forEach { sendNotice(it) }
 
-    @Transactional(readOnly = true)
+    @Transactional
     fun getAllNotifications(pageable: Pageable, loginUser: User) =
-        getPagedObject(pageable, loginUser.notices.sortedByDescending { it.id })
+        loginUser.notices.let { notices ->
+            if (notices.lastIndex > 0) { notices.last().isRead = true }
+            getPagedObject(pageable, notices.sortedByDescending { it.id })
+        }
 
     fun deleteNotice(noticeId: Long, loginUser: User) =
         loginUser.notices.remove(loginUser.notices.find { it.id == noticeId })

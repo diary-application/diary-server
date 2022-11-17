@@ -15,7 +15,9 @@ class Notice(
     var receiver: User,
 
     var type: String,
-    var content: String
+    var content: String,
+
+    var isRead: Boolean = false,
 
 ): BaseTimeEntity() {
     fun getTypeAndId(): Pair<String, Long> =
