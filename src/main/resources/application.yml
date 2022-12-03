@@ -1,6 +1,6 @@
 # JPA sql 로그에 바인딩 된 파라미터 출력
-#logging.level.org.hibernate:
-#  SQL: debug
+logging.level.org.hibernate:
+  SQL: debug
 #  type:
 #    descriptor:
 #      sql: trace
@@ -10,16 +10,23 @@ spring:
     import: application-secret.yml
 
   jpa:
-    # JPA sql 쿼리 로그 출력
-#    show-sql: true
-#    properties.hibernate.format_sql: true
+    properties:
+      hibernate:
+        # DB 방언 설정
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+        default_batch_fetch_size: 500
+        # JPA sql 쿼리 로그 출력
+        highlight_sql: true
+        format_sql: true
 
     hibernate:
       ddl-auto: update
       use-new-id-generator-mappings: true
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+
+  datasource:
+    hikari:
+      idle-timeout: 300
+      max-lifetime: 300
 
   servlet:
     multipart:

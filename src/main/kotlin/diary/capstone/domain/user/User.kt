@@ -2,17 +2,13 @@ package diary.capstone.domain.user
 
 import diary.capstone.config.MESSAGE_MAX_LENGTH
 import diary.capstone.config.NAME_MAX_LENGTH
-import diary.capstone.domain.chat.Chat
 import diary.capstone.domain.chat.ChatSessionUser
 import diary.capstone.domain.feed.Feed
-import diary.capstone.domain.feed.FeedLike
 import diary.capstone.domain.feed.comment.Comment
-import diary.capstone.domain.feed.comment.CommentLike
 import diary.capstone.domain.user.feedline.FeedLine
 import diary.capstone.domain.file.File
 import diary.capstone.domain.notice.Notice
 import diary.capstone.domain.occupation.Occupation
-import diary.capstone.domain.schedule.Schedule
 import diary.capstone.util.BaseTimeEntity
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -48,7 +44,7 @@ class User(
     var occupation: Occupation? = null, // 직종
     var interests: String = "", // 관심 분야(직종 이름들): ,로 구분하여 3개까지
 
-    @OneToOne(mappedBy = "userFile", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToOne(mappedBy = "userFile", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var profileImage: File? = null,
 
     @OneToMany(mappedBy = "writer", cascade = [CascadeType.ALL], orphanRemoval = true)
@@ -56,15 +52,6 @@ class User(
 
     @OneToMany(mappedBy = "writer", cascade = [CascadeType.ALL], orphanRemoval = true)
     var comments: MutableList<Comment> = mutableListOf(),
-
-    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
-    var feedLikes: MutableList<FeedLike> = mutableListOf(),
-
-    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
-    var commentLikes: MutableList<CommentLike> = mutableListOf(),
-
-    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
-    var savedFeeds: MutableList<SavedFeed> = mutableListOf(),
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
     var feedLines: MutableList<FeedLine> = mutableListOf(),
@@ -78,14 +65,8 @@ class User(
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
     var chatSession: MutableList<ChatSessionUser> = mutableListOf(),
 
-    @OneToMany(mappedBy = "sender", cascade = [CascadeType.ALL], orphanRemoval = true)
-    var chats: MutableList<Chat> = mutableListOf(),
-
     @OneToMany(mappedBy = "receiver", cascade = [CascadeType.ALL], orphanRemoval = true)
     var notices: MutableList<Notice> = mutableListOf(),
-
-    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
-    var schedules: MutableList<Schedule> = mutableListOf()
 
 ): BaseTimeEntity() {
     fun update(
@@ -127,10 +108,6 @@ class User(
         this.notices.add(notice)
     }
 
-    fun addSchedule(schedule: Schedule) {
-        this.schedules.add(schedule)
-    }
-
     fun setLastLogin(): User {
         this.lastLogin = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
         return this
@@ -152,19 +129,4 @@ class Follow(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "target_user_id")
     var target: User,
-)
-
-@Entity
-class SavedFeed(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "saved_feed_id")
-    var id: Long? = null,
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    var user: User, // 유저
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "feed_id")
-    var feed: Feed, // 저장한 피드
 )

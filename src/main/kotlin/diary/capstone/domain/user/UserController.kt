@@ -97,7 +97,7 @@ class UserController(
     @ApiOperation(value = "특정 유저의 유저 정보 조회")
     @GetMapping("/{userId}")
     fun getUser(@PathVariable("userId") userId: Long, @ApiIgnore user: User) =
-        UserDetailResponse(userService.getUser(userId), user)
+        UserDetailResponse(userService.getUserById(userId), user)
 
     @ApiOperation(value = "해당 유저가 팔로우한 유저 목록 조회")
     @GetMapping("/{userId}/following")

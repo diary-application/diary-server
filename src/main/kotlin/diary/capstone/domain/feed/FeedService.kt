@@ -5,9 +5,7 @@ import diary.capstone.domain.feed.comment.CommentLike
 import diary.capstone.domain.feed.comment.CommentRequestForm
 import diary.capstone.domain.file.FileService
 import diary.capstone.domain.notice.NoticeRequest
-import diary.capstone.domain.notice.NoticeResponse
 import diary.capstone.domain.notice.NoticeService
-import diary.capstone.domain.user.SavedFeed
 import diary.capstone.domain.user.User
 import diary.capstone.domain.user.UserService
 import diary.capstone.util.*
@@ -73,7 +71,7 @@ class FeedService(
                     loginUser.feeds.sortedByDescending { it.id }
                 )
 
-            val user = userService.getUser(userId)
+            val user = userService.getUserById(userId)
 
             return getPagedObject(pageable,
                 user.feeds
@@ -99,7 +97,7 @@ class FeedService(
     @Transactional(readOnly = true)
     fun searchFeedsByUserAndKeyword(pageable: Pageable, userId: Long, keyword: String): Page<Feed> =
         getPagedObject(pageable,
-            userService.getUser(userId).feeds
+            userService.getUserById(userId).feeds
                 .filter { feed ->
                     feed.content.contains(keyword) ||
                             feed.files.any { it.description.contains(keyword) }
@@ -143,20 +141,6 @@ class FeedService(
                 feed.likes.find { it.user.id == loginUser.id }
             )
             feed
-        }
-
-    // 피드 저장
-    fun saveFeed(feedId: Long, loginUser: User) =
-        getFeed(feedId).let { feed ->
-            if (feed.saves.none { it.user == loginUser })
-                feed.saves.add(SavedFeed(user = loginUser, feed = feed))
-            else throw FeedSaveException(ALREADY_SAVED_FEED)
-        }
-
-    // 피드 저장 삭제
-    fun removeSavedFeed(feedId: Long, loginUser: User) =
-        getFeed(feedId).let { feed ->
-            feed.saves.remove(feed.saves.find { it.user.id == loginUser.id })
         }
 
     // 피드 수정
