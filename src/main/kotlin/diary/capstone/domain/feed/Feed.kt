@@ -2,7 +2,6 @@ package diary.capstone.domain.feed
 
 import diary.capstone.domain.feed.comment.Comment
 import diary.capstone.domain.file.File
-import diary.capstone.domain.user.SavedFeed
 import diary.capstone.domain.user.User
 import diary.capstone.util.BaseTimeEntity
 import javax.persistence.*
@@ -22,7 +21,7 @@ class Feed(
     @JoinColumn(name = "user_id")
     var writer: User,
 
-    @Column(length = 5000)
+    @Lob
     var content: String,
 
     @OneToMany(mappedBy = "feedFile", cascade = [CascadeType.ALL], orphanRemoval = true)
@@ -33,9 +32,6 @@ class Feed(
 
     @OneToMany(mappedBy = "feed", cascade = [CascadeType.ALL], orphanRemoval = true)
     var likes: MutableList<FeedLike> = mutableListOf(),
-
-    @OneToMany(mappedBy = "feed", cascade = [CascadeType.ALL], orphanRemoval = true)
-    var saves: MutableList<SavedFeed> = mutableListOf(),
 
     // 피드 공개 범위
     var showScope: String

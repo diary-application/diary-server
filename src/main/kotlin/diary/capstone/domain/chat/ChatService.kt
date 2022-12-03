@@ -3,13 +3,10 @@ package diary.capstone.domain.chat
 import diary.capstone.domain.user.User
 import diary.capstone.domain.user.UserService
 import diary.capstone.util.getPagedObject
-import diary.capstone.util.logger
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 @Service
 @Transactional
@@ -26,7 +23,7 @@ class ChatService(
      * - 없을 경우 새 채팅 세션을 만들어 반환
      */
     fun createChatSession(targetUserId: Long, loginUser: User): ChatSession {
-        val targetUser = userService.getUser(targetUserId)
+        val targetUser = userService.getUserById(targetUserId)
         val targetChatSessions = targetUser.chatSession.map { it.chatSession.id }
         val userChatSessions = loginUser.chatSession.map { it.chatSession.id }
         val union = targetChatSessions + userChatSessions
@@ -43,7 +40,7 @@ class ChatService(
         getChatSession(chatRequest.sessionId).let { chatSession ->
             chatRepository.save(
                 Chat(
-                    sender = userService.getUser(chatRequest.sender),
+                    sender = userService.getUserById(chatRequest.sender),
                     message = chatRequest.message,
                     chatSession = chatSession
                 )

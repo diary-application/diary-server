@@ -113,7 +113,7 @@ class UserService(
 ) {
 
     @Transactional(readOnly = true)
-    fun getUser(userId: Long): User =
+    fun getUserById(userId: Long): User =
         userRepository.findById(userId).orElseThrow { throw UserException(USER_NOT_FOUND) }
 
     // 이름, 이메일로 유저 검색
@@ -125,7 +125,7 @@ class UserService(
     @Transactional(readOnly = true)
     fun getFollowing(pageable: Pageable, userId: Long): Page<User> =
         getPagedObject(pageable,
-            getUser(userId).following
+            getUserById(userId).following
                 .map { it.target }
                 .sortedBy { it.name }
         )
@@ -134,7 +134,7 @@ class UserService(
     @Transactional(readOnly = true)
     fun getFollowers(pageable: Pageable, userId: Long): Page<User> =
         getPagedObject(pageable,
-            getUser(userId).follower
+            getUserById(userId).follower
                 .map { it.user }
                 .sortedBy { it.name }
         )
@@ -144,7 +144,7 @@ class UserService(
         // 자기 자신은 팔로우 불가능
         if (loginUser.id == userId) throw UserException(FOLLOW_TARGET_INVALID)
         
-        getUser(userId).let { targetUser ->
+        getUserById(userId).let { targetUser ->
             // 이미 팔로우 한 대상은 팔로우 불가능
             if (loginUser.following.none { it.target.id == targetUser.id })
                 loginUser.following.add(Follow(user = loginUser, target = targetUser))
@@ -156,7 +156,7 @@ class UserService(
     fun unfollowUser(userId: Long, loginUser: User) =
         loginUser.following.remove(
             loginUser.following
-                .find { it.user.id == loginUser.id && it.target.id == getUser(userId).id }
+                .find { it.user.id == loginUser.id && it.target.id == getUserById(userId).id }
         )
 
     // 내 이름 수정

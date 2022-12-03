@@ -21,7 +21,7 @@ class Aspect(private val jwtProvider: JwtProvider) {
     /**
      * domain 내 모든 메소드 실행 시간 측정
      */
-/*    @Around("execution(* diary.capstone.domain..*.*(..))")
+    @Around("execution(* diary.capstone.domain..*.*(..))")
     fun logExecutionTime(joinPoint: ProceedingJoinPoint): Any? {
         val start = System.currentTimeMillis()
         try { return joinPoint.proceed() }
@@ -31,7 +31,7 @@ class Aspect(private val jwtProvider: JwtProvider) {
                         "${System.currentTimeMillis() - start}ms taken"
             )
         }
-    }*/
+    }
 
     /**
      * Auth 어노테이션이 부착된 클래스, 메소드의 실행 전

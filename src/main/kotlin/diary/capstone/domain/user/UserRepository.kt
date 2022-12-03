@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 
 interface UserRepository: JpaRepository<User, Long> {
-    fun findByEmailAndPassword(email: String, password: String): User?
+
     fun findByEmail(email: String): User?
     fun existsByEmail(email: String): Boolean
 

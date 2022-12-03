@@ -75,7 +75,7 @@ class ChatMessageController(
         accessor: SimpMessageHeaderAccessor
     ) {
         logger().info(chatRequest.toString())
-        val sender = userService.getUser(chatRequest.sender)
+        val sender = userService.getUserById(chatRequest.sender)
         if (chatRequest.message.isNotEmpty()) {
             ChatResponse(chatService.createChat(chatRequest), sender).let { chat ->
                 sendingOperations.convertAndSend("/sub/chat/$receiverId", chat)

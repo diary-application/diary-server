@@ -21,7 +21,7 @@ class NoticeService(
     @Async
     @TransactionalEventListener
     fun sendNotice(noticeRequest: NoticeRequest) {
-        userService.getUser(noticeRequest.receiver).let {
+        userService.getUserById(noticeRequest.receiver).let {
             it.addNotice(
                 noticeRepository.save(
                     Notice(
