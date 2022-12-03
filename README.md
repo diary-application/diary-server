@@ -1,7 +1,7 @@
 # 모두의 일기장 REST API 서버
 
 ## Techs
-* Backend `Kotlin` `Spring Boot` `Spring Data JPA` `WebSocket` `MySQL` `S3`
+* Backend `Kotlin` `Spring Boot` `Spring Data JPA` `QueryDSL` `WebSocket` `MySQL` `S3`
 * DevOps  `EC2` `CodeDeploy` `Github Action`
 
 ## Authentication
