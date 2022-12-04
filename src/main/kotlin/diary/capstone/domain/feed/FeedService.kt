@@ -297,13 +297,6 @@ class FeedService(
             }
         }
 
-    // 댓글 좋아요한 사람 목록 조회
-    @Transactional(readOnly = true)
-    fun getCommentLikes(feedId: Long, commentId: Long, loginUser: User): List<User> =
-        getComment(feedId, commentId).let { comment ->
-            comment.likes.map { it.user }
-        }
-
     // 댓글 좋아요 등록
     fun likeComment(feedId: Long, commentId: Long, loginUser: User): Comment =
         getComment(feedId, commentId).let { comment ->

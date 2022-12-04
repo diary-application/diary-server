@@ -1,5 +1,7 @@
 package diary.capstone.domain.user
 
+import diary.capstone.config.COMMENT_PAGE_SIZE
+import diary.capstone.config.FEED_PAGE_SIZE
 import diary.capstone.config.MESSAGE_MAX_LENGTH
 import diary.capstone.config.NAME_MAX_LENGTH
 import diary.capstone.domain.chat.ChatSessionUser
@@ -44,7 +46,8 @@ class User(
     var occupation: Occupation? = null, // 직종
     var interests: String = "", // 관심 분야(직종 이름들): ,로 구분하여 3개까지
 
-    @OneToOne(mappedBy = "userFile", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "profile_image_id")
     var profileImage: File? = null,
 
     @OneToMany(mappedBy = "writer", cascade = [CascadeType.ALL], orphanRemoval = true)
@@ -104,9 +107,7 @@ class User(
         return if (this.interests == "") listOf() else this.interests.split(",")
     }
 
-    fun addNotice(notice: Notice) {
-        this.notices.add(notice)
-    }
+    fun addNotice(notice: Notice) { this.notices.add(notice) }
 
     fun setLastLogin(): User {
         this.lastLogin = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))

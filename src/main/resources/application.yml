@@ -12,9 +12,8 @@ spring:
   jpa:
     properties:
       hibernate:
-        # DB 방언 설정
-        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
-        default_batch_fetch_size: 500
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect # DB 방언 설정
+#        default_batch_fetch_size: 10
         # JPA sql 쿼리 로그 출력
         highlight_sql: true
         format_sql: true

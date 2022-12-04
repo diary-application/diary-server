@@ -52,4 +52,10 @@ data class CommentPagedResponse(
         comments = comments.content
             .map { CommentResponse(it, user) }
     )
+    constructor(comments: Page<CommentResponse>): this(
+        currentPage = comments.number + 1,
+        totalPages = comments.totalPages,
+        totalElements = comments.totalElements,
+        comments = comments.content
+    )
 }
