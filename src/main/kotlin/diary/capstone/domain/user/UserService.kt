@@ -119,7 +119,10 @@ class UserService(
     // 이름, 이메일로 유저 검색
     @Transactional(readOnly = true)
     fun searchUser(pageable: Pageable, keyword: String): Page<User> =
-        userRepository.searchAllByNameOrEmail(pageable, keyword, keyword)
+        keyword.let {
+            if (it.isNotBlank()) userRepository.searchAllByNameOrEmail(pageable, it, it)
+            else throw UserException(USER_NOT_FOUND)
+        }
 
     // 내가 팔로우 중인 유저 목록
     @Transactional(readOnly = true)

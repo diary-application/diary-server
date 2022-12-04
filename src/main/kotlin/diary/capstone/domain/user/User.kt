@@ -1,12 +1,9 @@
 package diary.capstone.domain.user
 
-import diary.capstone.config.COMMENT_PAGE_SIZE
-import diary.capstone.config.FEED_PAGE_SIZE
 import diary.capstone.config.MESSAGE_MAX_LENGTH
 import diary.capstone.config.NAME_MAX_LENGTH
 import diary.capstone.domain.chat.ChatSessionUser
 import diary.capstone.domain.feed.Feed
-import diary.capstone.domain.feed.comment.Comment
 import diary.capstone.domain.user.feedline.FeedLine
 import diary.capstone.domain.file.File
 import diary.capstone.domain.notice.Notice
@@ -52,9 +49,6 @@ class User(
 
     @OneToMany(mappedBy = "writer", cascade = [CascadeType.ALL], orphanRemoval = true)
     var feeds: MutableList<Feed> = mutableListOf(),
-
-    @OneToMany(mappedBy = "writer", cascade = [CascadeType.ALL], orphanRemoval = true)
-    var comments: MutableList<Comment> = mutableListOf(),
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
     var feedLines: MutableList<FeedLine> = mutableListOf(),

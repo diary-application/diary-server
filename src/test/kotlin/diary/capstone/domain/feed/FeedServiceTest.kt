@@ -25,7 +25,7 @@ internal class FeedServiceTest {
      * - files, likes, comments 가 해당 엔티티.feed_id IN (result 피드 id 목록 pageSize 만큼) Batch 쿼리로 처리
      * - isFollowed 를 얻기 위해 로그인 유저의 following 정보를 불러오는 데에 일반 쿼리 처리
      * - select Follow from Follow following where following.user_id = 로그인 유저 ID;
-     * - 피드 페이징 목록: 2(페이징) + 1(following) + 1(files) + 1(likes) + 1(comments) = 6개의 쿼리가 실행
+     * - 피드 페이징 목록: 2(페이징) + 1(following) + 1(files) + 1(likes) + 1(comments) = 6개 쿼리가 실행
      */
     private fun feedTestResult(feedList: Page<FeedResponse>) {
         println("currentPage: " + (feedList.number + 1))
@@ -46,7 +46,7 @@ internal class FeedServiceTest {
      * - likes: likes.comment_id IN (result 댓글 id 목록 pageSize 만큼) Batch
      * - isFollowed 를 얻기 위해 로그인 유저의 following 정보를 불러오는 데에 일반 쿼리 처리
      * - select Follow from Follow following where following.user_id = 로그인 유저 ID;
-     * - 댓글 페이징 목록: 2(페이징) + 1(following) + 1(children) + 1(likes) = 5개의 쿼리 실행
+     * - 댓글 페이징 목록: 2(페이징) + 1(following) + 1(children) + 1(likes) = 5개 쿼리 실행
      */
     private fun commentTestResult(commentList: Page<CommentResponse>) {
         println("currentPage: " + (commentList.number + 1))
@@ -93,12 +93,14 @@ internal class FeedServiceTest {
 
     @Test @DisplayName("피드 좋아요 목록 조회")
     fun getFeedLikes() {
+        val loginUser = userService.getUserById(1L)
         val feedId = 1L
         val pageable = PageRequest.of(0, 3)
-        val likedUsers = qFeedRepository.findFeedLikeUsers(pageable, feedId)
+        val likedUsers = qFeedRepository.findFeedLikeUsers(pageable, feedId, loginUser)
         println("피드 좋아요 수: ${likedUsers.totalElements}")
 
-        likedUsers.forEach { println(it.name + ": " + it.profileImage?.source) }
+        // FeedLike 페이징 쿼리 2개 + 로그인 유저의 following 쿼리 1개 = 3개 쿼리 실행
+        likedUsers.forEach { println(it.name + ": " + it.image?.source) }
     }
     
     @Test @DisplayName("루트 댓글 목록 조회")

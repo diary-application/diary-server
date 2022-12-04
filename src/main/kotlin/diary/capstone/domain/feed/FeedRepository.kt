@@ -8,13 +8,13 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import diary.capstone.domain.feed.QFeed.feed
 import diary.capstone.domain.feed.QFeedLike.feedLike
-import diary.capstone.domain.feed.comment.Comment
 import diary.capstone.domain.feed.comment.CommentResponse
 import diary.capstone.domain.feed.comment.QComment.comment
 import diary.capstone.domain.feed.comment.QCommentLike.commentLike
 import diary.capstone.domain.user.QUser.user
 import diary.capstone.domain.file.QFile.file
 import diary.capstone.domain.user.User
+import diary.capstone.domain.user.UserSimpleResponse
 import diary.capstone.util.getPagedObject
 
 interface FeedRepository: JpaRepository<Feed, Long> {
@@ -108,18 +108,18 @@ class QFeedRepository(private val jpaQueryFactory: JPAQueryFactory) {
     /**
      * @return 해당 피드의 좋아요 한 유저 페이징 목록, FeedLike.id ASC
      */
-    fun findFeedLikeUsers(pageable: Pageable, feedId: Long): Page<User> {
+    fun findFeedLikeUsers(pageable: Pageable, feedId: Long, loginUser: User): Page<UserSimpleResponse> {
         val likedUsers = jpaQueryFactory
             .selectFrom(feedLike).distinct()
             .leftJoin(feedLike.user, user).fetchJoin()
-            .leftJoin(user.profileImage, file).fetchJoin()
+            .leftJoin(user.profileImage).fetchJoin()
             .where(feedLike.feed.id.eq(feedId))
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
             .fetch()
             .map { it.user }
 
-        return getPagedObject(pageable, likedUsers, getFeedLikeCount(feedId))
+        return getPagedObject(pageable, likedUsers.map { UserSimpleResponse(it, loginUser) }, getFeedLikeCount(feedId))
     }
 
     /**
