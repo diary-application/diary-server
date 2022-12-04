@@ -3,6 +3,7 @@ package diary.capstone.domain.user
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.DisplayName
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Page
@@ -15,74 +16,62 @@ internal class UserServiceTest {
 
     @Autowired lateinit var userService: UserService
     @Autowired lateinit var userRepository: UserRepository
+    @Autowired lateinit var qUserRepository: QUserRepository
 
-    @Test
+    /**
+     * Follow 엔티티로부터 user 또는 target 엔티티 페치 조인
+     * - 유저 페이징 목록: 2(페이징) + 1(following) = 3개 쿼리 실행
+     */
+    private fun userTestResult(userList: Page<UserSimpleResponse>) {
+        println("totalSize: ${userList.totalElements}")
+        userList.content.forEach {
+            println("${it.id} User ================================")
+            println("name: ${it.name}")
+            println("image: ${it.image?.source}")
+            println("isFollowed: ${it.isFollowed}")
+        }
+    }
+
+    @Test @DisplayName("userId 로 유저 조회")
     fun getUserById() {
-        val userId = 1L
-        userService.getUserById(userId)
+        val userId = 6L
+        val loginUser = userService.getUserById(1L)
+        val result = qUserRepository.findUserDetailByUserId(userId, loginUser)
+
+        // user, follow, 로그인 유저 following -> 3개 쿼리 실행
+        println("[${result.id}] ${result.name}")
+        println("followingCount = ${result.followingCount}")
+        println("followerCount = ${result.followerCount}")
+        println("image = ${result.image?.source}")
+        println("occupation = ${result.occupation}")
+        println("interests = ${result.interests}")
+        println("isFollowed = ${result.isFollowed}")
     }
 
-    @Test
+    @Test @DisplayName("이메일 또는 이름으로 유저 검색")
     fun searchUser() {
-        val userId = 1L
-    }
-
-    @Test
-    fun getFollowing() {
-        val userId = 1L
-        val pageable = PageRequest.of(0, 15)
-        val result = userService.getFollowing(pageable, userId)
-        println("result = ${result.content}")
-    }
-
-    @Test
-    fun getFollowers() {
-        val userId = 1L
+        val loginUser = userService.getUserById(1L)
         val pageable = PageRequest.of(0, 10)
+        val result = qUserRepository.findUsersByEmailOrName(pageable, "이", loginUser)
 
+        userTestResult(result)
     }
 
-    @Test
-    fun followUser() {
+    @Test @DisplayName("해당 유저의 팔로잉 유저 페이징 목록")
+    fun getFollowing() {
+        val loginUser = userService.getUserById(1L)
+        val pageable = PageRequest.of(0, 10)
+        val result = qUserRepository.findFollowingByUserId(pageable, loginUser.id!!, loginUser)
+
+        userTestResult(result)
     }
 
-    @Test
-    fun unfollowUser() {
-    }
+    @Test @DisplayName("해당 유저의 팔로워 페이징 목록")
+    fun getFollowers() {
+        val loginUser = userService.getUserById(1L)
+        val pageable = PageRequest.of(0, 10)
+        val result = qUserRepository.findFollowersByUserId(pageable, loginUser.id!!, loginUser)
 
-    @Test
-    fun updateUserName() {
-    }
-
-    @Test
-    fun updateUserMessage() {
-    }
-
-    @Test
-    fun updateUserOccupation() {
-    }
-
-    @Test
-    fun updateUserInterests() {
-    }
-
-    @Test
-    fun updateProfileImage() {
-    }
-
-    @Test
-    fun deleteProfileImage() {
-    }
-
-    @Test
-    fun updateUserProfileShow() {
-    }
-
-    @Test
-    fun updatePassword() {
-    }
-
-    @Test
-    fun deleteUser() {
+        userTestResult(result)
     }
 }

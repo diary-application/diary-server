@@ -131,6 +131,19 @@ data class UserDetailResponse(
         isFollowed = me.following
             .any { it.target.id == user.id }
     )
+    constructor(user: User, me: User, followingCount: Int, followerCount: Int): this(
+        id = user.id!!,
+        image = user.profileImage?.let { ProfileImageFileResponse(it) },
+        name = user.name,
+        message = user.message,
+        email = user.email,
+        occupation = user.occupation?.name,
+        interests = user.getInterests(),
+        followingCount = followingCount,
+        followerCount = followerCount,
+        isFollowed = me.following
+            .any { it.target.id == user.id }
+    )
 }
 
 data class UserPagedResponse(
