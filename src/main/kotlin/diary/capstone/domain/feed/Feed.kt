@@ -1,9 +1,11 @@
 package diary.capstone.domain.feed
 
+import diary.capstone.config.FEED_PAGE_SIZE
 import diary.capstone.domain.feed.comment.Comment
 import diary.capstone.domain.file.File
 import diary.capstone.domain.user.User
 import diary.capstone.util.BaseTimeEntity
+import org.hibernate.annotations.BatchSize
 import javax.persistence.*
 
 // 공개 범위 Domains
@@ -24,12 +26,15 @@ class Feed(
     @Lob
     var content: String,
 
+    @BatchSize(size = FEED_PAGE_SIZE)
     @OneToMany(mappedBy = "feedFile", cascade = [CascadeType.ALL], orphanRemoval = true)
     var files: MutableList<File> = mutableListOf(),
 
+    @BatchSize(size = FEED_PAGE_SIZE)
     @OneToMany(mappedBy = "feed", cascade = [CascadeType.ALL], orphanRemoval = true)
     var comments: MutableList<Comment> = mutableListOf(),
 
+    @BatchSize(size = FEED_PAGE_SIZE)
     @OneToMany(mappedBy = "feed", cascade = [CascadeType.ALL], orphanRemoval = true)
     var likes: MutableList<FeedLike> = mutableListOf(),
 

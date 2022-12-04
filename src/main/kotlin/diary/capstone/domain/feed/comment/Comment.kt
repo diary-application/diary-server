@@ -1,8 +1,10 @@
 package diary.capstone.domain.feed.comment
 
+import diary.capstone.config.COMMENT_PAGE_SIZE
 import diary.capstone.domain.feed.Feed
 import diary.capstone.domain.user.User
 import diary.capstone.util.BaseTimeEntity
+import org.hibernate.annotations.BatchSize
 import javax.persistence.*
 
 @Entity
@@ -20,19 +22,19 @@ class Comment(
     var writer: User,
 
     var content: String,
-
-    @OneToMany(mappedBy = "comment", cascade = [CascadeType.ALL], orphanRemoval = true)
-    var likes: MutableList<CommentLike> = mutableListOf(),
-
-    // 계층형 댓글 구조
     var layer: Int = 1, // 계층
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     var parent: Comment? = null,
 
+    @BatchSize(size = COMMENT_PAGE_SIZE)
     @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true)
     var children: MutableList<Comment> = mutableListOf(),
+
+    @BatchSize(size = COMMENT_PAGE_SIZE)
+    @OneToMany(mappedBy = "comment", cascade = [CascadeType.ALL], orphanRemoval = true)
+    var likes: MutableList<CommentLike> = mutableListOf(),
 
 ): BaseTimeEntity() {
     fun update(content: String): Comment {

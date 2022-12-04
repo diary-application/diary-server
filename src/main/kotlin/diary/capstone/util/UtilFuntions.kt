@@ -31,3 +31,6 @@ fun <T> getPagedObject(pageable: Pageable, entityList: List<T>): Page<T> {
     val end = min((start + pageable.pageSize), total)
     return PageImpl(entityList.subList(start, end), pageable, total.toLong())
 }
+
+fun <T> getPagedObject(pageable: Pageable, entityList: List<T>, totalSize: Long): Page<T> =
+    PageImpl(entityList, pageable, totalSize)

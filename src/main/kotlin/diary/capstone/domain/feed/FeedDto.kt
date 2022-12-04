@@ -77,4 +77,9 @@ data class FeedPagedResponse(
         feeds = feeds.content
             .map { FeedResponse(it, user) }
     )
+    constructor(feeds: Page<FeedResponse>): this(
+        currentPage = feeds.number + 1,
+        totalPages = feeds.totalPages,
+        feeds = feeds.content
+    )
 }
