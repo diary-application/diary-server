@@ -34,6 +34,17 @@ dependencies {
 	// Spring Data JPA
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
+	// Spring Data MongoDB
+	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+
+	// S3
+	implementation("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
+
+	// DynamoDB
+	val awsDynamoDBSdkVersion = "2.18.28"
+	implementation("software.amazon.awssdk:dynamodb:$awsDynamoDBSdkVersion")
+	implementation("software.amazon.awssdk:dynamodb-enhanced:$awsDynamoDBSdkVersion")
+
 	// JWT
 	val jwtVersion = "0.11.5"
 	implementation("javax.xml.bind:jaxb-api")
@@ -50,9 +61,6 @@ dependencies {
 
 	// AOP
 	implementation("org.springframework.boot:spring-boot-starter-aop")
-
-	// S3
-	implementation("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
 
 	// Swagger
 	implementation("io.springfox:springfox-boot-starter:3.0.0")

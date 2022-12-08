@@ -3,6 +3,7 @@ package diary.capstone.domain.feed
 import com.querydsl.jpa.impl.JPAQueryFactory
 import diary.capstone.domain.feed.comment.CommentResponse
 import diary.capstone.domain.user.UserService
+import org.bson.types.ObjectId
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -12,6 +13,10 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.transaction.annotation.Transactional
+import java.sql.Timestamp
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 @SpringBootTest
 @Transactional
@@ -20,6 +25,8 @@ internal class FeedServiceTest {
     @Autowired lateinit var userService: UserService
     @Autowired lateinit var qFeedRepository: QFeedRepository
     @Autowired lateinit var jpaQueryFactory: JPAQueryFactory
+    @Autowired lateinit var feedRepository: FeedRepository
+    @Autowired lateinit var feedRepositoryM: FeedRepositoryM
 
     /**
      * - files, likes, comments 가 해당 엔티티.feed_id IN (result 피드 id 목록 pageSize 만큼) Batch 쿼리로 처리
@@ -139,5 +146,59 @@ internal class FeedServiceTest {
 
         val result = qFeedRepository.getCommentLikeCount(commentId)
         println("$commentId LikeCount: $result")
+    }
+
+    @Test
+    fun feedMigration() {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+
+        feedRepositoryM.deleteAll()
+        val feeds = feedRepository.findAll()
+        feeds.forEach { feed ->
+            feedRepositoryM.save(
+                FeedM(
+                    id = ObjectId(Timestamp.valueOf(LocalDateTime.parse(feed.createTime, formatter))),
+                    writer = feed.writer.id!!,
+                    content = feed.content,
+                    likedUsers = feed.likes.map { it.user.id!! }.toMutableList(),
+                    comments = feed.comments.map { c1 ->
+                        CommentM(
+                            c1.writer.id!!,
+                            c1.content,
+                            c1.layer,
+                            c1.children.map { c2 -> CommentM(
+                                c2.writer.id!!,
+                                c2.content,
+                                c2.layer,
+                                c2.children.map { c3 -> CommentM(
+                                    c3.writer.id!!,
+                                    c3.content,
+                                    c3.layer,
+                                    c3.children.map { c4 -> CommentM(
+                                        c4.writer.id!!,
+                                        c4.content,
+                                        c4.layer,
+                                        c4.children.map { c5 -> CommentM(
+                                            c5.writer.id!!,
+                                            c5.content,
+                                            c5.layer,
+                                            mutableListOf(),
+                                            LocalDateTime.parse(c5.createTime, formatter)
+                                        ) }.toMutableList(),
+                                        LocalDateTime.parse(c4.createTime, formatter)
+                                    ) }.toMutableList(),
+                                    LocalDateTime.parse(c3.createTime, formatter)
+                                ) }.toMutableList(),
+                                LocalDateTime.parse(c2.createTime, formatter)
+                            ) }.toMutableList(),
+                            LocalDateTime.parse(c1.createTime, formatter)
+                        )
+                    }.toMutableList(),
+                    images = feed.files.map { FileM(it.originalName, it.source, it.description) }.toMutableList(),
+                    showScope = feed.showScope,
+                    createTime = LocalDateTime.parse(feed.createTime, formatter),
+                )
+            )
+        }
     }
 }

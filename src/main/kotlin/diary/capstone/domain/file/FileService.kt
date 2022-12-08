@@ -1,10 +1,6 @@
 package diary.capstone.domain.file
 
-import com.amazonaws.auth.AWSCredentials
-import com.amazonaws.auth.AWSStaticCredentialsProvider
-import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.amazonaws.services.s3.model.CannedAccessControlList
 import com.amazonaws.services.s3.model.DeleteObjectRequest
 import com.amazonaws.services.s3.model.ObjectMetadata
@@ -15,33 +11,14 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import java.util.*
-import javax.annotation.PostConstruct
 
 @Service
 @Transactional
-class FileService(private val fileRepository: FileRepository) {
-    private lateinit var s3Client: AmazonS3
-
-    @Value("\${cloud.aws.s3.bucket}")
-    private lateinit var bucketName: String
-
-    @Value("\${cloud.aws.credentials.accessKey}")
-    private lateinit var accessKey: String
-
-    @Value("\${cloud.aws.credentials.secretKey}")
-    private lateinit var secretKey: String
-
-    @Value("\${cloud.aws.region.static}")
-    private lateinit var region: String
-
-    @PostConstruct
-    fun setS3Client() {
-        val credentials: AWSCredentials = BasicAWSCredentials(accessKey, secretKey)
-        s3Client = AmazonS3ClientBuilder.standard()
-            .withCredentials(AWSStaticCredentialsProvider(credentials))
-            .withRegion(region)
-            .build()
-    }
+class FileService(
+    @Value("\${cloud.aws.s3.bucket}") val bucketName: String,
+    private val s3Client: AmazonS3,
+    private val fileRepository: FileRepository
+) {
 
     // 서버에 이미지 파일 업로드 & DB에 파일 저장
     fun uploadFile(file: MultipartFile, description: String = ""): File {
