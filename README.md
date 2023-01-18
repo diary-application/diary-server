@@ -4,7 +4,7 @@
 * Backend `Kotlin` `Spring Boot` `Spring Data JPA` `QueryDSL` `WebSocket` `MySQL` `S3`
 * DevOps  `EC2` `CodeDeploy` `Github Action`
 
-## Authentication
+## Authentication 
 토큰 기반 인증 방식
 * AOP 및 ArgumentResolver를 사용하여 요청의 인증 여부 확인 및 유저 정보 바인딩
 
